@@ -9,8 +9,10 @@ export default function Home() {
     <div>
       <Banner />
 
-      <div className="mt-8 w-[1260px] mx-auto">
-        <ContainerRecomend />
+      <div className="w-[1260px] mx-auto">
+        <div className="mt-8">
+          <ContainerRecomend />
+        </div>
 
         <Container />
 

@@ -26,11 +26,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`font-roboto antialiased`}
-      >
+      <body className={`font-roboto antialiased`}>
         <Header />
-        {children}
+        <div className="bg-gray-100 min-h-screen">{children}</div>
       </body>
     </html>
   );
