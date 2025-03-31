@@ -1,4 +1,9 @@
-const InforRomItem = () => {
+interface IProps {
+  title: string;
+  price: number;
+}
+
+const InforRomItem: React.FC<IProps> = ({ title, price }) => {
   return (
     <div className="border border-gray-300 rounded-xl shadow-md hover:shadow-lg transition duration-300 cursor-pointer">
       <img
@@ -16,11 +21,9 @@ const InforRomItem = () => {
             Exceptional <span>(6 reviews)</span>
           </p>
         </div>
-        <h4 className="text-[16px] font-semibold mt-1">
-          Goergeous RiverBluff View of the White River + WIFI
-        </h4>
+        <h4 className="text-[16px] font-semibold mt-1">{title}</h4>
         <p className="text-sm mt-1">Calico Rock, AR</p>
-        <p className="text-md font-semibold mt-2">$150</p>
+        <p className="text-md font-semibold mt-2">{price}</p>
         <p className="text-[12px]">per night</p>
         <p className="text-[12px]">$350 total</p>
       </div>
