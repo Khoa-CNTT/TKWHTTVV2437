@@ -1,31 +1,63 @@
+import { useRouter } from "next/navigation";
+
+import { ratingText } from "@/helper/ratingText";
+
 interface IProps {
   title: string;
   price: number;
+  image: string;
+  location: string;
+  quantityReview: string;
+  rating: string;
+  id: string;
 }
 
-const InforRomItem: React.FC<IProps> = ({ title, price }) => {
+const InforRomItem: React.FC<IProps> = ({
+  title,
+  price,
+  image,
+  location,
+  quantityReview,
+  rating,
+  id,
+}) => {
+  const router = useRouter(); // Khởi tạo useRouter
+
+  const handleNavigate = () => {
+    router.push(`/detail/${id}`); // Điều hướng đến trang chi tiết với ID
+  };
   return (
-    <div className="border border-gray-300 rounded-xl shadow-md hover:shadow-lg transition duration-300 cursor-pointer">
+    <div
+      onClick={handleNavigate}
+      className="border border-gray-300 rounded-xl shadow-md hover:shadow-lg transition duration-300 cursor-pointer"
+    >
       <img
         className="min-h-[250px] object-fit rounded-t-xl"
-        src="https://images.trvl-media.com/lodging/20000000/19110000/19107300/19107268/139b07c5.jpg?impolicy=fcrop&w=600&h=400&p=1&q=high"
-        alt="anh"
+        src={image}
+        alt="ảnh"
       />
 
       <div className="p-2">
         <div className="flex items-center gap-2 mt-1">
-          <span className="bg-green-700 font-medium text-sm text-white px-1 rounded-md">
-            9.8
+          <span className="bg-green-700 font-medium text-sm text-white px-1 rounded-md px-2">
+            {rating}
           </span>
           <p className="text-sm">
-            Exceptional <span>(6 reviews)</span>
+            {ratingText(Number(rating))} <span>({quantityReview} reviews)</span>
           </p>
         </div>
-        <h4 className="text-[16px] font-semibold mt-1">{title}</h4>
-        <p className="text-sm mt-1">Calico Rock, AR</p>
-        <p className="text-md font-semibold mt-2">{price}</p>
-        <p className="text-[12px]">per night</p>
-        <p className="text-[12px]">$350 total</p>
+        <h4 className="text-[16px] min-h-[48px] font-semibold mt-1">
+          {title.length > 50 ? title.slice(0, 50) + "..." : title}
+        </h4>
+        <p className="text-sm mt-1">{location}</p>
+        <p className="text-md font-semibold mt-2">
+          {price.toLocaleString("it-IT", {
+            style: "currency",
+            currency: "VND",
+          })}
+        </p>
+        <p className="text-[12px]">Một đêm</p>
+        {/* <p className="text-[12px]">$350 total</p> */}
       </div>
     </div>
   );

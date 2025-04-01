@@ -9,35 +9,15 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-const data = [
-  {
-    image:
-      "https://r-xx.bstatic.com/xdata/images/city/170x136/688893.jpg?k=d32ef7ff94e5d02b90908214fb2476185b62339549a1bd7544612bdac51fda31&o=",
-    title: "New York",
-  },
-  {
-    image:
-      "https://r-xx.bstatic.com/xdata/images/city/170x136/981517.jpg?k=2268f51ad34ab94115ea9e42155bc593aa8d48ffaa6fc58432a8760467dc4ea6&o=",
-    title: "New York",
-  },
-  {
-    image:
-      "https://r-xx.bstatic.com/xdata/images/city/170x136/688893.jpg?k=d32ef7ff94e5d02b90908214fb2476185b62339549a1bd7544612bdac51fda31&o=",
-    title: "New York",
-  },
-  {
-    image:
-      "https://r-xx.bstatic.com/xdata/images/city/170x136/688893.jpg?k=d32ef7ff94e5d02b90908214fb2476185b62339549a1bd7544612bdac51fda31&o=",
-    title: "New York",
-  },
-  {
-    image:
-      "https://r-xx.bstatic.com/xdata/images/city/170x136/688893.jpg?k=d32ef7ff94e5d02b90908214fb2476185b62339549a1bd7544612bdac51fda31&o=",
-    title: "New York",
-  },
-];
+interface IProps {
+  cities: {
+    image: string;
+    name: string;
+  }[];
+}
 
-const Container = () => {
+const Container: React.FC<IProps> = ({ cities }) => {
+  console.log(cities);
   return (
     <div className="container mx-auto pt-8">
       <TitleContainer title="Các thành phố tiêu biểu" />
@@ -50,16 +30,16 @@ const Container = () => {
           navigation={true}
           modules={[Pagination, Navigation, Autoplay]}
         >
-          {data.map((item, index) => (
+          {cities?.map((item, index) => (
             <SwiperSlide>
               <div className="relative" key={index}>
                 <img
-                  className="min-h-[300px] object-fit rounded-lg"
+                  className="min-h-[230px] object-fit rounded-lg"
                   src={item.image}
                   alt=""
                 />
                 <p className="text-gray-800 text-lg font-semibold absolute bottom-0 left-[10px] text-white">
-                  {item.title}
+                  {item.name}
                 </p>
               </div>
             </SwiperSlide>

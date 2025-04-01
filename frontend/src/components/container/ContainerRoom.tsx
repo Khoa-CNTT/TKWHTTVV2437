@@ -17,7 +17,7 @@ interface IProps {
 }
 
 const ContainerRoom: React.FC<IProps> = ({ rooms }) => {
-  console.log({ rooms });
+  console.log(rooms);
   return (
     <div className="pt-4 mt-8">
       <TitleContainer
@@ -35,7 +35,16 @@ const ContainerRoom: React.FC<IProps> = ({ rooms }) => {
         >
           {rooms.map((item: any, index) => (
             <SwiperSlide>
-              <InforRomItem key={index} title={item.name} price={item.price} />
+              <InforRomItem
+                image={item.images[0].image}
+                key={index}
+                title={item.name}
+                price={item.price}
+                location={item.property.city.name}
+                quantityReview={item.reviewCount}
+                rating={item.averageRating || 0}
+                id={item.id}
+              />
             </SwiperSlide>
           ))}
         </Swiper>
