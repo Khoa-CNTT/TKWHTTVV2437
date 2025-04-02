@@ -1,57 +1,54 @@
-const db = require("../models");
-const bcrypt = require("bcrypt");
-const { v4 } = require("uuid");
+const User = require("../models/User");
+const HomestayResort = require("../models/HomestayResort");
+const Booking = require("../models/Booking");
 
-const hashPassword = (password) => bcrypt.hashSync(password, bcrypt.genSaltSync(12));
-
-const getAllUsers = async () => {
-  try {
-    const users = await db.User.findAll();
-    return { status: "OK", data: users };
-  } catch (error) {
-    throw new Error("Error fetching users: " + error.message);
+const manageUsers = async (action, userId) => {
+  switch (action) {
+    case "add":
+      // Code to add a user
+      break;
+    case "delete":
+      // Code to delete a user
+      break;
+    case "lock":
+      // Code to lock a user account
+      break;
+    default:
+      return { status: "ERR", msg: "Invalid action" };
   }
+  return { status: "OK", msg: "Action performed successfully" };
 };
 
-const createUser = async (newUser) => {
-  try {
-    const { name, email, password, role } = newUser;
-    const hashedPassword = hashPassword(password);
-    
-    const user = await db.User.create({
-      id: v4(),
-      name,
-      email,
-      password: hashedPassword,
-      role: role || "user",
-    });
-    return { status: "OK", message: "User created successfully", data: user };
-  } catch (error) {
-    throw new Error("Error creating user: " + error.message);
+const manageHomestayResort = async (action, homestayResortId) => {
+  switch (action) {
+    case "approve":
+      // Code to approve a homestay/resort
+      break;
+    case "reject":
+      // Code to reject a homestay/resort
+      break;
+    default:
+      return { status: "ERR", msg: "Invalid action" };
   }
+  return { status: "OK", msg: "Action performed successfully" };
 };
 
-const deleteUser = async (id) => {
-  try {
-    const deleted = await db.User.destroy({ where: { id } });
-    if (!deleted) return { status: "ERR", message: "User not found" };
-    return { status: "OK", message: "User deleted successfully" };
-  } catch (error) {
-    throw new Error("Error deleting user: " + error.message);
+const manageBookingsPayments = async (action, bookingId) => {
+  switch (action) {
+    case "process":
+      // Code to process a booking
+      break;
+    case "refund":
+      // Code to refund a booking
+      break;
+    default:
+      return { status: "ERR", msg: "Invalid action" };
   }
+  return { status: "OK", msg: "Action performed successfully" };
 };
 
-const toggleUserStatus = async (id) => {
-  try {
-    const user = await db.User.findByPk(id);
-    if (!user) return { status: "ERR", message: "User not found" };
-    
-    user.isActive = !user.isActive;
-    await user.save();
-    return { status: "OK", message: "User status updated" };
-  } catch (error) {
-    throw new Error("Error updating user status: " + error.message);
-  }
+module.exports = {
+  manageUsers,
+  manageHomestayResort,
+  manageBookingsPayments,
 };
-
-module.exports = { getAllUsers, createUser, deleteUser, toggleUserStatus };
