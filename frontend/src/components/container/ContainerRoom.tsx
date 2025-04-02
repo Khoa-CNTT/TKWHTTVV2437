@@ -31,6 +31,11 @@ const ContainerRoom: React.FC<IProps> = ({ rooms }) => {
           slidesPerView={4}
           pagination={{ clickable: true }}
           navigation={true}
+          loop={true}
+          autoplay={{
+            delay: 2500,
+            disableOnInteraction: false,
+          }}
           modules={[Navigation, Autoplay]}
         >
           {rooms.map((item: any, index) => (
@@ -43,7 +48,7 @@ const ContainerRoom: React.FC<IProps> = ({ rooms }) => {
                 location={item.property.city.name}
                 quantityReview={item.reviewCount}
                 rating={item.averageRating || 0}
-                id={item.id}
+                slug={item.slug}
               />
             </SwiperSlide>
           ))}

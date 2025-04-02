@@ -13,7 +13,11 @@ import dayjs, { Dayjs } from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateRangePickerDay } from "@mui/x-date-pickers-pro/DateRangePickerDay";
 
-const InforBookingContainer = () => {
+interface IProps {
+  price: string;
+}
+
+const InforBookingContainer: React.FC<IProps> = ({ price }) => {
   const [showDateRange, setShowDateRange] = useState<boolean>(false);
   const [selectedDateRange, setSelectedDateRange] = useState<
     [Dayjs | null, Dayjs | null]
@@ -79,21 +83,24 @@ const InforBookingContainer = () => {
   return (
     <div className="border-[1px] border-gray-300 rounded-xl p-5 shadow-sm">
       <p className="text-xl font-semibold flex items-center gap-1 pb-2">
-        $300
-        <span className="text-sm font-medium">per night</span>
+        {price.toLocaleString("it-IT", {
+          style: "currency",
+          currency: "VND",
+        })}
+        <span className="text-sm font-medium">mỗi đêm</span>
       </p>
 
       <div className="flex items-center gap-1 border-t-[1px] pt-3 text-sm text-green-700">
-        <p>Free cancellation</p>
+        <p>Đặt ngay hôm nay</p>
 
         <RiErrorWarningLine size={20} />
       </div>
 
-      <p className="text-[11px] mt-1">Before Wed, Apr 2</p>
+      {/* <p className="text-[11px] mt-1">Before Wed, Apr 2</p> */}
 
       <div className="flex gap-2 items-center mt-2">
         <FaCheckCircle className="text-green-700" />
-        <p className="text-sm">Your dates are vailable</p>
+        <p className="text-sm">Hãy chọn ngày mong muốn của bạn</p>
       </div>
 
       <div className="flex gap-2 items-center mt-2">

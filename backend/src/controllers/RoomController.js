@@ -12,9 +12,9 @@ const listRoomByUser = async (req, res) => {
   }
 };
 
-const getDetailRoomById = async (req, res) => {
+const getDetailRoomBySlug = async (req, res) => {
   try {
-    const response = await RoomService.getDetailRoomById(req.params.id);
+    const response = await RoomService.getDetailRoomBySlug(req.params.slug);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(404).json({
@@ -25,4 +25,5 @@ const getDetailRoomById = async (req, res) => {
 
 module.exports = {
   listRoomByUser,
+  getDetailRoomBySlug,
 };

@@ -25,16 +25,20 @@ const Container: React.FC<IProps> = ({ cities }) => {
       <div className="mt-4">
         <Swiper
           spaceBetween={10}
-          slidesPerView={5}
+          slidesPerView={6}
           pagination={{ clickable: true }}
           navigation={true}
-          modules={[Pagination, Navigation, Autoplay]}
+          autoplay={{
+            delay: 3000,
+            disableOnInteraction: false,
+          }}
+          modules={[Navigation, Autoplay]}
         >
           {cities?.map((item, index) => (
             <SwiperSlide>
               <div className="relative" key={index}>
                 <img
-                  className="min-h-[230px] object-fit rounded-lg"
+                  className="min-h-[170px] object-fit rounded-lg"
                   src={item.image}
                   alt=""
                 />

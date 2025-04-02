@@ -9,7 +9,7 @@ interface IProps {
   location: string;
   quantityReview: string;
   rating: string;
-  id: string;
+  slug: string;
 }
 
 const InforRomItem: React.FC<IProps> = ({
@@ -19,12 +19,12 @@ const InforRomItem: React.FC<IProps> = ({
   location,
   quantityReview,
   rating,
-  id,
+  slug,
 }) => {
   const router = useRouter(); // Khởi tạo useRouter
 
   const handleNavigate = () => {
-    router.push(`/detail/${id}`); // Điều hướng đến trang chi tiết với ID
+    router.push(`/detail/${slug}`); // Điều hướng đến trang chi tiết với ID
   };
   return (
     <div

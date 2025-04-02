@@ -8,7 +8,14 @@ const listTop10Room = () => {
         attributes: {
           include: [
             // Tính trung bình điểm rating và làm tròn đến 1 chữ số thập phân
-            [fn("ROUND", fn("AVG", col("reviews.rating")), 1), "averageRating"],
+            [
+              fn(
+                "COALESCE",
+                fn("ROUND", fn("AVG", col("reviews.rating")), 1),
+                0
+              ),
+              "averageRating",
+            ],
             [fn("COUNT", col("reviews.id")), "reviewCount"],
           ],
         },
@@ -52,23 +59,16 @@ const listTop10Room = () => {
   });
 };
 
-const getDetailRoomById = (id) => {
+const getDetailRoomBySlug = (slug) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const room = await db.Room.find({
-        where: { id },
-        attributes: {
-          include: [
-            // Tính trung bình điểm rating và làm tròn đến 1 chữ số thập phân
-            [fn("ROUND", fn("AVG", col("reviews.rating")), 1), "averageRating"],
-            [fn("COUNT", col("reviews.id")), "reviewCount"],
-          ],
-        },
+      const room = await db.Room.findOne({
+        where: { slug },
         include: [
           {
             model: db.ImageRoom,
             as: "images", // Alias được định nghĩa trong `Room.associate`
-            attributes: ["id", "image"], // Chỉ lấy các cột cần thiết từ ImageRoom
+            attributes: ["id", "image"], // Lấy tất cả các ảnh liên kết
           },
           {
             model: db.Property,
@@ -83,17 +83,20 @@ const getDetailRoomById = (id) => {
             ],
           },
           {
+            model: db.Amenity,
+            as: "amenities", // Alias được định nghĩa trong Room.associate
+          },
+          {
             model: db.Review,
             as: "reviews", // Alias được định nghĩa trong `Room.associate`
             attributes: [], // Không lấy các cột từ bảng Review
           },
         ],
-        group: ["Room.id", "images.id", "property.id", "property->city.id"], // Nhóm theo Room và các bảng liên kết
       });
 
       resolve({
         status: room ? "OK" : "ERR",
-        data: room || [],
+        data: room || null,
       });
     } catch (error) {
       reject(error);
@@ -103,5 +106,5 @@ const getDetailRoomById = (id) => {
 
 module.exports = {
   listTop10Room,
-  getDetailRoomById,
+  getDetailRoomBySlug,
 };
