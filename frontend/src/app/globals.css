@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Tùy chỉnh nút điều hướng Next */
+.swiper-button-next {
+  width: 30px !important ; /* Chiều rộng */
+  height: 30px !important; /* Chiều cao */
+  font-size: 20px !important; /* Kích thước biểu tượng */
+  border-radius: 50%; /* Bo tròn */
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  color: #ffffff !important; /* Màu biểu tượng */
+  right: -1px !important;
+}
+
+/* Tùy chỉnh nút điều hướng Prev */
+.swiper-button-prev {
+  width: 30px !important; /* Chiều rộng */
+  height: 30px !important; /* Chiều cao */
+  font-size: 10px !important; /* Kích thước biểu tượng */
+  border-radius: 50%; /* Bo tròn */
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  color: #ffffff !important; /* Màu biểu tượng */
+  left: -1px !important;
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 20px !important; /* Kích thước biểu tượng */
+  font-size: 600 !important; /* Độ đậm của biểu tượng */
+  color: #ffffff !important; /* Màu biểu tượng */
+}
