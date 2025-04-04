@@ -9,11 +9,17 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+
+      City.hasOne(models.Property, {
+        foreignKey: "idCity", // Khóa ngoại trong bảng imageRoom
+        as: "property", // Alias để truy cập
+      });
     }
   }
   City.init(
     {
       name: DataTypes.STRING,
+      image: DataTypes.STRING,
     },
     {
       sequelize,

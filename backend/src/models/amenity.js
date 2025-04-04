@@ -9,6 +9,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Amenity.belongsToMany(models.Room, {
+        through: "AmenityRoom", // Tên bảng trung gian
+        foreignKey: "idAmenity", // Khóa ngoại trong bảng trung gian trỏ đến Amenity
+        otherKey: "idRoom", // Khóa ngoại trong bảng trung gian trỏ đến Room
+        as: "rooms", // Alias để truy cập
+      });
     }
   }
   Amenity.init(
