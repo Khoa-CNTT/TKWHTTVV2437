@@ -3,26 +3,49 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const authAdminMiddleware = (req, res, next) => {
-  const token = req.headers.token.split(" ")[1];
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({
+        message: "Authorization header is missing",
+        status: "ERROR",
+      });
+    }
 
-  jwt.verify(token, process.env.ACCESS_TOKEN, function (err, user) {
-    if (err) {
-      return res.status(404).json({
-        message: "Authentication error",
+    const token = authHeader.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({
+        message: "Token is missing",
         status: "ERROR",
       });
     }
-    if (user?.role === "admin") {
-      next();
-    } else {
-      return res.status(404).json({
-        message: "Unauthorized access",
-        status: "ERROR",
-      });
-    }
-  });
+
+    jwt.verify(token, process.env.ACCESS_TOKEN, (err, user) => {
+      if (err) {
+        return res.status(403).json({
+          message: "Invalid or expired token",
+          status: "ERROR",
+        });
+      }
+
+      if (user?.role === "1") {
+        req.user = user; 
+        next(); 
+      } else {
+        return res.status(403).json({
+          message: "Unauthorized access",
+          status: "ERROR",
+        });
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal Server Error",
+      status: "ERROR",
+      error: error.message,
+    });
+  }
 };
-
 const authMiddleWare = (req, res, next) => {
   const token = req.headers.token.split(" ")[1];
 
