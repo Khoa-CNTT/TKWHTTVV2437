@@ -1,7 +1,7 @@
 const db = require("../models");
 const RoomService = require("../services/RoomService");
 
-const listRoomByUser = async (req, res) => {
+const listTop10Rating = async (req, res) => {
   try {
     const response = await RoomService.listTop10Room();
     return res.status(200).json(response);
@@ -24,6 +24,6 @@ const getDetailRoomBySlug = async (req, res) => {
 };
 
 module.exports = {
-  listRoomByUser,
+  listTop10Rating,
   getDetailRoomBySlug,
 };

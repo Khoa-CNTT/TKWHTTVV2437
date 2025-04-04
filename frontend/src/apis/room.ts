@@ -1,7 +1,7 @@
 const apisRoom = {
-  getListRoom: async () => {
+  getListTop10Rating: async () => {
     const response = await fetch(
-      `${process.env.URL_SERVER_API}/room/list-room`,
+      `${process.env.URL_SERVER_API}/room/list-top-10-rating`,
       {
         method: "GET",
         cache: "no-store",

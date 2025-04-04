@@ -12,17 +12,20 @@ import dayjs, { Dayjs } from "dayjs";
 
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateRangePickerDay } from "@mui/x-date-pickers-pro/DateRangePickerDay";
+import ChooseQuantityPerson from "./ChooseQuantityPerson";
 
 interface IProps {
-  price: string;
+  price: number;
 }
 
 const InforBookingContainer: React.FC<IProps> = ({ price }) => {
+  const [showChoosePerson, setShowChoosePerson] = useState<boolean>(false);
   const [showDateRange, setShowDateRange] = useState<boolean>(false);
   const [selectedDateRange, setSelectedDateRange] = useState<
     [Dayjs | null, Dayjs | null]
   >([dayjs("2022-04-17"), dayjs("2022-04-21")]);
-
+  const choosePersonRef = useRef<HTMLDivElement>(null);
+  const [traveler, setTraveler] = useState<number>(2);
   const calendarRef = useRef<HTMLDivElement>(null);
 
   // handle click outside to close the calendar
@@ -58,8 +61,12 @@ const InforBookingContainer: React.FC<IProps> = ({ price }) => {
       ];
 
       // Kiểm tra nếu bất kỳ ngày nào trong khoảng bị vô hiệu hóa
-      const isRangeValid = !disabledDates.some((disabledDate) =>
-        disabledDate.isBetween(startDate, endDate, "day", "[]")
+      const isRangeValid = !disabledDates.some(
+        (disabledDate) =>
+          disabledDate.isSame(startDate, "day") || // Kiểm tra nếu trùng với ngày bắt đầu
+          disabledDate.isSame(endDate, "day") || // Kiểm tra nếu trùng với ngày kết thúc
+          (disabledDate.isAfter(startDate, "day") &&
+            disabledDate.isBefore(endDate, "day")) // Kiểm tra nếu nằm giữa khoảng
       );
 
       if (!isRangeValid) {
@@ -75,15 +82,43 @@ const InforBookingContainer: React.FC<IProps> = ({ price }) => {
     const check = handleCheckDate(selectedDateRange);
 
     if (check) {
+      // console.log(selectedDateRange[0]);
+
       console.log("Start Date:", selectedDateRange[0]?.format("YYYY-MM-DD"));
       console.log("End Date:", selectedDateRange[1]?.format("YYYY-MM-DD"));
       handleShowDateRange();
     }
   };
+
+  const handleShowChoosePerson = () => {
+    setShowChoosePerson((prev) => !prev);
+  };
+
+  // Lắng nghe sự kiện click bên ngoài thẻ div
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        choosePersonRef.current &&
+        !choosePersonRef.current.contains(event.target as Node)
+      ) {
+        setShowChoosePerson(false); // Đặt lại giá trị showChoosePerson
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleSetTravelers = (adults: number, children: number) => {
+    setTraveler(adults + children);
+  };
+
   return (
     <div className="border-[1px] border-gray-300 rounded-xl p-5 shadow-sm">
       <p className="text-xl font-semibold flex items-center gap-1 pb-2">
-        {price.toLocaleString("it-IT", {
+        {Number(price).toLocaleString("it-IT", {
           style: "currency",
           currency: "VND",
         })}
@@ -163,9 +198,42 @@ const InforBookingContainer: React.FC<IProps> = ({ price }) => {
         </div>
       </div>
 
-      <div className="border-[1px] border-gray-500 p-1 px-3 mt-4 flex-1 cursor-pointer rounded-md">
+      <div
+        onClick={() => handleShowChoosePerson()}
+        className="ralative border-[1px] border-gray-500 p-1 px-3 mt-4 flex-1 cursor-pointer rounded-md"
+      >
         <p className="text-[11px]">Travelrs</p>
-        <p className="text-md">2 travelers</p>
+        <p className="text-md">{traveler} travelers</p>
+
+        {showChoosePerson && (
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="absolute bottom-[-200px] right-[340px]"
+            ref={choosePersonRef}
+          >
+            <ChooseQuantityPerson
+              onShowChoosePerson={setShowChoosePerson}
+              onChangeTraveler={handleSetTravelers}
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center justify-between mt-3">
+        <p className="font-semibold">Thành tiền: </p>
+        <p className="text-blue-600 font-semibold">
+          {selectedDateRange[0] && selectedDateRange[1]
+            ? Number(
+                price *
+                  Math.abs(
+                    selectedDateRange[1].diff(selectedDateRange[0], "day")
+                  )
+              ).toLocaleString("it-IT", {
+                style: "currency",
+                currency: "VND",
+              })
+            : "0 VND"}
+        </p>
       </div>
 
       <button className="w-full bg-blue-600 text-md font-semibold text-white py-2 mt-4 rounded-3xl">

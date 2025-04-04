@@ -1,23 +1,21 @@
 "use client";
 
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination, Navigation, Autoplay } from "swiper/modules";
+import { Navigation, Autoplay } from "swiper/modules";
 
 import InforRomItem from "../room/InforRomItem";
 import TitleContainer from "./TitleContainer";
+import { IRoom } from "@/app/types/room";
 
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-
-const data = [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 
 interface IProps {
   rooms: [];
 }
 
 const ContainerRoom: React.FC<IProps> = ({ rooms }) => {
-  console.log(rooms);
   return (
     <div className="pt-4 mt-8">
       <TitleContainer
@@ -38,8 +36,8 @@ const ContainerRoom: React.FC<IProps> = ({ rooms }) => {
           }}
           modules={[Navigation, Autoplay]}
         >
-          {rooms.map((item: any, index) => (
-            <SwiperSlide>
+          {rooms.map((item: IRoom, index: number) => (
+            <SwiperSlide key={index}>
               <InforRomItem
                 image={item.images[0].image}
                 key={index}

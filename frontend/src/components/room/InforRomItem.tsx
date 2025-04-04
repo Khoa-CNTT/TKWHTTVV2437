@@ -7,8 +7,8 @@ interface IProps {
   price: number;
   image: string;
   location: string;
-  quantityReview: string;
-  rating: string;
+  quantityReview: number;
+  rating: number;
   slug: string;
 }
 
@@ -26,6 +26,7 @@ const InforRomItem: React.FC<IProps> = ({
   const handleNavigate = () => {
     router.push(`/detail/${slug}`); // Điều hướng đến trang chi tiết với ID
   };
+
   return (
     <div
       onClick={handleNavigate}

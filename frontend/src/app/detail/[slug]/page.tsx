@@ -8,6 +8,7 @@ import { CiLogin } from "react-icons/ci";
 import { CiLogout } from "react-icons/ci";
 import { MdPets } from "react-icons/md";
 import { RiErrorWarningLine } from "react-icons/ri";
+import ContainerRecomend from "@/components/container/ContainerRecomend";
 
 import { FaPerson } from "react-icons/fa6";
 
@@ -28,11 +29,22 @@ interface IProps {
   params: { slug: string };
 }
 
+interface IImage {
+  image: string;
+  id: string;
+}
+
+interface Amenity {
+  icon: string; // Tên icon (key trong `iconMap`)
+  name: string; // Tên tiện ích
+}
+
 const DetailPage = async (props: IProps) => {
   const { params } = props;
 
   const room = await apisRoom.getRoomBySlug(params.slug);
   const rating = await apisReview.getReviewByRoom(room.data.id);
+  const rooms = await apisRoom.getListTop10Rating();
 
   return (
     <div className="pt-4 w-[1260px] mx-auto">
@@ -45,9 +57,14 @@ const DetailPage = async (props: IProps) => {
 
         <div className="grid grid-cols-2 gap-1">
           {room.data.images.map(
-            (item: any, index: number) =>
+            (item: IImage, index: number) =>
               index > 0 && (
-                <img className="w-full rounded-md" src={item.image} alt="" />
+                <img
+                  key={index}
+                  className="w-full rounded-md"
+                  src={item.image}
+                  alt=""
+                />
               )
           )}
         </div>
@@ -85,7 +102,7 @@ const DetailPage = async (props: IProps) => {
               Các tiện nghi được ưa chuộng nhất
             </h5>
             <div className="grid grid-cols-5 gap-4">
-              {room.data.amenities.map((item: any, index: number) => (
+              {room.data.amenities.map((item: Amenity, index: number) => (
                 <div
                   key={index}
                   className="flex items-center gap-2 mt-2 text-sm font-medium"
@@ -187,6 +204,10 @@ const DetailPage = async (props: IProps) => {
             </button>
           </div>
         </div>
+      </div>
+
+      <div className="mt-8">
+        <ContainerRecomend rooms={rooms.data} />
       </div>
     </div>
   );

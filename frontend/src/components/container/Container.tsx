@@ -1,7 +1,7 @@
 "use client";
 
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination, Navigation, Autoplay } from "swiper/modules";
+import { Navigation, Autoplay } from "swiper/modules";
 
 import TitleContainer from "./TitleContainer";
 
@@ -35,7 +35,7 @@ const Container: React.FC<IProps> = ({ cities }) => {
           modules={[Navigation, Autoplay]}
         >
           {cities?.map((item, index) => (
-            <SwiperSlide>
+            <SwiperSlide key={index}>
               <div className="relative" key={index}>
                 <img
                   className="min-h-[170px] object-fit rounded-lg"

@@ -4,11 +4,10 @@ import ContainerRecomend from "@/components/container/ContainerRecomend";
 import ContainerRoom from "@/components/container/ContainerRoom";
 import InforContainer from "@/components/container/InforContainer";
 import apisRoom from "@/apis/room";
-import { MdRoomService } from "react-icons/md";
 import apisCity from "@/apis/city";
 
 export default async function Home() {
-  const rooms = await apisRoom.getListRoom();
+  const rooms = await apisRoom.getListTop10Rating();
   const cities = await apisCity.getListTop10City();
 
   return (
@@ -16,13 +15,13 @@ export default async function Home() {
       <Banner />
 
       <div className="w-[1260px] mx-auto">
-        <div className="mt-8">
-          <ContainerRecomend />
-        </div>
+        <ContainerRoom rooms={rooms.data} />
 
         <Container cities={cities.data} />
 
-        <ContainerRoom rooms={rooms.data} />
+        <div className="mt-8">
+          <ContainerRecomend rooms={rooms.data} />
+        </div>
 
         <InforContainer />
       </div>
