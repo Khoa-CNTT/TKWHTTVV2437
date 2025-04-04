@@ -3,20 +3,25 @@ import Container from "@/components/container/Container";
 import ContainerRecomend from "@/components/container/ContainerRecomend";
 import ContainerRoom from "@/components/container/ContainerRoom";
 import InforContainer from "@/components/container/InforContainer";
+import apisRoom from "@/apis/room";
+import apisCity from "@/apis/city";
 
-export default function Home() {
+export default async function Home() {
+  const rooms = await apisRoom.getListTop10Rating();
+  const cities = await apisCity.getListTop10City();
+
   return (
     <div>
       <Banner />
 
       <div className="w-[1260px] mx-auto">
+        <ContainerRoom rooms={rooms.data} />
+
+        <Container cities={cities.data} />
+
         <div className="mt-8">
-          <ContainerRecomend />
+          <ContainerRecomend rooms={rooms.data} />
         </div>
-
-        <Container />
-
-        <ContainerRoom />
 
         <InforContainer />
       </div>

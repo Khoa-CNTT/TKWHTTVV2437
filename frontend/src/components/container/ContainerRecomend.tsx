@@ -1,21 +1,21 @@
-'use client';
+"use client";
 
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination, Navigation, Autoplay } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Autoplay } from "swiper/modules";
 
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
-import TitleContainer from './TitleContainer';
+import TitleContainer from "./TitleContainer";
 import RoomItemRecomend from "../room/RoomItemRecomend";
+import { IRoom } from "@/app/types/room";
 
-const data = [
-  1, 2, 4, 5, 6, 7, 8, 9, 10,
-  11, 12, 13
-]
+interface IProps {
+  rooms: [];
+}
 
-const ContainerRecomend = () => {
+const ContainerRecomend: React.FC<IProps> = ({ rooms }) => {
   return (
     <div>
       <TitleContainer title="Đề xuất cho bạn" />
@@ -25,16 +25,30 @@ const ContainerRecomend = () => {
         slidesPerView={4}
         pagination={{ clickable: true }}
         navigation={true}
+        loop={true}
+        autoplay={{
+          delay: 2500,
+          disableOnInteraction: false,
+        }}
         modules={[Navigation, Autoplay]}
       >
-        {data.map((item, index) => (
-          <SwiperSlide>
-            <RoomItemRecomend key={index} />
+        {rooms.map((item: IRoom, index: number) => (
+          <SwiperSlide key={index}>
+            <RoomItemRecomend
+              key={index}
+              images={item.images}
+              title={item.name}
+              price={item.price}
+              location={item.property.city.name}
+              quantityReview={item.reviewCount}
+              rating={item.averageRating || 0}
+              slug={item.slug}
+            />
           </SwiperSlide>
         ))}
       </Swiper>
     </div>
   );
-}
+};
 
 export default ContainerRecomend;

@@ -6,6 +6,9 @@ const {
   authUserMiddleWare,
 } = require("../middlewares/authMiddleware");
 
+router.post("/sendMailOTP", userController.sendMailOTP);
+router.post("/verifyOTP", userController.verifyOTP);
+router.post("/verifyOTPLogin", userController.verifyOTPLogin);
 router.post("/sign-up", userController.registerUser);
 router.post("/sign-in", userController.signInUser);
 router.post("/log-out", userController.logOutUser);

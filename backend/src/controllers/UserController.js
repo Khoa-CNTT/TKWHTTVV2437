@@ -12,6 +12,15 @@ const registerUser = async (req, res) => {
     }
 
     const response = await UserService.registerUser(req.body);
+    const { refresh_token = null, ...newRespone } = response;
+    console.log("123 ", refresh_token);
+    if (refresh_token !== null) {
+      res.cookie("refresh_token", refresh_token, {
+        httpOnly: true,
+        secure: false,
+        samesite: "strict",
+      });
+    }
     return res.status(200).json(response);
   } catch (error) {
     return res.status(404).json({
@@ -111,6 +120,72 @@ const updateUser = async (req, res) => {
   }
 };
 
+const sendMailOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+    console.log("email", email);
+    if (!email) {
+      return res.status(200).json({
+        status: "ERR",
+        msg: "Email is required",
+      });
+    }
+
+    const respone = await UserService.sendMailOTP(email);
+
+    return res.status(200).json(respone);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
+const verifyOTP = async (req, res) => {
+  try {
+    const { email, OTP } = req.body;
+    if (!email || !OTP) {
+      return res.status(200).json({
+        status: "OK",
+        msg: "Email or OTP is required",
+      });
+    }
+
+    const respon = await UserService.verifyOTP(email, OTP);
+
+    return res.status(200).json(respon);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
+const verifyOTPLogin = async (req, res) => {
+  try {
+    const { email, OTP } = req.body;
+    if (!email || !OTP) {
+      return res.status(200).json({
+        status: "OK",
+        msg: "Email or OTP is required",
+      });
+    }
+
+    const respon = await UserService.verifyOTPLogin(email, OTP);
+    const { refresh_token, ...newRespone } = respon;
+    res.cookie("refresh_token", refresh_token, {
+      httpOnly: true,
+      secure: false,
+      samesite: "strict",
+    });
+    return res.status(200).json(respon);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
 module.exports = {
   registerUser,
   signInUser,
@@ -118,4 +193,7 @@ module.exports = {
   logOutUser,
   detailUser,
   updateUser,
+  sendMailOTP,
+  verifyOTP,
+  verifyOTPLogin,
 };
