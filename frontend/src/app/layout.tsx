@@ -18,7 +18,7 @@ export default function RootLayout({
       <AuthProvider>
         <body className={`font-roboto antialiased`}>
           <Header />
-          <div className="bg-gray-100 ">{children}</div>
+          <div>{children}</div>
         </body>
       </AuthProvider>
     </html>

@@ -1,0 +1,98 @@
+import * as React from "react";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import { TextareaAutosize } from "@mui/base/TextareaAutosize";
+import { styled } from "@mui/joy/styles";
+import Textarea from "@mui/joy/Textarea";
+
+const ContentCheckout = () => {
+  return (
+    <div>
+      <div className="flex items-center justify-between w-full">
+        <p className="text-2xl font-semibold">Begin your booking</p>
+        <p className="text-gray-500">Bước 1/2 </p>
+      </div>
+
+      <div className="border-[1px] border-gray-300 rounded-lg p-8 mt-4">
+        <h3 className="font-semibold text-lg mb-8">Nhập thông tin liên lạc</h3>
+
+        <Box
+          component="form"
+          sx={{ "& > :not(style)": { m: 1 } }}
+          noValidate
+          autoComplete="off"
+        >
+          <div className="flex justify-between items-center gap-2">
+            <TextField
+              className="flex-1"
+              id="outlined-basic"
+              label="Họ và tên"
+              variant="outlined"
+            />
+            <TextField
+              className="flex-1"
+              id="filled-basic"
+              label="Số điện thoại"
+              variant="outlined"
+            />
+          </div>
+          <div className="flex justify-between items-center gap-2 pt-2">
+            <TextField
+              className="flex-1"
+              id="standard-basic"
+              label="Email"
+              variant="outlined"
+            />
+          </div>
+        </Box>
+      </div>
+
+      <div className="border-[1px] border-gray-300 rounded-lg p-8 mt-4">
+        <h3 className="font-semibold text-lg mb-5">
+          Tin nhắn cho chủ homestay
+        </h3>
+
+        <div className="flex gap-4">
+          <img
+            className="rounded-full w-[50px] h-[50px] object-fit"
+            src="https://th.bing.com/th/id/OIP.6oWaJdGi2oeU1vkqk--GoAHaLH?rs=1&pid=ImgDetMain"
+          ></img>
+
+          <div>
+            <p className="font-semibold">Nguyên Trung</p>
+            <span className="border-[1px] border-gray-300 text-[11px] px-3 py-[3px] rounded-3xl text-gray-500">
+              Chủ
+            </span>
+          </div>
+        </div>
+
+        <Textarea
+          className="mt-4"
+          placeholder="Tin nhắn của bạn"
+          minRows={4}
+          sx={{
+            "&::before": {
+              display: "none",
+            },
+            "&:focus-within": {
+              outline: "2px solid var(--Textarea-focusedHighlight)",
+              outlineOffset: "2px",
+            },
+          }}
+        />
+      </div>
+
+      <div>
+        <p className="mt-6 text-sm text-gray-600">
+          Nhấn và nút "Tiếp tục" tiến đến quá trình thanh toán tiếp theo
+        </p>
+        <div className="flex justify-end">
+          <button className="text-white font-semibold bg-blue-600 px-20 py-3 rounded-3xl mt-8 hover:bg-blue-700 transition duration-300 ease-in-out">
+            Tiếp tục
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+export default ContentCheckout;
