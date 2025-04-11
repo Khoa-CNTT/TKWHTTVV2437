@@ -1,16 +1,41 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { FaCheck } from "react-icons/fa6";
+import { useCheckoutContext } from "@/app/contexts/CheckoutContext";
 
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import apisReview from "@/apis/review";
+import { IRoom } from "@/app/types/room";
 
-const data = [1, 2, 3, 4, 5];
+interface IReview {
+  averageRating: number;
+  reviewCount: number;
+}
 
-const InforRoomCheckout = () => {
+interface IProps {
+  room: IRoom | null;
+}
+
+const InforRoomCheckout: React.FC<IProps> = ({ room }) => {
+  const { roomId, startDate, endDate, guest } = useCheckoutContext(); // Lấy hàm setRoomId từ context
+  const [review, setReview] = useState<IReview>();
+
+  useEffect(() => {
+    const fetchReview = async () => {
+      const reviewData = await apisReview.getReviewByRoom(String(roomId));
+      if (reviewData.data) {
+        setReview(reviewData.data);
+      }
+    };
+
+    fetchReview();
+  }, [roomId]);
+
   return (
     <div className="w-full">
       <div>
@@ -21,15 +46,13 @@ const InforRoomCheckout = () => {
           navigation={true}
           modules={[Navigation]}
         >
-          {data?.map((item, index) => (
-            <div>
-              <SwiperSlide key={index}>
+          {room?.images?.map((item, index) => (
+            <div key={index}>
+              <SwiperSlide>
                 <div key={index}>
                   <img
                     className="object-cover rounded-lg w-full h-[300px]"
-                    src={
-                      "https://cf.bstatic.com/xdata/images/hotel/square600/489013625.webp?k=4bcd3314e69b15662f04a7099fa9d4b00ddd40f243ce9098583c79045becce1f&o="
-                    }
+                    src={item?.image}
                     alt="anh"
                   />
                 </div>
@@ -40,13 +63,16 @@ const InforRoomCheckout = () => {
       </div>
 
       <div className="border-b-[1px] border-x-[1px] rounded-b-md border-gray-300 px-6 py-8">
-        <h4 className="font-semibold">
-          Secluded 3 Acres on the White River. Custom
-        </h4>
-        <p>Hội An</p>
+        <h4 className="font-semibold">{room?.name}</h4>
+        <p>{room?.property?.city?.name}</p>
         <p className="mt-3">
-          <span className="font-semibold">10/10 Exceptional</span>
-          <span className="text-gray-500"> (2 đánh giá)</span>
+          <span className="font-semibold">
+            {review?.averageRating || 0}/10 Exceptional
+          </span>
+          <span className="text-gray-500">
+            {" "}
+            ({review?.reviewCount} đánh giá)
+          </span>
         </p>
 
         <div className="p-4 border-[1px] border-green-700 rounded-lg my-8 text-green-700 flex items-center gap-4">
@@ -58,33 +84,69 @@ const InforRoomCheckout = () => {
 
         <div>
           <span className="text-sm text-gray-500">Check In</span>
-          <p>Fri, 2 May, 4:00 pm</p>
+          <p>{startDate?.format("DD/MM/YYYY")} 14:00</p>
         </div>
 
         <div className="mt-3">
           <span className="text-sm text-gray-500">Check In</span>
-          <p>Fri, 2 May, 4:00 pm</p>
+          <p>{endDate?.format("DD/MM/YYYY")} 12:00</p>
         </div>
 
         <div className="mt-3">
           <span className="text-sm text-gray-500">Số khách</span>
-          <p>6 khách</p>
+          <p>{guest} khách</p>
         </div>
 
         <div className="mt-4 border-t-[1px] border-gray-300 pt-4">
           <div className="flex justify-between items-center">
-            <p>200000 x 2 đêm</p>
-            <p>400000</p>
+            <p>
+              {room?.price.toLocaleString("it-IT", {
+                style: "currency",
+                currency: "VND",
+              })}{" "}
+              x{" "}
+              {startDate &&
+                endDate &&
+                Math.abs(startDate?.diff(endDate, "day"))}{" "}
+              đêm
+            </p>
+            <p>
+              {startDate &&
+                endDate &&
+                room?.price &&
+                Number(
+                  room?.price * Math.abs(startDate?.diff(endDate, "day"))
+                ).toLocaleString("it-IT", {
+                  style: "currency",
+                  currency: "VND",
+                })}
+            </p>
           </div>
           <div className="flex justify-between items-center">
             <p>Giá</p>
-            <p>200000 / đêm</p>
+            <p>
+              {room?.price.toLocaleString("it-IT", {
+                style: "currency",
+                currency: "VND",
+              })}
+              / đêm
+            </p>
           </div>
         </div>
 
         <div className="mt-3 border-t-[1px] border-gray-300 pt-4 flex justify-between items-center">
           <p className="font-semibold">Tổng</p>
-          <p className="text-lg font-semibold">400000</p>
+          <p className="text-lg font-semibold">
+            {startDate &&
+              endDate &&
+              room?.price &&
+              Number(
+                room?.price * Math.abs(startDate?.diff(endDate, "day"))
+              ).toLocaleString("it-IT", {
+                style: "currency",
+                currency: "VND",
+              })}
+          </p>
         </div>
       </div>
     </div>

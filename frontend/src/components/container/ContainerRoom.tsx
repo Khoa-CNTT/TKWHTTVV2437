@@ -39,7 +39,7 @@ const ContainerRoom: React.FC<IProps> = ({ rooms }) => {
           {rooms.map((item: IRoom, index: number) => (
             <SwiperSlide key={index}>
               <InforRomItem
-                image={item.images[0].image}
+                image={item.images[0]?.image}
                 key={index}
                 title={item.name}
                 price={item.price}

@@ -15,12 +15,14 @@ export default async function Home() {
       <Banner />
 
       <div className="w-[1260px] mx-auto">
-        <ContainerRoom rooms={rooms.data} />
+        <div className="mt-8">
+          <ContainerRecomend rooms={rooms.data} />
+        </div>
 
         <Container cities={cities.data} />
 
         <div className="mt-8">
-          <ContainerRecomend rooms={rooms.data} />
+          <ContainerRoom rooms={rooms.data} />
         </div>
 
         <InforContainer />

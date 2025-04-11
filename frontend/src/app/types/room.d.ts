@@ -11,7 +11,7 @@ export interface IRoom {
   quantityReview: string;
   name: string;
   rating: string;
-  property: { city: { name: string } };
+  property: { city: { name: string }; name: string };
   slug: string;
   reviewCount: number;
   averageRating: number;
