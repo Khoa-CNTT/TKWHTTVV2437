@@ -43,10 +43,10 @@ const listTop10Room = () => {
             attributes: [], // Không lấy các cột từ bảng Review
           },
         ],
-        group: ["Room.id", "images.id", "property.id", "property->city.id"], // Nhóm theo Room và các bảng liên kết
+        group: ["Room.id"], // Nhóm theo Room và các bảng liên kết
         order: [[fn("AVG", col("reviews.rating")), "DESC"]], // Sắp xếp theo điểm trung bình giảm dần
         subQuery: false,
-        limit: 10, // Giới hạn kết quả trả về là 10 bản ghi
+        limit: 10,
       });
 
       resolve({
@@ -104,7 +104,45 @@ const getDetailRoomBySlug = (slug) => {
   });
 };
 
+const getDetailRoomById = (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const room = await db.Room.findOne({
+        where: { id },
+        include: [
+          {
+            model: db.ImageRoom,
+            as: "images", // Alias được định nghĩa trong `Room.associate`
+            attributes: ["id", "image"], // Lấy tất cả các ảnh liên kết
+          },
+          {
+            model: db.Property,
+            as: "property",
+            attributes: ["id", "name"], // Chỉ lấy các cột cần thiết từ Property
+            include: [
+              {
+                model: db.City,
+                as: "city", // Alias được định nghĩa trong `Property.associate`
+                attributes: ["name"], // Chỉ lấy cột "name" từ City
+              },
+            ],
+          },
+        ],
+        attributes: ["name", "price"],
+      });
+
+      resolve({
+        status: room ? "OK" : "ERR",
+        data: room || null,
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   listTop10Room,
   getDetailRoomBySlug,
+  getDetailRoomById,
 };

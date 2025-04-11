@@ -1,29 +1,18 @@
 import { IoLocationSharp } from "react-icons/io5";
 import { FaChevronRight } from "react-icons/fa";
-import { FaSwimmer } from "react-icons/fa";
-import { TbSmokingNo } from "react-icons/tb";
-import { FaWifi } from "react-icons/fa";
-import { LuCircleParking } from "react-icons/lu";
+
 import { CiLogin } from "react-icons/ci";
 import { CiLogout } from "react-icons/ci";
 import { MdPets } from "react-icons/md";
 import { RiErrorWarningLine } from "react-icons/ri";
 import ContainerRecomend from "@/components/container/ContainerRecomend";
-
 import { FaPerson } from "react-icons/fa6";
-
 import InforBookingContainer from "@/components/container/InforBookingContainer";
 import ReviewContainer from "@/components/container/ReviewContainer";
 import apisRoom from "@/apis/room";
 import apisReview from "@/apis/review";
 import { ratingText } from "@/helper/ratingText";
-
-const iconMap: { [key: string]: JSX.Element } = {
-  FaSwimmer: <FaSwimmer />,
-  TbSmokingNo: <TbSmokingNo />,
-  FaWifi: <FaWifi />,
-  LuCircleParking: <LuCircleParking />,
-};
+import AnmenityContainer from "@/components/container/AmenityContainer";
 
 interface IProps {
   params: { slug: string };
@@ -32,11 +21,6 @@ interface IProps {
 interface IImage {
   image: string;
   id: string;
-}
-
-interface Amenity {
-  icon: string; // Tên icon (key trong `iconMap`)
-  name: string; // Tên tiện ích
 }
 
 const DetailPage = async (props: IProps) => {
@@ -82,7 +66,7 @@ const DetailPage = async (props: IProps) => {
           <div className="mt-5">
             <div className="flex items-center gap-2">
               <div className="px-2 py-1 rounded-md text-sm font-medium text-white bg-green-800">
-                {rating.data.averageRating}
+                {rating.data.averageRating || 0}
               </div>
               <span className="font-semibold text-xl">
                 {ratingText(rating.data.averageRating)}
@@ -101,19 +85,7 @@ const DetailPage = async (props: IProps) => {
             <h5 className="mt-4 font-semibold text-lg">
               Các tiện nghi được ưa chuộng nhất
             </h5>
-            <div className="grid grid-cols-5 gap-4">
-              {room.data.amenities.map((item: Amenity, index: number) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-2 mt-2 text-sm font-medium"
-                >
-                  <div className="text-green-700 text-xl ">
-                    {iconMap[item.icon]}
-                  </div>
-                  <span>{item.name}</span>
-                </div>
-              ))}
-            </div>
+            <AnmenityContainer amenities={room.data.amenities} />
           </div>
 
           <div className="mt-8">
@@ -173,7 +145,10 @@ const DetailPage = async (props: IProps) => {
           </div>
         </div>
         <div className="flex-3">
-          <InforBookingContainer price={room.data.price} />
+          <InforBookingContainer
+            roomId={room.data.id}
+            price={room.data.price}
+          />
         </div>
       </div>
 
@@ -183,7 +158,7 @@ const DetailPage = async (props: IProps) => {
         <div>
           <div className="mt-4">
             <p className="text-4xl text-green-700 font-semibold">
-              {rating.data.averageRating}/10
+              {rating.data.averageRating || 0}/10
             </p>
             <p className="font-semibold">
               {ratingText(rating.data.averageRating)}

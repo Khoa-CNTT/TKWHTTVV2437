@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useRef, useEffect } from "react";
 
 import { RiErrorWarningLine } from "react-icons/ri";
@@ -9,24 +10,31 @@ import {
   LocalizationProvider,
 } from "@mui/x-date-pickers-pro";
 import dayjs, { Dayjs } from "dayjs";
+import { useRouter } from "next/navigation";
 
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateRangePickerDay } from "@mui/x-date-pickers-pro/DateRangePickerDay";
 import ChooseQuantityPerson from "./ChooseQuantityPerson";
+import { useCheckoutContext } from "@/app/contexts/CheckoutContext";
 
 interface IProps {
   price: number;
+  roomId?: string | number | null;
 }
 
-const InforBookingContainer: React.FC<IProps> = ({ price }) => {
+const InforBookingContainer: React.FC<IProps> = ({ price, roomId }) => {
   const [showChoosePerson, setShowChoosePerson] = useState<boolean>(false);
   const [showDateRange, setShowDateRange] = useState<boolean>(false);
   const [selectedDateRange, setSelectedDateRange] = useState<
     [Dayjs | null, Dayjs | null]
-  >([dayjs("2022-04-17"), dayjs("2022-04-21")]);
+  >([dayjs(new Date()), dayjs(new Date().setDate(new Date().getDate() + 2))]);
   const choosePersonRef = useRef<HTMLDivElement>(null);
   const [traveler, setTraveler] = useState<number>(2);
   const calendarRef = useRef<HTMLDivElement>(null);
+  const router = useRouter(); // Khởi tạo useRouter
+
+  const { setRoomId, setStartDate, setEndDate, setGuest } =
+    useCheckoutContext(); // Lấy hàm setRoomId từ context
 
   // handle click outside to close the calendar
   useEffect(() => {
@@ -115,6 +123,14 @@ const InforBookingContainer: React.FC<IProps> = ({ price }) => {
     setTraveler(adults + children);
   };
 
+  const handleCheckOut = () => {
+    setStartDate(selectedDateRange[0] || null);
+    setEndDate(selectedDateRange[1] || null);
+    setRoomId(roomId || null); // Gọi hàm setRoomId với giá trị "roomId"
+    setGuest(traveler);
+    router.push("/checkout"); // Chuyển hướng đến trang checkout
+  };
+
   return (
     <div className="border-[1px] border-gray-300 rounded-xl p-5 shadow-sm">
       <p className="text-xl font-semibold flex items-center gap-1 pb-2">
@@ -171,17 +187,17 @@ const InforBookingContainer: React.FC<IProps> = ({ price }) => {
                   defaultValue={selectedDateRange}
                   onChange={(newValue) => setSelectedDateRange(newValue)}
                   slots={{ day: DateRangePickerDay }}
-                  shouldDisableDate={(date) => {
-                    // Vô hiệu hóa các ngày cụ thể
-                    const disabledDates = [
-                      dayjs("2022-04-20"),
-                      dayjs("2022-04-22"),
-                      dayjs("2022-04-25"),
-                    ];
-                    return disabledDates.some((disabledDate) =>
-                      date.isSame(disabledDate, "day")
-                    );
-                  }}
+                  // shouldDisableDate={(date) => {
+                  //   // Vô hiệu hóa các ngày cụ thể
+                  //   const disabledDates = [
+                  //     dayjs("2022-04-20"),
+                  //     dayjs("2022-04-22"),
+                  //     dayjs("2022-04-25"),
+                  //   ];
+                  //   return disabledDates.some((disabledDate) =>
+                  //     date.isSame(disabledDate, "day")
+                  //   );
+                  // }}
                 />
               </LocalizationProvider>
 
@@ -236,8 +252,11 @@ const InforBookingContainer: React.FC<IProps> = ({ price }) => {
         </p>
       </div>
 
-      <button className="w-full bg-blue-600 text-md font-semibold text-white py-2 mt-4 rounded-3xl">
-        Check availability
+      <button
+        onClick={() => handleCheckOut()}
+        className="w-full bg-blue-600 text-md font-semibold text-white py-2 mt-4 rounded-3xl"
+      >
+        Đặt phòng ngay
       </button>
     </div>
   );

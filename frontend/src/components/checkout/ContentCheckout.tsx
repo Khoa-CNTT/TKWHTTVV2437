@@ -1,11 +1,14 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import { TextareaAutosize } from "@mui/base/TextareaAutosize";
-import { styled } from "@mui/joy/styles";
 import Textarea from "@mui/joy/Textarea";
+import { IRoom } from "@/app/types/room";
 
-const ContentCheckout = () => {
+interface IProps {
+  room: IRoom | null;
+}
+
+const ContentCheckout: React.FC<IProps> = ({ room }) => {
   return (
     <div>
       <div className="flex items-center justify-between w-full">
@@ -54,12 +57,12 @@ const ContentCheckout = () => {
 
         <div className="flex gap-4">
           <img
-            className="rounded-full w-[50px] h-[50px] object-fit"
-            src="https://th.bing.com/th/id/OIP.6oWaJdGi2oeU1vkqk--GoAHaLH?rs=1&pid=ImgDetMain"
+            className="rounded-full w-[50px] h-[50px] object-cover"
+            src="https://th.bing.com/th/id/R.2dbede307b3c506c10c620ec96665caa?rik=%2fickOaxn66GHxg&riu=http%3a%2f%2fwww.psi-solutions.org%2fwp-content%2fuploads%2fdefault-avatar-profile-icon-of-social-media-user-vector-768x768.jpg&ehk=vTohsCcYIkdH398ZZ32%2bw5C4WEYO3VM%2fgP2aOj12N6M%3d&risl=&pid=ImgRaw&r=0"
           ></img>
 
           <div>
-            <p className="font-semibold">Nguyên Trung</p>
+            <p className="font-semibold">{room?.property?.name}</p>
             <span className="border-[1px] border-gray-300 text-[11px] px-3 py-[3px] rounded-3xl text-gray-500">
               Chủ
             </span>

@@ -21,6 +21,17 @@ const apisRoom = {
 
     return response.json();
   },
+  getRoomById: async (id: string) => {
+    const response = await fetch(
+      `${process.env.URL_SERVER_API}/room/detail-id/${id}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
+
+    return response.json();
+  },
 };
 
 export default apisRoom;
