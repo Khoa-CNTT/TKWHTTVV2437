@@ -11,6 +11,7 @@ import {
 } from "@mui/x-date-pickers-pro";
 import dayjs, { Dayjs } from "dayjs";
 import { useRouter } from "next/navigation";
+import { IRoom } from "@/types/room";
 
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateRangePickerDay } from "@mui/x-date-pickers-pro/DateRangePickerDay";
@@ -19,10 +20,15 @@ import { useCheckoutContext } from "@/app/contexts/CheckoutContext";
 
 interface IProps {
   price: number;
-  roomId?: string | number | null;
+  propertyId?: string | number | null;
+  rooms: any;
 }
 
-const InforBookingContainer: React.FC<IProps> = ({ price, roomId }) => {
+const InforBookingContainer: React.FC<IProps> = ({
+  price,
+  propertyId,
+  rooms,
+}) => {
   const [showChoosePerson, setShowChoosePerson] = useState<boolean>(false);
   const [showDateRange, setShowDateRange] = useState<boolean>(false);
   const [selectedDateRange, setSelectedDateRange] = useState<
@@ -126,7 +132,7 @@ const InforBookingContainer: React.FC<IProps> = ({ price, roomId }) => {
   const handleCheckOut = () => {
     setStartDate(selectedDateRange[0] || null);
     setEndDate(selectedDateRange[1] || null);
-    setRoomId(roomId || null); // Gọi hàm setRoomId với giá trị "roomId"
+    setRoomId(propertyId || null); // Gọi hàm setRoomId với giá trị "roomId"
     setGuest(traveler);
     router.push("/checkout"); // Chuyển hướng đến trang checkout
   };
@@ -214,26 +220,7 @@ const InforBookingContainer: React.FC<IProps> = ({ price, roomId }) => {
         </div>
       </div>
 
-      <div
-        onClick={() => handleShowChoosePerson()}
-        className="ralative border-[1px] border-gray-500 p-1 px-3 mt-4 flex-1 cursor-pointer rounded-md"
-      >
-        <p className="text-[11px]">Travelrs</p>
-        <p className="text-md">{traveler} travelers</p>
-
-        {showChoosePerson && (
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="absolute bottom-[-200px] right-[340px]"
-            ref={choosePersonRef}
-          >
-            <ChooseQuantityPerson
-              onShowChoosePerson={setShowChoosePerson}
-              onChangeTraveler={handleSetTravelers}
-            />
-          </div>
-        )}
-      </div>
+      <div></div>
 
       <div className="flex items-center justify-between mt-3">
         <p className="font-semibold">Thành tiền: </p>

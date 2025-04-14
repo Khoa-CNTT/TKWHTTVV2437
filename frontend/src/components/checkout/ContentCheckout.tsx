@@ -2,7 +2,7 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Textarea from "@mui/joy/Textarea";
-import { IRoom } from "@/app/types/room";
+import { IRoom } from "@/app/types/property";
 
 interface IProps {
   room: IRoom | null;

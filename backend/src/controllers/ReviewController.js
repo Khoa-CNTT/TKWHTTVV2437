@@ -1,9 +1,11 @@
 const db = require("../models");
 const ReviewService = require("../services/ReviewService");
 
-const getRatingByRoomId = async (req, res) => {
+const getRatingByPropertyId = async (req, res) => {
   try {
-    const response = await ReviewService.getRatingByRoomId(req.params.roomId);
+    const response = await ReviewService.getRatingByPropertyId(
+      req.params.propertyId
+    );
     return res.status(200).json(response);
   } catch (error) {
     return res.status(404).json({
@@ -13,5 +15,5 @@ const getRatingByRoomId = async (req, res) => {
 };
 
 module.exports = {
-  getRatingByRoomId,
+  getRatingByPropertyId,
 };

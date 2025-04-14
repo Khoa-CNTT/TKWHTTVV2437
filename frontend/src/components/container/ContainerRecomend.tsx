@@ -9,13 +9,13 @@ import "swiper/css/pagination";
 
 import TitleContainer from "./TitleContainer";
 import RoomItemRecomend from "../room/RoomItemRecomend";
-import { IRoom } from "@/app/types/room";
+import { IProperty } from "@/app/types/property";
 
 interface IProps {
-  rooms: [];
+  properties: [];
 }
 
-const ContainerRecomend: React.FC<IProps> = ({ rooms }) => {
+const ContainerRecomend: React.FC<IProps> = ({ properties }) => {
   return (
     <div>
       <TitleContainer title="Đề xuất cho bạn" />
@@ -32,14 +32,14 @@ const ContainerRecomend: React.FC<IProps> = ({ rooms }) => {
         }}
         modules={[Navigation, Autoplay]}
       >
-        {rooms.map((item: IRoom, index: number) => (
+        {properties.map((item: IProperty, index: number) => (
           <SwiperSlide key={index}>
             <RoomItemRecomend
               key={index}
               images={item.images}
               title={item.name}
               price={item.price}
-              location={item.property.city.name}
+              city={item.city.name}
               quantityReview={item.reviewCount}
               rating={item.averageRating || 0}
               slug={item.slug}
