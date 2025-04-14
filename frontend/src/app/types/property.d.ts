@@ -3,7 +3,7 @@ export interface IImage {
   image: string;
 }
 
-export interface IRoom {
+export interface IProperty {
   title: string;
   price: number;
   images: { id: string; image: string }[]; // Cập nhật kiểu dữ liệu của images
@@ -11,7 +11,7 @@ export interface IRoom {
   quantityReview: string;
   name: string;
   rating: string;
-  property: { city: { name: string }; name: string };
+  city: { id: string; name: string };
   slug: string;
   reviewCount: number;
   averageRating: number;

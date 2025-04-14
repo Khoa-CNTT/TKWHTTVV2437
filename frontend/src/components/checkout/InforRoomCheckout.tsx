@@ -10,7 +10,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import apisReview from "@/apis/review";
-import { IRoom } from "@/app/types/room";
+import { IRoom } from "@/app/types/property";
 
 interface IReview {
   averageRating: number;

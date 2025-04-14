@@ -1,52 +1,23 @@
 const db = require("../models");
-const { fn, col } = require("sequelize");
 
-const listTop10Room = () => {
+const getListRoomByPropertyId = (propertyId) => {
   return new Promise(async (resolve, reject) => {
     try {
       const rooms = await db.Room.findAll({
-        attributes: {
-          include: [
-            // Tính trung bình điểm rating và làm tròn đến 1 chữ số thập phân
-            [
-              fn(
-                "COALESCE",
-                fn("ROUND", fn("AVG", col("reviews.rating")), 1),
-                0
-              ),
-              "averageRating",
-            ],
-            [fn("COUNT", col("reviews.id")), "reviewCount"],
-          ],
-        },
+        where: { idProperty: propertyId },
         include: [
           {
+            model: db.Amenity,
+            as: "amenities", // Alias được định nghĩa trong Room.associate
+            attributes: ["name", "icon"],
+            through: { attributes: [] },
+          },
+          {
             model: db.ImageRoom,
-            as: "images", // Alias được định nghĩa trong `Room.associate`
-            attributes: ["id", "image"], // Chỉ lấy các cột cần thiết từ ImageRoom
-          },
-          {
-            model: db.Property,
-            as: "property",
-            attributes: ["id", "name"], // Chỉ lấy các cột cần thiết từ Property
-            include: [
-              {
-                model: db.City,
-                as: "city", // Alias được định nghĩa trong `Property.associate`
-                attributes: ["name"], // Chỉ lấy cột "name" từ City
-              },
-            ],
-          },
-          {
-            model: db.Review,
-            as: "reviews", // Alias được định nghĩa trong `Room.associate`
-            attributes: [], // Không lấy các cột từ bảng Review
+            as: "images",
+            attributes: ["id", "image"],
           },
         ],
-        group: ["Room.id"], // Nhóm theo Room và các bảng liên kết
-        order: [[fn("AVG", col("reviews.rating")), "DESC"]], // Sắp xếp theo điểm trung bình giảm dần
-        subQuery: false,
-        limit: 10,
       });
 
       resolve({
@@ -59,90 +30,6 @@ const listTop10Room = () => {
   });
 };
 
-const getDetailRoomBySlug = (slug) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const room = await db.Room.findOne({
-        where: { slug },
-        include: [
-          {
-            model: db.ImageRoom,
-            as: "images", // Alias được định nghĩa trong `Room.associate`
-            attributes: ["id", "image"], // Lấy tất cả các ảnh liên kết
-          },
-          {
-            model: db.Property,
-            as: "property",
-            attributes: ["id", "name"], // Chỉ lấy các cột cần thiết từ Property
-            include: [
-              {
-                model: db.City,
-                as: "city", // Alias được định nghĩa trong `Property.associate`
-                attributes: ["name"], // Chỉ lấy cột "name" từ City
-              },
-            ],
-          },
-          {
-            model: db.Amenity,
-            as: "amenities", // Alias được định nghĩa trong Room.associate
-          },
-          {
-            model: db.Review,
-            as: "reviews", // Alias được định nghĩa trong `Room.associate`
-            attributes: [], // Không lấy các cột từ bảng Review
-          },
-        ],
-      });
-
-      resolve({
-        status: room ? "OK" : "ERR",
-        data: room || null,
-      });
-    } catch (error) {
-      reject(error);
-    }
-  });
-};
-
-const getDetailRoomById = (id) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const room = await db.Room.findOne({
-        where: { id },
-        include: [
-          {
-            model: db.ImageRoom,
-            as: "images", // Alias được định nghĩa trong `Room.associate`
-            attributes: ["id", "image"], // Lấy tất cả các ảnh liên kết
-          },
-          {
-            model: db.Property,
-            as: "property",
-            attributes: ["id", "name"], // Chỉ lấy các cột cần thiết từ Property
-            include: [
-              {
-                model: db.City,
-                as: "city", // Alias được định nghĩa trong `Property.associate`
-                attributes: ["name"], // Chỉ lấy cột "name" từ City
-              },
-            ],
-          },
-        ],
-        attributes: ["name", "price"],
-      });
-
-      resolve({
-        status: room ? "OK" : "ERR",
-        data: room || null,
-      });
-    } catch (error) {
-      reject(error);
-    }
-  });
-};
-
 module.exports = {
-  listTop10Room,
-  getDetailRoomBySlug,
-  getDetailRoomById,
+  getListRoomByPropertyId,
 };

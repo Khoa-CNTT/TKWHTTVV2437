@@ -1,29 +1,7 @@
 const apisRoom = {
-  getListTop10Rating: async () => {
+  getListRoomByPropertyId: async (propertyId: string) => {
     const response = await fetch(
-      `${process.env.URL_SERVER_API}/room/list-top-10-rating`,
-      {
-        method: "GET",
-        cache: "no-store",
-      }
-    );
-
-    return response.json();
-  },
-  getRoomBySlug: async (slug: string) => {
-    const response = await fetch(
-      `${process.env.URL_SERVER_API}/room/detail/${slug}`,
-      {
-        method: "GET",
-        cache: "no-store",
-      }
-    );
-
-    return response.json();
-  },
-  getRoomById: async (id: string) => {
-    const response = await fetch(
-      `${process.env.URL_SERVER_API}/room/detail-id/${id}`,
+      `${process.env.URL_SERVER_API}/room/list-room/${propertyId}`,
       {
         method: "GET",
         cache: "no-store",

@@ -1,7 +1,7 @@
 const apisReview = {
-  getReviewByRoom: async (roomId: string) => {
+  getReviewByProperty: async (propertyId: string) => {
     const response = await fetch(
-      `${process.env.URL_SERVER_API}/review/rating-by-room/${roomId}`,
+      `${process.env.URL_SERVER_API}/review/rating-by-property/${propertyId}`,
       {
         method: "GET",
         cache: "no-store",

@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import InforRoomCheckout from "@/components/checkout/InforRoomCheckout";
 import ContentCheckout from "@/components/checkout/ContentCheckout";
 import { useCheckoutContext } from "@/app/contexts/CheckoutContext";
-import apisRoom from "@/apis/room";
-import { IRoom } from "@/app/types/room";
+import apisRoom from "@/apis/property";
+import { IRoom } from "@/app/types/property";
 
 const CheckoutPage = () => {
   const { roomId } = useCheckoutContext(); // Lấy hàm setRoomId từ context

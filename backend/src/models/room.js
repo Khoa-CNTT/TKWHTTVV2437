@@ -40,8 +40,6 @@ module.exports = (sequelize, DataTypes) => {
       maxPerson: DataTypes.INTEGER,
       price: DataTypes.DOUBLE,
       status: DataTypes.STRING,
-      slug: DataTypes.STRING,
-      address: DataTypes.STRING,
     },
     {
       sequelize,
