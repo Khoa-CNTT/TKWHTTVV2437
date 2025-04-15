@@ -7,12 +7,15 @@ import { MdPets } from "react-icons/md";
 import { RiErrorWarningLine } from "react-icons/ri";
 import ContainerRecomend from "@/components/container/ContainerRecomend";
 import { FaPerson } from "react-icons/fa6";
-import InforBookingContainer from "@/components/container/InforBookingContainer";
+import HighlightProperty from "@/components/container/HighlightProperty";
 import ReviewContainer from "@/components/container/ReviewContainer";
-import apisRoom from "@/apis/room";
+import apisProperty from "@/apis/property";
 import apisReview from "@/apis/review";
 import { ratingText } from "@/helper/ratingText";
 import AnmenityContainer from "@/components/container/AmenityContainer";
+import ListRoomContainer from "@/components/container/ListRoomContainer";
+import apisRoom from "@/apis/room";
+import ChooseDateContainer from "@/components/container/ChooseDateContainer";
 
 interface IProps {
   params: { slug: string };
@@ -26,21 +29,22 @@ interface IImage {
 const DetailPage = async (props: IProps) => {
   const { params } = props;
 
-  const room = await apisRoom.getRoomBySlug(params.slug);
-  const rating = await apisReview.getReviewByRoom(room.data.id);
-  const rooms = await apisRoom.getListTop10Rating();
+  const property = await apisProperty.getPropertyBySlug(params.slug);
+  const rating = await apisReview.getReviewByProperty(property.data.id);
+  const properties = await apisProperty.getListTop10Rating();
+  const rooms = await apisRoom.getListRoomByPropertyId(property.data.id);
 
   return (
     <div className="pt-4 w-[1260px] mx-auto">
       <div className="grid grid-cols-2 gap-1">
         <img
           className="w-full rounded-md"
-          src={room.data.images[0].image}
+          src={property.data?.images[0]?.image}
           alt="anh"
         />
 
         <div className="grid grid-cols-2 gap-1">
-          {room.data.images.map(
+          {property.data.images.map(
             (item: IImage, index: number) =>
               index > 0 && (
                 <img
@@ -56,11 +60,11 @@ const DetailPage = async (props: IProps) => {
 
       <div className="flex p-4 gap-5">
         <div className="mt-2 flex-7">
-          <h2 className="font-semibold text-2xl">{room.data.name}</h2>
+          <h2 className="font-semibold text-2xl">{property.data.name}</h2>
 
           <div className="flex items-center gap-1 mt-1">
             <IoLocationSharp size={22} className="text-blue-600" />
-            <p className="text-sm">{room.data.address}</p>
+            <p className="text-sm">{property.data.address}</p>
           </div>
 
           <div className="mt-5">
@@ -79,13 +83,30 @@ const DetailPage = async (props: IProps) => {
             </div>
           </div>
 
-          <p className="mt-4 text-sm">{room.data.description}</p>
+          <p className="mt-4 text-sm">{property.data.description}</p>
 
           <div>
             <h5 className="mt-4 font-semibold text-lg">
               Các tiện nghi được ưa chuộng nhất
             </h5>
-            <AnmenityContainer amenities={room.data.amenities} />
+            <AnmenityContainer amenities={property.data.amenities} />
+          </div>
+
+          <div>
+            <h5 className="mt-8 font-semibold text-lg">Thông tin phòng</h5>
+            <ChooseDateContainer />
+            {rooms.data.map((item: any, index: number) => (
+              <ListRoomContainer
+                key={index}
+                id={item.id}
+                propertyId={property.data.id}
+                name={item.name}
+                maxPerson={item.maxPerson}
+                price={item.price}
+                images={item.images}
+                amenities={item.amenities}
+              />
+            ))}
           </div>
 
           <div className="mt-8">
@@ -144,11 +165,10 @@ const DetailPage = async (props: IProps) => {
             </div>
           </div>
         </div>
-        <div className="flex-3">
-          <InforBookingContainer
-            roomId={room.data.id}
-            price={room.data.price}
-          />
+        <div className="flex-3 ralative">
+          <div className="sticky top-0">
+            <HighlightProperty />
+          </div>
         </div>
       </div>
 
@@ -182,7 +202,7 @@ const DetailPage = async (props: IProps) => {
       </div>
 
       <div className="mt-8">
-        <ContainerRecomend rooms={rooms.data} />
+        <ContainerRecomend properties={properties.data} />
       </div>
     </div>
   );

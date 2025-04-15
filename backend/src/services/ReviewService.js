@@ -1,7 +1,7 @@
 const db = require("../models");
 const { fn, col } = require("sequelize");
 
-const getRatingByRoomId = (roomId) => {
+const getRatingByPropertyId = (propertyId) => {
   return new Promise(async (resolve, reject) => {
     try {
       const result = await db.Review.findOne({
@@ -11,7 +11,7 @@ const getRatingByRoomId = (roomId) => {
           // Đếm số lượng review
           [fn("COUNT", col("id")), "reviewCount"],
         ],
-        where: { idRoom: roomId }, // Điều kiện để lấy review của phòng cụ thể
+        where: { idProperty: propertyId }, // Điều kiện để lấy review của phòng cụ thể
       });
 
       resolve({
@@ -25,5 +25,5 @@ const getRatingByRoomId = (roomId) => {
 };
 
 module.exports = {
-  getRatingByRoomId,
+  getRatingByPropertyId,
 };

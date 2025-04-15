@@ -3,11 +3,11 @@ import Container from "@/components/container/Container";
 import ContainerRecomend from "@/components/container/ContainerRecomend";
 import ContainerRoom from "@/components/container/ContainerRoom";
 import InforContainer from "@/components/container/InforContainer";
-import apisRoom from "@/apis/room";
+import apisProperty from "@/apis/property";
 import apisCity from "@/apis/city";
 
 export default async function Home() {
-  const rooms = await apisRoom.getListTop10Rating();
+  const properties = await apisProperty.getListTop10Rating();
   const cities = await apisCity.getListTop10City();
 
   return (
@@ -16,13 +16,13 @@ export default async function Home() {
 
       <div className="w-[1260px] mx-auto">
         <div className="mt-8">
-          <ContainerRecomend rooms={rooms.data} />
+          <ContainerRecomend properties={properties.data} />
         </div>
 
         <Container cities={cities.data} />
 
         <div className="mt-8">
-          <ContainerRoom rooms={rooms.data} />
+          <ContainerRoom properties={properties.data} />
         </div>
 
         <InforContainer />
