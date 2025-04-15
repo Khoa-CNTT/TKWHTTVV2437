@@ -7,7 +7,7 @@ import { MdPets } from "react-icons/md";
 import { RiErrorWarningLine } from "react-icons/ri";
 import ContainerRecomend from "@/components/container/ContainerRecomend";
 import { FaPerson } from "react-icons/fa6";
-import InforBookingContainer from "@/components/container/InforBookingContainer";
+import HighlightProperty from "@/components/container/HighlightProperty";
 import ReviewContainer from "@/components/container/ReviewContainer";
 import apisProperty from "@/apis/property";
 import apisReview from "@/apis/review";
@@ -15,6 +15,7 @@ import { ratingText } from "@/helper/ratingText";
 import AnmenityContainer from "@/components/container/AmenityContainer";
 import ListRoomContainer from "@/components/container/ListRoomContainer";
 import apisRoom from "@/apis/room";
+import ChooseDateContainer from "@/components/container/ChooseDateContainer";
 
 interface IProps {
   params: { slug: string };
@@ -93,10 +94,12 @@ const DetailPage = async (props: IProps) => {
 
           <div>
             <h5 className="mt-8 font-semibold text-lg">Thông tin phòng</h5>
+            <ChooseDateContainer />
             {rooms.data.map((item: any, index: number) => (
               <ListRoomContainer
                 key={index}
                 id={item.id}
+                propertyId={property.data.id}
                 name={item.name}
                 maxPerson={item.maxPerson}
                 price={item.price}
@@ -164,11 +167,7 @@ const DetailPage = async (props: IProps) => {
         </div>
         <div className="flex-3 ralative">
           <div className="sticky top-0">
-            <InforBookingContainer
-              propertyId={property.data.id}
-              price={property.data.price}
-              rooms={rooms.data}
-            />
+            <HighlightProperty />
           </div>
         </div>
       </div>
