@@ -87,6 +87,12 @@ const Header = () => {
                   >
                     Đăng nhập
                   </button>
+                  <button
+                    className="bg-primary text-white px-4 py-2 rounded-3xl hover:bg-blue-600  hover:opacity-80"
+                    onClick={handleNavigateLogin} // Đóng modal khi click vào nút
+                  >
+                    Đăng nhập cho chủ sở hữu
+                  </button>
                 </div>
               </div>
             )}
