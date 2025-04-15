@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      User.hasMany(models.Property, {
+        foreignKey: "idUser", // Giữ nguyên tên trường hiện tại
+        as: "properties",
+      });
     }
   }
   User.init(

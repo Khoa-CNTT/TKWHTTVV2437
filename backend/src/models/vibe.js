@@ -8,7 +8,12 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      Vibe.belongsToMany(models.Address, {
+        through: models.AddressVibe,
+        foreignKey: "vibeId",
+        otherKey: "addressId",
+        as: "addresses",
+      });
     }
   }
   Vibe.init(
