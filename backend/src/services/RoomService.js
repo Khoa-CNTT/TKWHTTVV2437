@@ -30,6 +30,25 @@ const getListRoomByPropertyId = (propertyId) => {
   });
 };
 
+const getDetailById = (roomId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const rooms = await db.Room.findOne({
+        where: { id: roomId },
+        attributes: ["name", "price", "maxPerson"],
+      });
+
+      resolve({
+        status: rooms.length > 0 ? "OK" : "ERR",
+        data: rooms || [],
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   getListRoomByPropertyId,
+  getDetailById,
 };

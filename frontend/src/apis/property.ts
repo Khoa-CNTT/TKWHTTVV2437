@@ -21,9 +21,9 @@ const apisProperty = {
 
     return response.json();
   },
-  getRoomById: async (id: string) => {
+  getPropertyById: async (id: string) => {
     const response = await fetch(
-      `${process.env.URL_SERVER_API}/room/detail-id/${id}`,
+      `${process.env.URL_SERVER_API}/property/detail-id/${id}`,
       {
         method: "GET",
         cache: "no-store",

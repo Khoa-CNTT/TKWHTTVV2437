@@ -97,36 +97,29 @@ const getDetailBySlug = (slug) => {
   });
 };
 
-const getDetailRoomById = (id) => {
+const getDetailProperyById = (propertyId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const room = await db.Room.findOne({
-        where: { id },
+      const property = await db.Property.findOne({
+        where: { id: propertyId },
         include: [
           {
-            model: db.ImageRoom,
-            as: "images", // Alias được định nghĩa trong `Room.associate`
+            model: db.ImageProperty,
+            as: "images", // Alias được định nghĩa trong `property.associate`
             attributes: ["id", "image"], // Lấy tất cả các ảnh liên kết
           },
           {
-            model: db.Property,
-            as: "property",
-            attributes: ["id", "name"], // Chỉ lấy các cột cần thiết từ Property
-            include: [
-              {
-                model: db.City,
-                as: "city", // Alias được định nghĩa trong `Property.associate`
-                attributes: ["name"], // Chỉ lấy cột "name" từ City
-              },
-            ],
+            model: db.City,
+            as: "city", // Alias được định nghĩa trong `Property.associate`
+            attributes: ["name"], // Chỉ lấy cột "name" từ City
           },
         ],
-        attributes: ["name", "price"],
+        attributes: ["name"],
       });
 
       resolve({
-        status: room ? "OK" : "ERR",
-        data: room || null,
+        status: property ? "OK" : "ERR",
+        data: property || null,
       });
     } catch (error) {
       reject(error);
@@ -137,5 +130,5 @@ const getDetailRoomById = (id) => {
 module.exports = {
   listTop10HomestayRating,
   getDetailBySlug,
-  getDetailRoomById,
+  getDetailProperyById,
 };

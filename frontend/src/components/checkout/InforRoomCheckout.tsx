@@ -10,7 +10,8 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import apisReview from "@/apis/review";
-import { IRoom } from "@/app/types/property";
+import { IProperty } from "@/app/types/property";
+import { IRoom } from "@/app/types/room";
 
 interface IReview {
   averageRating: number;
@@ -18,23 +19,27 @@ interface IReview {
 }
 
 interface IProps {
+  property: IProperty | null;
   room: IRoom | null;
 }
 
-const InforRoomCheckout: React.FC<IProps> = ({ room }) => {
-  const { roomId, startDate, endDate, guest } = useCheckoutContext(); // Lấy hàm setRoomId từ context
+const InforRoomCheckout: React.FC<IProps> = ({ property, room }) => {
+  console.log({ property });
+  const { propertyId, startDate, endDate, guest } = useCheckoutContext(); // Lấy hàm setRoomId từ context
   const [review, setReview] = useState<IReview>();
 
   useEffect(() => {
     const fetchReview = async () => {
-      const reviewData = await apisReview.getReviewByRoom(String(roomId));
+      const reviewData = await apisReview.getReviewByProperty(
+        String(propertyId)
+      );
       if (reviewData.data) {
         setReview(reviewData.data);
       }
     };
 
     fetchReview();
-  }, [roomId]);
+  }, [propertyId]);
 
   return (
     <div className="w-full">
@@ -46,7 +51,7 @@ const InforRoomCheckout: React.FC<IProps> = ({ room }) => {
           navigation={true}
           modules={[Navigation]}
         >
-          {room?.images?.map((item, index) => (
+          {property?.images?.map((item, index) => (
             <div key={index}>
               <SwiperSlide>
                 <div key={index}>
@@ -63,8 +68,9 @@ const InforRoomCheckout: React.FC<IProps> = ({ room }) => {
       </div>
 
       <div className="border-b-[1px] border-x-[1px] rounded-b-md border-gray-300 px-6 py-8">
-        <h4 className="font-semibold">{room?.name}</h4>
-        <p>{room?.property?.city?.name}</p>
+        <h4 className="font-semibold">{property?.name}</h4>
+        <h3 className="font-medium">{room?.name}</h3>
+        <p className="mt-2">{property?.city?.name}</p>
         <p className="mt-3">
           <span className="font-semibold">
             {review?.averageRating || 0}/10 Exceptional
@@ -94,7 +100,7 @@ const InforRoomCheckout: React.FC<IProps> = ({ room }) => {
 
         <div className="mt-3">
           <span className="text-sm text-gray-500">Số khách</span>
-          <p>{guest} khách</p>
+          <p>{room?.maxPerson} khách</p>
         </div>
 
         <div className="mt-4 border-t-[1px] border-gray-300 pt-4">

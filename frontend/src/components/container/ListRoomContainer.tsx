@@ -1,9 +1,14 @@
+"use client";
+import React, { useEffect } from "react";
 import { IoFastFood } from "react-icons/io5";
 import { IoPersonSharp } from "react-icons/io5";
 import { IoBed } from "react-icons/io5";
 import { FaCity } from "react-icons/fa";
-import AmenityRoomContainer from "./amenityRoomContainer";
+import AmenityRoomContainer from "./AmenityRoomContainer";
 import { IImage } from "@/app/types/property";
+import { useCheckoutContext } from "@/app/contexts/CheckoutContext";
+import { useRouter } from "next/navigation";
+import dayjs from "dayjs";
 
 interface IProps {
   amenities: {
@@ -15,6 +20,7 @@ interface IProps {
   images: IImage[];
   maxPerson: number;
   price: number;
+  propertyId: string;
 }
 
 const ListRoomContainer: React.FC<IProps> = ({
@@ -24,7 +30,33 @@ const ListRoomContainer: React.FC<IProps> = ({
   images,
   maxPerson,
   price,
+  propertyId,
 }) => {
+  const { setPropertyId, setRoomId, setStartDate, setEndDate } =
+    useCheckoutContext();
+  const router = useRouter();
+
+  const handleCheckOut = () => {
+    console.log("propertyId", propertyId);
+    // setStartDate(selectedDateRange[0] || null);
+    // setEndDate(selectedDateRange[1] || null);
+    setRoomId(id); // Gọi hàm setRoomId với giá trị "roomId"
+    setPropertyId(propertyId); // Gọi hàm setRoomId với giá trị "roomId"
+    router.push("/checkout"); // Chuyển hướng đến trang checkout
+  };
+
+  // Delete localStorage when component unmounts
+  useEffect(() => {
+    // localStorage.removeItem("propertyId");
+    // localStorage.removeItem("roomId");
+    // localStorage.removeItem("startDate");
+    // localStorage.removeItem("endDate");
+    setPropertyId("");
+    setRoomId("");
+    setStartDate(dayjs(new Date()));
+    setEndDate(dayjs(new Date().setDate(new Date().getDate() + 2)));
+  }, []);
+
   return (
     <div className="shadow-md bg-white border-gray-300 rounded-md p-4 mt-2">
       <h2 className="mb-4 font-semibold text-lg">{name}</h2>
@@ -74,7 +106,7 @@ const ListRoomContainer: React.FC<IProps> = ({
             </div>
           </div>
 
-          <div className="flex items-end justify-end">
+          <div className="flex items-center justify-end mt-4">
             <p className="font-semibold text-md">
               Giá:{" "}
               {price.toLocaleString("it-IT", {
@@ -82,6 +114,12 @@ const ListRoomContainer: React.FC<IProps> = ({
                 currency: "VND",
               })}
             </p>
+            <button
+              onClick={handleCheckOut}
+              className="text-white font-medium bg-blue-700 text-sm px-6 py-2 rounded-md ml-4 hover:opacity-90 transition-all duration-200"
+            >
+              Đặt ngay
+            </button>
           </div>
         </div>
       </div>

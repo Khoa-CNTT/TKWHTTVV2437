@@ -23,9 +23,9 @@ const getDetailBySlug = async (req, res) => {
   }
 };
 
-const getDetailRoomById = async (req, res) => {
+const getDetailProperyById = async (req, res) => {
   try {
-    const response = await RoomService.getDetailRoomById(req.params.id);
+    const response = await PropertyService.getDetailProperyById(req.params.id);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(404).json({
@@ -37,5 +37,5 @@ const getDetailRoomById = async (req, res) => {
 module.exports = {
   listTop10HomestayRating,
   getDetailBySlug,
-  getDetailRoomById,
+  getDetailProperyById,
 };
