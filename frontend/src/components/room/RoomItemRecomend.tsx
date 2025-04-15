@@ -5,7 +5,7 @@ interface IProps {
   title: string;
   price: number;
   images: { id: string; image: string }[]; // Cập nhật kiểu dữ liệu của images
-  location: string;
+  city: string;
   quantityReview: number;
   rating: number;
   slug: string;
@@ -15,7 +15,7 @@ const RoomItemRecomend: React.FC<IProps> = ({
   title,
   price,
   images,
-  location,
+  city,
   quantityReview,
   rating,
   slug,
@@ -45,7 +45,7 @@ const RoomItemRecomend: React.FC<IProps> = ({
               <span>({quantityReview} reviews)</span>
             </p>
           </div>
-          <p className="text-sm mt-1">{location}</p>
+          <p className="text-sm mt-1">{city}</p>
           <p className="text-md font-semibold mt-2 text-right">
             {" "}
             {price.toLocaleString("it-IT", {

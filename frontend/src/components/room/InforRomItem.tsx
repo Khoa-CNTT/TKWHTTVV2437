@@ -6,7 +6,7 @@ interface IProps {
   title: string;
   price: number;
   image: string;
-  location: string;
+  city: string;
   quantityReview: number;
   rating: number;
   slug: string;
@@ -16,7 +16,7 @@ const InforRomItem: React.FC<IProps> = ({
   title,
   price,
   image,
-  location,
+  city,
   quantityReview,
   rating,
   slug,
@@ -50,7 +50,7 @@ const InforRomItem: React.FC<IProps> = ({
         <h4 className="text-[16px] min-h-[48px] font-semibold mt-1">
           {title.length > 50 ? title.slice(0, 50) + "..." : title}
         </h4>
-        <p className="text-sm mt-1">{location}</p>
+        <p className="text-sm mt-1">{city}</p>
         <p className="text-md font-semibold mt-2">
           {price.toLocaleString("it-IT", {
             style: "currency",

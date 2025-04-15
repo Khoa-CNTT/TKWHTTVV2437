@@ -14,7 +14,6 @@ module.exports = {
       idRoom: {
         type: Sequelize.STRING,
       },
-
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

@@ -13,6 +13,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "idRoom", // Khóa ngoại trong bảng imageRoom
         as: "room", // Alias để truy cập
       });
+
+      Review.belongsTo(models.Property, {
+        foreignKey: "idProperty", // Khóa ngoại trong bảng imageRoom
+        as: "property", // Alias để truy cập
+      });
     }
   }
   Review.init(

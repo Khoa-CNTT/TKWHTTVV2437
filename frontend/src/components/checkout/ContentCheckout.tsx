@@ -2,13 +2,25 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Textarea from "@mui/joy/Textarea";
-import { IRoom } from "@/app/types/room";
+import { IProperty } from "@/app/types/property";
 
 interface IProps {
-  room: IRoom | null;
+  property: IProperty | null;
 }
 
-const ContentCheckout: React.FC<IProps> = ({ room }) => {
+const ContentCheckout: React.FC<IProps> = ({ property }) => {
+  const [dataEnter, setDataEnter] = React.useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    message: "",
+  });
+
+  React.useEffect(() => {
+    console.log("Data entered:", dataEnter);
+  }, [dataEnter]);
+
   return (
     <div>
       <div className="flex items-center justify-between w-full">
@@ -29,14 +41,26 @@ const ContentCheckout: React.FC<IProps> = ({ room }) => {
             <TextField
               className="flex-1"
               id="outlined-basic"
-              label="Họ và tên"
+              label="Tên"
               variant="outlined"
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setDataEnter((prev) => ({
+                  ...prev,
+                  firstName: event.target.value,
+                }));
+              }}
             />
             <TextField
               className="flex-1"
               id="filled-basic"
-              label="Số điện thoại"
+              label="Họ"
               variant="outlined"
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setDataEnter((prev) => ({
+                  ...prev,
+                  lastName: event.target.value,
+                }));
+              }}
             />
           </div>
           <div className="flex justify-between items-center gap-2 pt-2">
@@ -45,6 +69,24 @@ const ContentCheckout: React.FC<IProps> = ({ room }) => {
               id="standard-basic"
               label="Email"
               variant="outlined"
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setDataEnter((prev) => ({
+                  ...prev,
+                  email: event.target.value,
+                }));
+              }}
+            />
+            <TextField
+              className="flex-1"
+              id="standard-basic"
+              label="Sô điện thoại"
+              variant="outlined"
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setDataEnter((prev) => ({
+                  ...prev,
+                  phone: event.target.value,
+                }));
+              }}
             />
           </div>
         </Box>
@@ -62,7 +104,7 @@ const ContentCheckout: React.FC<IProps> = ({ room }) => {
           ></img>
 
           <div>
-            <p className="font-semibold">{room?.property?.name}</p>
+            <p className="font-semibold">{property?.name}</p>
             <span className="border-[1px] border-gray-300 text-[11px] px-3 py-[3px] rounded-3xl text-gray-500">
               Chủ
             </span>
@@ -81,6 +123,13 @@ const ContentCheckout: React.FC<IProps> = ({ room }) => {
               outline: "2px solid var(--Textarea-focusedHighlight)",
               outlineOffset: "2px",
             },
+          }}
+          value={dataEnter.message} // Hiển thị giá trị từ state
+          onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
+            setDataEnter((prev) => ({
+              ...prev,
+              message: event.target.value, // Cập nhật giá trị message trong state
+            }));
           }}
         />
       </div>
