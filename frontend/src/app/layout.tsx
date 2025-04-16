@@ -18,7 +18,7 @@ export default function RootLayout({
     <html lang="en">
       <AuthProvider>
         <CheckoutProvider>
-          <body className={`font-roboto antialiased`}>
+          <body className={`font-roboto antialiased `}>
             <Header />
             <div>{children}</div>
           </body>
