@@ -16,6 +16,7 @@ interface IProps {
 }
 
 const ContainerRecomend: React.FC<IProps> = ({ rooms }) => {
+  console.log("123: ", rooms);
   return (
     <div>
       <TitleContainer title="Đề xuất cho bạn" />
@@ -32,20 +33,21 @@ const ContainerRecomend: React.FC<IProps> = ({ rooms }) => {
         }}
         modules={[Navigation, Autoplay]}
       >
-        {rooms.map((item: IRoom, index: number) => (
-          <SwiperSlide key={index}>
-            <RoomItemRecomend
-              key={index}
-              images={item.images}
-              title={item.name}
-              price={item.price}
-              location={item.property.city.name}
-              quantityReview={item.reviewCount}
-              rating={item.averageRating || 0}
-              slug={item.slug}
-            />
-          </SwiperSlide>
-        ))}
+        {rooms !== undefined &&
+          rooms.map((item: IRoom, index: number) => (
+            <SwiperSlide key={index}>
+              <RoomItemRecomend
+                key={index}
+                images={item.images}
+                title={item.name}
+                price={item.price}
+                location={item.property.city.name}
+                quantityReview={item.reviewCount}
+                rating={item.averageRating || 0}
+                slug={item.slug}
+              />
+            </SwiperSlide>
+          ))}
       </Swiper>
     </div>
   );

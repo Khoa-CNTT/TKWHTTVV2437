@@ -23,6 +23,7 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
         primary: "#1668e3",
+        "[text]": "#191e3b",
       },
       fontFamily: {
         roboto: ["Roboto", "sans-serif"],
