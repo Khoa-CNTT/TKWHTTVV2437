@@ -4,6 +4,7 @@ const CityRouter = require("./CityRouter");
 const ReviewRouter = require("./ReviewRouter");
 const AdminRouter = require("./AdminRouter");
 const RoomRouter = require("./RoomRouter");
+const ReservationRouter = require("./ReservationRouter");
 
 const initRoutes = (app) => {
   app.use("/api/user", UserRouter);
@@ -13,7 +14,7 @@ const initRoutes = (app) => {
   app.use("/api/user", UserRouter);
   app.use("/api/admin", AdminRouter);
   app.use("/api/room", RoomRouter);
-
+  app.use("/api/reservation", ReservationRouter);
   return app.use("/", (req, res) => {
     res.send("server on 123");
   });
