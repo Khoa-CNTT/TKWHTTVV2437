@@ -5,13 +5,17 @@ import ContainerRoom from "@/components/container/ContainerRoom";
 import InforContainer from "@/components/container/InforContainer";
 import apisProperty from "@/apis/property";
 import apisCity from "@/apis/city";
+import IconChat from "@/components/chat/IconChat";
 
 export default async function Home() {
   const properties = await apisProperty.getListTop10Rating();
   const cities = await apisCity.getListTop10City();
 
   return (
-    <div>
+    <div className="relative">
+      <div className="fixed bottom-[80px] right-[80px] shadow-lg z-10">
+        <IconChat />
+      </div>
       <Banner />
 
       <div className="w-[1260px] mx-auto">
