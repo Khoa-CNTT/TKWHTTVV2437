@@ -4,30 +4,44 @@ import TextField from "@mui/material/TextField";
 import Textarea from "@mui/joy/Textarea";
 import { IProperty } from "@/app/types/property";
 
-interface IProps {
-  property: IProperty | null;
+interface IDataEnter {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  message: string;
+  imageBanking: string | null;
 }
 
-const ContentCheckout: React.FC<IProps> = ({ property }) => {
-  const [dataEnter, setDataEnter] = React.useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    message: "",
-  });
+interface IProps {
+  property: IProperty | null;
+  handleStep2: (data: object) => void;
+  dataEnter: IDataEnter;
+  onChangeDataEnter: (
+    newData: IDataEnter | ((prev: IDataEnter) => IDataEnter)
+  ) => void;
+}
 
-  React.useEffect(() => {
-    console.log("Data entered:", dataEnter);
-  }, [dataEnter]);
+const ContentCheckout: React.FC<IProps> = ({
+  property,
+  handleStep2,
+  dataEnter,
+  onChangeDataEnter,
+}) => {
+  // const [dataEnter, setDataEnter] = React.useState({
+  //   firstName: "",
+  //   lastName: "",
+  //   email: "",
+  //   phone: "",
+  //   message: "",
+  // });
+
+  // React.useEffect(() => {
+  //   console.log("Data entered:", dataEnter);
+  // }, [dataEnter]);
 
   return (
     <div>
-      <div className="flex items-center justify-between w-full">
-        <p className="text-2xl font-semibold">Begin your booking</p>
-        <p className="text-gray-500">Bước 1/2 </p>
-      </div>
-
       <div className="border-[1px] border-gray-300 rounded-lg p-8 mt-4">
         <h3 className="font-semibold text-lg mb-8">Nhập thông tin liên lạc</h3>
 
@@ -43,8 +57,9 @@ const ContentCheckout: React.FC<IProps> = ({ property }) => {
               id="outlined-basic"
               label="Tên"
               variant="outlined"
+              value={dataEnter.firstName}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setDataEnter((prev) => ({
+                onChangeDataEnter((prev) => ({
                   ...prev,
                   firstName: event.target.value,
                 }));
@@ -55,8 +70,9 @@ const ContentCheckout: React.FC<IProps> = ({ property }) => {
               id="filled-basic"
               label="Họ"
               variant="outlined"
+              value={dataEnter.lastName}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setDataEnter((prev) => ({
+                onChangeDataEnter((prev) => ({
                   ...prev,
                   lastName: event.target.value,
                 }));
@@ -69,8 +85,9 @@ const ContentCheckout: React.FC<IProps> = ({ property }) => {
               id="standard-basic"
               label="Email"
               variant="outlined"
+              value={dataEnter.email}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setDataEnter((prev) => ({
+                onChangeDataEnter((prev) => ({
                   ...prev,
                   email: event.target.value,
                 }));
@@ -81,8 +98,9 @@ const ContentCheckout: React.FC<IProps> = ({ property }) => {
               id="standard-basic"
               label="Sô điện thoại"
               variant="outlined"
+              value={dataEnter.phone}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setDataEnter((prev) => ({
+                onChangeDataEnter((prev) => ({
                   ...prev,
                   phone: event.target.value,
                 }));
@@ -126,7 +144,7 @@ const ContentCheckout: React.FC<IProps> = ({ property }) => {
           }}
           value={dataEnter.message} // Hiển thị giá trị từ state
           onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
-            setDataEnter((prev) => ({
+            onChangeDataEnter((prev) => ({
               ...prev,
               message: event.target.value, // Cập nhật giá trị message trong state
             }));
@@ -136,10 +154,15 @@ const ContentCheckout: React.FC<IProps> = ({ property }) => {
 
       <div>
         <p className="mt-6 text-sm text-gray-600">
-          Nhấn và nút "Tiếp tục" tiến đến quá trình thanh toán tiếp theo
+          Nhấn và nút Tiếp tục tiến đến quá trình thanh toán tiếp theo
         </p>
         <div className="flex justify-end">
-          <button className="text-white font-semibold bg-blue-600 px-20 py-3 rounded-3xl mt-8 hover:bg-blue-700 transition duration-300 ease-in-out">
+          <button
+            className="text-white font-semibold bg-blue-600 px-20 py-3 rounded-3xl mt-8 hover:bg-blue-700 transition duration-300 ease-in-out"
+            onClick={() => {
+              handleStep2(dataEnter);
+            }}
+          >
             Tiếp tục
           </button>
         </div>
