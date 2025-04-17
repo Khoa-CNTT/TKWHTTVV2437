@@ -23,6 +23,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "idProperty", // Khóa ngoại trong bảng imageRoom
         as: "property", // Alias để truy cập
       });
+      Room.hasMany(models.Reservation, {
+        foreignKey: "idRoom", // hoặc tên khóa ngoại tương ứng
+        as: "reservations", // Alias này phải đúng như trong phần include
+      });
 
       Room.belongsToMany(models.Amenity, {
         through: "AmenityRoom", // Tên bảng trung gian
