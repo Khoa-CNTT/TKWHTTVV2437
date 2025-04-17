@@ -1,5 +1,7 @@
 const db = require("../models");
 const { fn, col } = require("sequelize");
+const { generateEmbeddings } = require("./AIService");
+const { v4 } = require("uuid");
 
 const listTop10HomestayRating = () => {
   return new Promise(async (resolve, reject) => {
@@ -60,6 +62,32 @@ const listTop10HomestayRating = () => {
       });
     } catch (error) {
       reject(error);
+    }
+  });
+};
+
+const createProperty = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const property = await db.Property.create({
+        ...data,
+        id: v4(),
+        name: data.name,
+        description: data.description,
+        idUser: data.idUser,
+        idCategory: data.idCategory,
+      });
+
+      resolve({
+        status: "OK",
+        data: property,
+      });
+    } catch (error) {
+      // Ném lỗi có thông tin chi tiết về lỗi
+      reject({
+        status: "ERR",
+        message: `Error creating property: ${error.message || error}`, // Cung cấp thông tin lỗi chi tiết hơn
+      });
     }
   });
 };
@@ -127,8 +155,97 @@ const getDetailProperyById = (propertyId) => {
   });
 };
 
+const fetchFullData = async (filters = {}) => {
+  try {
+    const properties = await db.Property.findAll({
+      attributes: ["name", "description", "address", "slug"],
+      where: {
+        ...(filters.name && {
+          name: { [Op.iLike]: `%${filters.name}%` },
+        }),
+        ...(filters.address && {
+          address: { [Op.iLike]: `%${filters.address}%` },
+        }),
+      },
+      include: [
+        {
+          association: "rooms",
+          attributes: ["name", "description", "price", "maxPerson"],
+          where: filters.roomStatus
+            ? { status: filters.roomStatus }
+            : undefined,
+        },
+        {
+          association: "images",
+          attributes: ["image"],
+        },
+        {
+          association: "reviews",
+          attributes: ["text", "rating"],
+        },
+        {
+          association: "amenities",
+          attributes: ["name"],
+          where:
+            filters.amenities && filters.amenities.length
+              ? {
+                  name: {
+                    [Op.in]: filters.amenities,
+                  },
+                }
+              : undefined,
+        },
+      ],
+    });
+
+    // Chuyển đổi sang text
+    const result = properties.map((property) => {
+      const roomDescriptions = property.rooms
+        ?.map((room) => {
+          return `Room name: ${room.name}, Price: ${room.price}, Max person: ${
+            room.maxPerson
+          }, Description: ${room.description || "No description"}`;
+        })
+        .join("\n");
+
+      const imageDescriptions = property.images
+        ?.map((image) => `Image URL: ${image.image}`)
+        .join("\n");
+
+      const reviewTexts = property.reviews
+        ?.map((review) => `Review: ${review.text}, Rating: ${review.rating}`)
+        .join("\n");
+
+      const amenities = property.amenities
+        ?.map((amenity) => `Amenity: ${amenity.name}`)
+        .join("\n");
+
+      return {
+        name: property.name,
+        description: property.description,
+        address: property.address,
+        rooms: roomDescriptions,
+        images: imageDescriptions,
+        reviews: reviewTexts,
+        amenities: amenities,
+      };
+    });
+
+    return result;
+  } catch (error) {
+    console.error("Error in fetchFullData:", error);
+    throw error;
+  }
+};
+console.log(
+  "🚀 ~ file: PropertyService.js:1 ~ fetchFullData ~ fetchFullData:",
+  fetchFullData
+);
+
 module.exports = {
   listTop10HomestayRating,
   getDetailBySlug,
   getDetailProperyById,
+  fetchFullData,
+  createProperty,
 };

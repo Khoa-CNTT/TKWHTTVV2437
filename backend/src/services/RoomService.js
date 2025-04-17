@@ -48,6 +48,41 @@ const getDetailById = (roomId) => {
   });
 };
 
+const createRoom = (data, propertdId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const property = await db.Property.findOne({
+        where: { id: propertdId },
+      });
+      // Kiểm tra xem phòng đã tồn tại chưa
+      const existingRoom = await db.Room.findOne({
+        where: { name: data.name, idProperty: data.idProperty },
+      });
+      const room = await db.Room.create({
+        name: data.name,
+        price: data.price,
+        maxPerson: data.maxPerson,
+        idProperty: data.idProperty,
+      });
+
+      const data_embeddings = {
+        propertyName: property.name,
+        name: room.name,
+        price: room.price,
+        maxPerson: room.maxPerson,
+        amenities: room.amenities,
+      };
+      const embedding = await generateEmbeddings("rooms", data_embeddings);
+      resolve({
+        status: room ? "OK" : "ERR",
+        data: room || null,
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   getListRoomByPropertyId,
   getDetailById,
