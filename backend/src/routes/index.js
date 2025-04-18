@@ -9,7 +9,6 @@ const initRoutes = (app) => {
   app.use("/api/room", RoomRouter);
   app.use("/api/city", CityRouter);
   app.use("/api/review", ReviewRouter);
-  app.use("/api/user", UserRouter);
   app.use("/api/admin", AdminRouter);
 
   return app.use("/", (req, res) => {
