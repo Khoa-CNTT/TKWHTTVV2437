@@ -1,7 +1,3 @@
-"use client";
-
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Autoplay } from "swiper/modules";
 import { ratingText } from "@/helper/ratingText";
 import { useRouter } from "next/navigation";
 
@@ -9,7 +5,7 @@ interface IProps {
   title: string;
   price: number;
   images: { id: string; image: string }[]; // Cập nhật kiểu dữ liệu của images
-  location: string;
+  city: string;
   quantityReview: number;
   rating: number;
   slug: string;
@@ -19,7 +15,7 @@ const RoomItemRecomend: React.FC<IProps> = ({
   title,
   price,
   images,
-  location,
+  city,
   quantityReview,
   rating,
   slug,
@@ -33,23 +29,11 @@ const RoomItemRecomend: React.FC<IProps> = ({
   return (
     <div className="mt-2">
       <div className="border border-gray-300 rounded-xl shadow-md hover:shadow-lg transition duration-300 cursor-pointer">
-        <Swiper
-          spaceBetween={10}
-          slidesPerView={1}
-          pagination={{ clickable: true }}
-          navigation={true}
-          modules={[Navigation, Autoplay]}
-        >
-          {images.map((item, index) => (
-            <SwiperSlide key={index}>
-              <img
-                className="min-h-[250px] object-fit rounded-t-xl"
-                src={item.image}
-                alt="anh"
-              />
-            </SwiperSlide>
-          ))}
-        </Swiper>
+        <img
+          className="min-h-[250px] object-fit rounded-t-xl"
+          src={images[0]?.image}
+          alt="anh"
+        />
         <div onClick={() => handleNavigate()} className="p-2">
           <h4 className="text-[16px] font-semibold min-h-[48px]">{title}</h4>
           <div className="flex items-center gap-2 mt-1">
@@ -61,7 +45,7 @@ const RoomItemRecomend: React.FC<IProps> = ({
               <span>({quantityReview} reviews)</span>
             </p>
           </div>
-          <p className="text-sm mt-1">{location}</p>
+          <p className="text-sm mt-1">{city}</p>
           <p className="text-md font-semibold mt-2 text-right">
             {" "}
             {price.toLocaleString("it-IT", {

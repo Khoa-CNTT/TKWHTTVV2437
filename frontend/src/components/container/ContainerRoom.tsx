@@ -5,17 +5,17 @@ import { Navigation, Autoplay } from "swiper/modules";
 
 import InforRomItem from "../room/InforRomItem";
 import TitleContainer from "./TitleContainer";
-import { IRoom } from "@/app/types/room";
+import { IProperty } from "@/app/types/property";
 
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 interface IProps {
-  rooms: [];
+  properties: [];
 }
 
-const ContainerRoom: React.FC<IProps> = ({ rooms }) => {
+const ContainerRoom: React.FC<IProps> = ({ properties }) => {
   return (
     <div className="pt-4 mt-8">
       <TitleContainer
@@ -36,14 +36,14 @@ const ContainerRoom: React.FC<IProps> = ({ rooms }) => {
           }}
           modules={[Navigation, Autoplay]}
         >
-          {rooms.map((item: IRoom, index: number) => (
+          {properties?.map((item: IProperty, index: number) => (
             <SwiperSlide key={index}>
               <InforRomItem
-                image={item.images[0].image}
+                image={item.images[0]?.image}
                 key={index}
                 title={item.name}
                 price={item.price}
-                location={item.property.city.name}
+                city={item.city.name}
                 quantityReview={item.reviewCount}
                 rating={item.averageRating || 0}
                 slug={item.slug}

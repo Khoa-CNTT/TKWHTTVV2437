@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      ImageProperty.belongsTo(models.Property, {
+        foreignKey: "idProperty", // Khóa ngoại trong bảng imageRoom
+        as: "property", // Alias để truy cập
+      });
     }
   }
   ImageProperty.init(

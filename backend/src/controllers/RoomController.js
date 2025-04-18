@@ -1,9 +1,11 @@
 const db = require("../models");
-const RoomService = require("../services/RoomService");
+const roomService = require("../services/RoomService");
 
-const listTop10Rating = async (req, res) => {
+const getListRoomByPropertyId = async (req, res) => {
   try {
-    const response = await RoomService.listTop10Room();
+    const response = await roomService.getListRoomByPropertyId(
+      req.params.propertyId
+    );
     return res.status(200).json(response);
   } catch (error) {
     return res.status(404).json({
@@ -12,9 +14,9 @@ const listTop10Rating = async (req, res) => {
   }
 };
 
-const getDetailRoomBySlug = async (req, res) => {
+const getDetailById = async (req, res) => {
   try {
-    const response = await RoomService.getDetailRoomBySlug(req.params.slug);
+    const response = await roomService.getDetailById(req.params.roomId);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(404).json({
@@ -24,6 +26,6 @@ const getDetailRoomBySlug = async (req, res) => {
 };
 
 module.exports = {
-  listTop10Rating,
-  getDetailRoomBySlug,
+  getListRoomByPropertyId,
+  getDetailById,
 };

@@ -1,52 +1,23 @@
 const db = require("../models");
-const { fn, col } = require("sequelize");
 
-const listTop10Room = () => {
+const getListRoomByPropertyId = (propertyId) => {
   return new Promise(async (resolve, reject) => {
     try {
       const rooms = await db.Room.findAll({
-        attributes: {
-          include: [
-            // Tính trung bình điểm rating và làm tròn đến 1 chữ số thập phân
-            [
-              fn(
-                "COALESCE",
-                fn("ROUND", fn("AVG", col("reviews.rating")), 1),
-                0
-              ),
-              "averageRating",
-            ],
-            [fn("COUNT", col("reviews.id")), "reviewCount"],
-          ],
-        },
+        where: { idProperty: propertyId },
         include: [
           {
+            model: db.Amenity,
+            as: "amenities", // Alias được định nghĩa trong Room.associate
+            attributes: ["name", "icon"],
+            through: { attributes: [] },
+          },
+          {
             model: db.ImageRoom,
-            as: "images", // Alias được định nghĩa trong `Room.associate`
-            attributes: ["id", "image"], // Chỉ lấy các cột cần thiết từ ImageRoom
-          },
-          {
-            model: db.Property,
-            as: "property",
-            attributes: ["id", "name"], // Chỉ lấy các cột cần thiết từ Property
-            include: [
-              {
-                model: db.City,
-                as: "city", // Alias được định nghĩa trong `Property.associate`
-                attributes: ["name"], // Chỉ lấy cột "name" từ City
-              },
-            ],
-          },
-          {
-            model: db.Review,
-            as: "reviews", // Alias được định nghĩa trong `Room.associate`
-            attributes: [], // Không lấy các cột từ bảng Review
+            as: "images",
+            attributes: ["id", "image"],
           },
         ],
-        group: ["Room.id", "images.id", "property.id", "property->city.id"], // Nhóm theo Room và các bảng liên kết
-        order: [[fn("AVG", col("reviews.rating")), "DESC"]], // Sắp xếp theo điểm trung bình giảm dần
-        subQuery: false,
-        limit: 10, // Giới hạn kết quả trả về là 10 bản ghi
       });
 
       resolve({
@@ -59,41 +30,49 @@ const listTop10Room = () => {
   });
 };
 
-const getDetailRoomBySlug = (slug) => {
+const getDetailById = (roomId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const room = await db.Room.findOne({
-        where: { slug },
-        include: [
-          {
-            model: db.ImageRoom,
-            as: "images", // Alias được định nghĩa trong `Room.associate`
-            attributes: ["id", "image"], // Lấy tất cả các ảnh liên kết
-          },
-          {
-            model: db.Property,
-            as: "property",
-            attributes: ["id", "name"], // Chỉ lấy các cột cần thiết từ Property
-            include: [
-              {
-                model: db.City,
-                as: "city", // Alias được định nghĩa trong `Property.associate`
-                attributes: ["name"], // Chỉ lấy cột "name" từ City
-              },
-            ],
-          },
-          {
-            model: db.Amenity,
-            as: "amenities", // Alias được định nghĩa trong Room.associate
-          },
-          {
-            model: db.Review,
-            as: "reviews", // Alias được định nghĩa trong `Room.associate`
-            attributes: [], // Không lấy các cột từ bảng Review
-          },
-        ],
+      const rooms = await db.Room.findOne({
+        where: { id: roomId },
+        attributes: ["name", "price", "maxPerson"],
       });
 
+      resolve({
+        status: rooms.length > 0 ? "OK" : "ERR",
+        data: rooms || [],
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const createRoom = (data, propertdId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const property = await db.Property.findOne({
+        where: { id: propertdId },
+      });
+      // Kiểm tra xem phòng đã tồn tại chưa
+      const existingRoom = await db.Room.findOne({
+        where: { name: data.name, idProperty: data.idProperty },
+      });
+      const room = await db.Room.create({
+        name: data.name,
+        price: data.price,
+        maxPerson: data.maxPerson,
+        idProperty: data.idProperty,
+      });
+
+      const data_embeddings = {
+        propertyName: property.name,
+        name: room.name,
+        price: room.price,
+        maxPerson: room.maxPerson,
+        amenities: room.amenities,
+      };
+      const embedding = await generateEmbeddings("rooms", data_embeddings);
       resolve({
         status: room ? "OK" : "ERR",
         data: room || null,
@@ -105,6 +84,6 @@ const getDetailRoomBySlug = (slug) => {
 };
 
 module.exports = {
-  listTop10Room,
-  getDetailRoomBySlug,
+  getListRoomByPropertyId,
+  getDetailById,
 };
