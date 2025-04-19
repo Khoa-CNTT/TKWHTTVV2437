@@ -9,19 +9,37 @@ const apisAdmin = {
   registerOwner: (data: any) => http.post(`admin/register-owner`, data),
 
   // Quản lý người dùng
-  createUser: (data: any) => http.post(`admin/create-user`, data),
-
-  updateUser: (id: string, data: any) =>
-    http.put(`admin/update-user/${id}`, data),
-
-  deleteUser: (id: string) => http.delete(`admin/delete-user/${id}`),
-
-  listUsers: () =>
-    http.get(`admin/list-users`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-      },
-    }),
+    listUsers: () =>
+      http.get(`admin/list-users`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      }),
+  
+    // Tạo user mới
+    createUser: (data: any) =>
+      http.post(`admin/create-user`, data, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      }),
+  
+    // Cập nhật thông tin user
+    updateUser: (id: string, data: any) =>
+      http.put(`admin/update-user/${id}`, data, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      }),
+  
+    // Xóa user
+    deleteUser: (id: string) =>
+      http.delete(`admin/delete-user/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      }),
+  
 
   lockAccount: (id: string) => http.put(`admin/lock-account/${id}`,{}),
 
