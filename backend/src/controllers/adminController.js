@@ -24,19 +24,18 @@ const registerOwner = async (req, res) => {
   }
 };
 
-const updateOwner = async (req, res) => {
+const createUser = async (req, res) => {
   try {
-    const response = await AdminService.updateOwner(req.params.id, req.body);
+    const response = await AdminService.createUser(req.body);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({ msg: "Error: " + error.message });
   }
 };
 
-
-const deleteOwner = async (req, res) => {
+const updateUser = async (req, res) => {
   try {
-    const response = await AdminService.deleteOwner(req.params.id);
+    const response = await AdminService.updateUser(req.params.id, req.body);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({ msg: "Error: " + error.message });
@@ -54,22 +53,147 @@ const deleteUser = async (req, res) => {
 
 const listUsers = async (req, res) => {
   try {
-    const response = await AdminService.listUsers();
+    const response = await AdminService.listUsers(req.query.role);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({ msg: "Error: " + error.message });
   }
 };
 
-const listOwners = async (req, res) => {
+const lockAccount = async (req, res) => {
   try {
-    const response = await AdminService.listOwners();
+    const response = await AdminService.lockAccount(req.params.id);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({ msg: "Error: " + error.message });
   }
 };
 
+const createCategory = async (req, res) => {
+  try {
+    const response = await AdminService.createCategory(req.body);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
+
+const updateCategory = async (req, res) => {
+  try {
+    const response = await AdminService.updateCategory(req.params.id, req.body);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
+
+const deleteCategory = async (req, res) => {
+  try {
+    const response = await AdminService.deleteCategory(req.params.id);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
+
+const listCategories = async (req, res) => {
+  try {
+    const response = await AdminService.listCategories();
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
+
+const createLocation = async (req, res) => {
+  try {
+    const response = await AdminService.createLocation(req.body);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
+
+const updateLocation = async (req, res) => {
+  try {
+    const response = await AdminService.updateLocation(req.params.id, req.body);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
+
+const deleteLocation = async (req, res) => {
+  try {
+    const response = await AdminService.deleteLocation(req.params.id);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
+
+const listLocations = async (req, res) => {
+  try {
+    const response = await AdminService.listLocations();
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
+
+const createAmenity = async (req, res) => {
+  try {
+    const response = await AdminService.createAmenity(req.body);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
+
+const updateAmenity = async (req, res) => {
+  try {
+    const response = await AdminService.updateAmenity(req.params.id, req.body);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
+
+const deleteAmenity = async (req, res) => {
+  try {
+    const response = await AdminService.deleteAmenity(req.params.id);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
+
+const listAmenities = async (req, res) => {
+  try {
+    const response = await AdminService.listAmenities();
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
+
+const approveHomestay = async (req, res) => {
+  try {
+    const response = await AdminService.approveHomestay(req.params.id);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
+
+const rejectHomestay = async (req, res) => {
+  try {
+    const response = await AdminService.rejectHomestay(req.params.id);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
 
 const updateHomestay = async (req, res) => {
   try {
@@ -89,46 +213,78 @@ const listHomestays = async (req, res) => {
   }
 };
 
-const manageCategories = async (req, res) => {
+const listPayments = async (req, res) => {
   try {
-    const response = await AdminService.manageCategories(req.body);
+    const response = await AdminService.listPayments();
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({ msg: "Error: " + error.message });
   }
 };
 
-const manageLocations = async (req, res) => {
+const refundPayment = async (req, res) => {
   try {
-    const response = await AdminService.manageLocations(req.body);
+    const response = await AdminService.refundPayment(req.params.id);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({ msg: "Error: " + error.message });
   }
 };
 
-const manageAmenities = async (req, res) => {
+const listBookings = async (req, res) => {
   try {
-    const response = await AdminService.manageAmenities(req.body);
+    const response = await AdminService.listBookings();
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({ msg: "Error: " + error.message });
   }
 };
 
+const confirmBooking = async (req, res) => {
+  try {
+    const response = await AdminService.confirmBooking(req.params.id);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
 
+const cancelBooking = async (req, res) => {
+  try {
+    const response = await AdminService.cancelBooking(req.params.id);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
 
 module.exports = {
   loginAdmin,
   registerOwner,
-  updateOwner,
-  deleteOwner,
+  createUser,
+  updateUser,
   deleteUser,
   listUsers,
-  listOwners,
+  lockAccount,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+  listCategories,
+  createLocation,
+  updateLocation,
+  deleteLocation,
+  listLocations,
+  createAmenity,
+  updateAmenity,
+  deleteAmenity,
+  listAmenities,
+  approveHomestay,
+  rejectHomestay,
   updateHomestay,
   listHomestays,
-  manageCategories,
-  manageLocations,
-  manageAmenities,
+  listPayments,
+  refundPayment,
+  listBookings,
+  confirmBooking,
+  cancelBooking,
 };
