@@ -1,3 +1,7 @@
+import { IAddress } from "./address";
+import { IAmenity } from "./amenity";
+import { IHightlight } from "./highlight";
+
 export interface IImage {
   id: string;
   image: string;
@@ -15,4 +19,9 @@ export interface IProperty {
   slug: string;
   reviewCount: number;
   averageRating: number;
+  description: Text;
+  propertyAddress: IAddress;
+  hightlight: IHightlight[];
+  amenities: IAmenity[];
+  idCategory: string;
 }

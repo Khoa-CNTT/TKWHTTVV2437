@@ -32,6 +32,30 @@ const apisProperty = {
 
     return response.json();
   },
+
+  getListAmenitiesByPropertyId: async (id: string) => {
+    const response = await fetch(
+      `${process.env.URL_SERVER_API}/property/amenities/${id}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
+
+    return response.json();
+  },
+
+  getListHighlightByPropertyId: async (id: string) => {
+    const response = await fetch(
+      `${process.env.URL_SERVER_API}/property/hightlights/${id}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
+
+    return response.json();
+  },
 };
 
 export default apisProperty;

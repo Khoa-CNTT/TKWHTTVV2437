@@ -15,7 +15,7 @@ const HighlightProperty = () => {
       <div className="flex items-center gap-3 mt-4">
         <FaParking size={30} />
         <div>
-          <span className="text-md font-semibold"> Bãi đỗ xe miễn phí</span>
+          <span className="text-md font-semibold">Bãi đỗ xe miễn phí</span>
           <p className="text-gray-500 text-sm">
             Bãi đỗ xe miễn phí. Bãi đổ xe riêng. Bãi đổ xe trong khuôn viên
           </p>

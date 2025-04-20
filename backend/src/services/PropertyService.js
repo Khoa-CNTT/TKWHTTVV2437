@@ -1,5 +1,5 @@
 const db = require("../models");
-const { fn, col } = require("sequelize");
+const { fn, col, where } = require("sequelize");
 const { generateEmbeddings } = require("./AIService");
 const { v4 } = require("uuid");
 
@@ -141,8 +141,25 @@ const getDetailProperyById = (propertyId) => {
             as: "city", // Alias được định nghĩa trong `Property.associate`
             attributes: ["name"], // Chỉ lấy cột "name" từ City
           },
+          {
+            model: db.Address,
+            as: "propertyAddress", // Alias được định nghĩa trong Room.associate
+            attributes: ["street", "district", "ward", "country", "id", "city"],
+          },
+          {
+            model: db.Highlight,
+            as: "highlights", // Alias được định nghĩa trong Room.associate
+            attributes: ["name", "id", "icon", "description"],
+            through: { attributes: [] },
+          },
+          {
+            model: db.Amenity,
+            as: "amenities", // Alias được định nghĩa trong Room.associate
+            attributes: ["name", "id", "icon"],
+            through: { attributes: [] },
+          },
         ],
-        attributes: ["name"],
+        // attributes: ["name"],
       });
 
       resolve({
@@ -242,10 +259,63 @@ console.log(
   fetchFullData
 );
 
+const getListAmenityByPropertyId = (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const amenities = await db.Property.findOne({
+        where: { id },
+        attributes: ["id"],
+        include: [
+          {
+            model: db.Amenity,
+            as: "amenities",
+            attributes: ["id", "name", "icon"],
+          },
+        ],
+      });
+
+      resolve({
+        status: amenities.length > 0 ? "OK" : "ERR",
+        data: amenities || [],
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const getListHightlightByPropertyId = (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const highlights = await db.Property.findOne({
+        where: { id },
+        attributes: ["id"],
+        include: [
+          {
+            model: db.Highlight,
+            as: "highlights",
+            attributes: ["id", "name", "icon", "description"],
+            through: { attributes: [] },
+          },
+        ],
+      });
+
+      resolve({
+        status: highlights.length > 0 ? "OK" : "ERR",
+        data: highlights || [],
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   listTop10HomestayRating,
   getDetailBySlug,
   getDetailProperyById,
   fetchFullData,
   createProperty,
+  getListAmenityByPropertyId,
+  getListHightlightByPropertyId,
 };
