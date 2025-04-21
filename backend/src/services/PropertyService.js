@@ -2,6 +2,7 @@ const db = require("../models");
 const { fn, col, where } = require("sequelize");
 const { generateEmbeddings } = require("./AIService");
 const { v4 } = require("uuid");
+const slugify = require("slugify");
 
 const listTop10HomestayRating = () => {
   return new Promise(async (resolve, reject) => {
@@ -69,14 +70,77 @@ const listTop10HomestayRating = () => {
 const createProperty = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
+      // console.log({ data });
+      // amenities = data?.amenities;
+      // highlights = data?.highlights;
+      // images = data?.images;
+
+      console.log({ amenities: data.amenities });
+      console.log({ highlights: data.highlights });
+
       const property = await db.Property.create({
-        ...data,
         id: v4(),
         name: data.name,
         description: data.description,
         idUser: data.idUser,
-        idCategory: data.idCategory,
+        idCategory: data.categoryId,
+        slug: slugify(data.name, {
+          lower: true, // chuyển thành chữ thường
+          strict: true, // bỏ các ký tự đặc biệt
+        }),
       });
+
+      console.log("hello1");
+
+      const address = await db.Address.create({
+        id: v4(),
+        idProperty: property.id,
+        street: data.street,
+        district: data.district,
+        city: data.city,
+        country: data.country,
+      });
+
+      console.log("hello2");
+
+      const images = await db.ImageProperty.bulkCreate(
+        data.images.map((item) => ({
+          id: item.id,
+          propertyId: property.id,
+          image: item.image,
+        }))
+      );
+
+      console.log("hello3");
+
+      try {
+        const amenities = await db.AmenityProperty.bulkCreate(
+          data.amenities.map((item) => ({
+            id: v4(),
+            idProperty: property.id,
+            idAmenity: item,
+          }))
+        );
+        console.log("Amenities created:", amenities);
+      } catch (error) {
+        console.log("Error creating amenities:", error);
+      }
+      console.log("hello 4");
+
+      try {
+        const highlights = await db.HighlightProperty.bulkCreate(
+          data.highlights.map((item) => ({
+            id: v4(),
+            idProperty: property.id,
+            idHighlight: item,
+          }))
+        );
+        console.log("Highlights created:", highlights);
+      } catch (error) {
+        console.log("Error creating highlights:", error);
+      }
+      console.log("Hello 5");
+      // const newdata = [...property, ...address, amenities, highlights, images];
 
       resolve({
         status: "OK",

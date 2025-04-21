@@ -8,6 +8,7 @@ const AIRouter = require("./AIRouter");
 const CategoryRouter = require("./CategoryRouter");
 const AmenityRouter = require("./AmenityRouter");
 const HighLightRouter = require("./HighLightRouter");
+const ImageRouter = require("./ImageRouter");
 
 const initRoutes = (app) => {
   app.use("/api/user", UserRouter);
@@ -21,6 +22,7 @@ const initRoutes = (app) => {
   app.use("/api/category", CategoryRouter);
   app.use("/api/amenity", AmenityRouter);
   app.use("/api/highlight", HighLightRouter);
+  app.use("/api/image", ImageRouter);
 
   return app.use("/", (req, res) => {
     res.send("server on 123");

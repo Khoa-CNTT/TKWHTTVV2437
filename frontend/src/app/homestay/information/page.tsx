@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { ChangeEvent } from "react";
 import { useState, useEffect } from "react";
 import { FaPlus } from "react-icons/fa6";
 import TextField from "@mui/material/TextField";
@@ -14,6 +14,7 @@ import Checkbox from "@mui/material/Checkbox";
 import { FaParking } from "react-icons/fa";
 import apisAmenity from "@/apis/amenity";
 import { IAmenity } from "@/app/types/amenity";
+import { v4 as uuidv4 } from "uuid";
 
 // import icon
 import { FaSwimmer } from "react-icons/fa";
@@ -36,6 +37,7 @@ import { listItemSecondaryActionClasses } from "@mui/material";
 import { IImage, IProperty } from "@/app/types/property";
 import apisCategory from "@/apis/category";
 import apisAddress from "@/apis/address";
+import apisImage from "@/apis/image";
 
 // set icon map
 const iconMap: { [key: string]: JSX.Element } = {
@@ -128,7 +130,7 @@ const HomestayPage = () => {
     };
 
     const fetchDataProperty = async () => {
-      const response = await apisProperty.getPropertyById("1");
+      const response = await apisProperty.getPropertyById();
       if (response?.data) {
         console.log({ dataResponse: response.data });
         setData({
@@ -223,12 +225,78 @@ const HomestayPage = () => {
     });
   };
 
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      // setFiles(Array.from(e.target.files));
+      const formData = new FormData();
+      Array.from(e.target.files).forEach((file) => {
+        formData.append("images", file);
+        // console.log(file);
+      });
+
+      // console.log({ formData });
+
+      const uploadImage = async () => {
+        const response = await apisImage.uploadImageMutiple(formData);
+
+        if (response.files) {
+          const newImages = response.files.map((item: { url: string }) => ({
+            id: uuidv4(),
+            image: item.url,
+          }));
+          setSelectedImage((prev) => [...prev, ...newImages]);
+        }
+      };
+
+      uploadImage();
+    }
+  };
+
+  // const handleSubmit = async (e) => {
+  //   // e.preventDefault();
+
+  //   // if (files.length === 0) {
+  //   //   setError('Please select at least one file');
+  //   //   return;
+  //   // }
+
+  //   // setIsUploading(true);
+  //   // setError(null);
+
+  //   try {
+  //     const formData = new FormData();
+  //     files.forEach((file) => {
+  //       formData.append("images", file);
+  //     });
+
+  //     const response = await fetch("/api/upload", {
+  //       method: "POST",
+  //       body: formData,
+  //     });
+
+  //     const data = await response.json();
+
+  //     if (!response.ok) {
+  //       throw new Error(data.error || "Upload failed");
+  //     }
+
+  //     // setUploadResults(data.files);
+  //   } catch (err) {
+  //     // setError(err.message);
+  //   } finally {
+  //     // setIsUploading(false);
+  //   }
+  // };
+
   // console.log({ data });
   // console.log({ selectedAmenities });
   // console.log({ selectedHighLight });
   // console.log({ highlights });
   // console.log({ selectedHighLight });
   console.log({ selectedImage });
+  console.log({ data });
+  console.log({ selectedAmenities });
+  console.log({ selectedHighLight });
 
   return (
     <div className="p-8">
@@ -241,14 +309,14 @@ const HomestayPage = () => {
           <img
             key={item.id}
             alt="image"
-            className="h-full rounded-md object-cover"
+            className="h-[160px] w-full rounded-md object-cover"
             src={item.image}
           ></img>
         ))}
 
         <label
           htmlFor="file-input"
-          className="border-[2px] border-blue-700 flex items-center justify-center border-dashed cursor-pointer"
+          className="border-[2px] border-blue-700 flex items-center justify-center border-dashed cursor-pointer h-[160px]"
         >
           <div>
             <div className="flex justify-center pb-3">
@@ -260,7 +328,11 @@ const HomestayPage = () => {
         <input
           id="file-input"
           type="file"
+          name="images"
+          multiple
           accept="image/*"
+          onChange={handleFileChange}
+          // disabled={isUploading}
           hidden
           // onChange={handleFileChange}
         />
