@@ -2,19 +2,16 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("AmenityProperties", {
+    await queryInterface.createTable("HighLightProperties", {
       id: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.STRING,
       },
+      idHightlight: {
+        type: Sequelize.STRING,
+      },
       idProperty: {
-        type: Sequelize.STRING,
-      },
-      idAmenity: {
-        type: Sequelize.STRING,
-      },
-      status: {
         type: Sequelize.STRING,
       },
       createdAt: {
@@ -28,6 +25,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("AmenityProperties");
+    await queryInterface.dropTable("HighlightProperties");
   },
 };

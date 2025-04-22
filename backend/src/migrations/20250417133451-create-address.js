@@ -30,6 +30,9 @@ module.exports = {
       country: {
         type: Sequelize.STRING,
       },
+      idProperty: {
+        type: Sequelize.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

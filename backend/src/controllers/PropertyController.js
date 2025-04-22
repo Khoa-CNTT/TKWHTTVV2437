@@ -55,10 +55,38 @@ const fetchFullData = async (req, res) => {
   }
 };
 
+const getListAmenityByPropertyId = async (req, res) => {
+  try {
+    const response = await PropertyService.getListAmenityByPropertyId(
+      req.params.id
+    );
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
+const getListHightlightByPropertyId = async (req, res) => {
+  try {
+    const response = await PropertyService.getListHightlightByPropertyId(
+      req.params.id
+    );
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
 module.exports = {
   fetchFullData,
   createProperty,
   listTop10HomestayRating,
   getDetailBySlug,
   getDetailProperyById,
+  getListAmenityByPropertyId,
+  getListHightlightByPropertyId,
 };
