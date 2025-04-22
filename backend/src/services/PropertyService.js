@@ -3,6 +3,7 @@ const { fn, col, where } = require("sequelize");
 const { generateEmbeddings } = require("./AIService");
 const { v4 } = require("uuid");
 const slugify = require("slugify");
+const hightlightProperty = require("../models/hightlightProperty");
 
 const listTop10HomestayRating = () => {
   return new Promise(async (resolve, reject) => {
@@ -70,14 +71,6 @@ const listTop10HomestayRating = () => {
 const createProperty = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      // console.log({ data });
-      // amenities = data?.amenities;
-      // highlights = data?.highlights;
-      // images = data?.images;
-
-      console.log({ amenities: data.amenities });
-      console.log({ highlights: data.highlights });
-
       const property = await db.Property.create({
         id: v4(),
         name: data.name,
@@ -90,8 +83,6 @@ const createProperty = (data) => {
         }),
       });
 
-      console.log("hello1");
-
       const address = await db.Address.create({
         id: v4(),
         idProperty: property.id,
@@ -101,56 +92,118 @@ const createProperty = (data) => {
         country: data.country,
       });
 
-      console.log("hello2");
-
       const images = await db.ImageProperty.bulkCreate(
         data.images.map((item) => ({
           id: item.id,
-          propertyId: property.id,
+          idProperty: property.id,
           image: item.image,
         }))
       );
 
-      console.log("hello3");
-
-      try {
         const amenities = await db.AmenityProperty.bulkCreate(
           data.amenities.map((item) => ({
-            id: v4(),
             idProperty: property.id,
             idAmenity: item,
           }))
         );
-        console.log("Amenities created:", amenities);
-      } catch (error) {
-        console.log("Error creating amenities:", error);
-      }
-      console.log("hello 4");
-
-      try {
-        const highlights = await db.HighlightProperty.bulkCreate(
-          data.highlights.map((item) => ({
-            id: v4(),
-            idProperty: property.id,
-            idHighlight: item,
-          }))
-        );
-        console.log("Highlights created:", highlights);
-      } catch (error) {
-        console.log("Error creating highlights:", error);
-      }
-      console.log("Hello 5");
-      // const newdata = [...property, ...address, amenities, highlights, images];
+     
+      const highlights = await db.HighlightProperty.bulkCreate(
+        data.highlights.map((item) => ({
+          idProperty: property.id,
+          idHighlight: item,
+        }))
+      );
+     
+      const newdata = [{property: property}, {address: address}, {amenities: amenities}, {highlights: highlights}, {images: images}];
 
       resolve({
         status: "OK",
-        data: property,
+        data: newdata,
       });
     } catch (error) {
       // Ném lỗi có thông tin chi tiết về lỗi
       reject({
         status: "ERR",
         message: `Error creating property: ${error.message || error}`, // Cung cấp thông tin lỗi chi tiết hơn
+      });
+    }
+  });
+};
+
+const updateProperty = (propertyId, data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // Update the property details
+      const property = await db.Property.update(
+        {
+          name: data.name,
+          description: data.description,
+          idUser: data.idUser,
+          idCategory: data.categoryId,
+          slug: slugify(data.name, {
+            lower: true, // Convert to lowercase
+            strict: true, // Remove special characters
+          }),
+        },
+        { where: { id: propertyId } }
+      );
+
+      // Update the address
+      const address = await db.Address.update(
+        {
+          street: data.street,
+          district: data.district,
+          city: data.city,
+          country: data.country,
+        },
+        { where: { idProperty: propertyId } }
+      );
+
+      // Update images: Delete old ones and add new ones
+      await db.ImageProperty.destroy({ where: { idProperty: propertyId } });
+      const images = await db.ImageProperty.bulkCreate(
+        data.images.map((item) => ({
+          id: item.id,
+          idProperty: propertyId,
+          image: item.image,
+        }))
+      );
+
+      // Update amenities: Delete old ones and add new ones
+      await db.AmenityProperty.destroy({ where: { idProperty: propertyId } });
+      const amenities = await db.AmenityProperty.bulkCreate(
+        data.amenities.map((item) => ({
+          idProperty: propertyId,
+          idAmenity: item,
+        }))
+      );
+
+      // Update highlights: Delete old ones and add new ones
+      await db.HighlightProperty.destroy({ where: { idProperty: propertyId } });
+      const highlights = await db.HighlightProperty.bulkCreate(
+        data.highlights.map((item) => ({
+          idProperty: propertyId,
+          idHighlight: item,
+        }))
+      );
+
+      const updatedData = {
+        property,
+        address,
+        images,
+        amenities,
+        highlights,
+      };
+
+      resolve({
+        status: "OK",
+        data: updatedData,
+      });
+    } catch (error) {
+      // Handle errors and provide detailed error messages
+      reject({
+        status: "ERR",
+        message: `Error updating property: ${error.message || error}`,
       });
     }
   });
@@ -382,4 +435,5 @@ module.exports = {
   createProperty,
   getListAmenityByPropertyId,
   getListHightlightByPropertyId,
+  updateProperty
 };

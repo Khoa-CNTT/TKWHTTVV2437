@@ -15,6 +15,8 @@ import { FaParking } from "react-icons/fa";
 import apisAmenity from "@/apis/amenity";
 import { IAmenity } from "@/app/types/amenity";
 import { v4 as uuidv4 } from "uuid";
+import { VscSaveAs } from "react-icons/vsc";
+import { IPropertyCreate } from "@/app/types/property";
 
 // import icon
 import { FaSwimmer } from "react-icons/fa";
@@ -28,6 +30,7 @@ import { MdFamilyRestroom } from "react-icons/md";
 import apisProperty from "@/apis/property";
 import apisHighlight from "@/apis/highlight";
 import { IHightlight } from "@/app/types/highlight";
+import { MdDeleteForever } from "react-icons/md";
 
 // import icon highlight
 import { IoIosHeartEmpty } from "react-icons/io";
@@ -71,6 +74,8 @@ interface IData {
   selectedAmenities?: string[];
 }
 
+const propertyId = "76f2ce75-e850-46e3-a81e-a6caa57747dd";
+
 const HomestayPage = () => {
   const [cities, setCities] = useState<{ name: string; code: string }[]>([]);
   const [districts, setDistricts] = useState<{ name: string; code: string }[]>(
@@ -83,6 +88,7 @@ const HomestayPage = () => {
   const [selectedHighLight, setSelectedHighLight] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<IImage[]>([]);
   const [provinceCode, setProvinceCode] = useState<string>("");
+  const [showTrash, setShowTrash] = useState<string>("");
   const [data, setData] = useState<IData>({
     name: "",
     categoryId: "",
@@ -130,7 +136,7 @@ const HomestayPage = () => {
     };
 
     const fetchDataProperty = async () => {
-      const response = await apisProperty.getPropertyById();
+      const response = await apisProperty.getPropertyById(propertyId);
       if (response?.data) {
         console.log({ dataResponse: response.data });
         setData({
@@ -227,14 +233,11 @@ const HomestayPage = () => {
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      // setFiles(Array.from(e.target.files));
       const formData = new FormData();
       Array.from(e.target.files).forEach((file) => {
         formData.append("images", file);
-        // console.log(file);
       });
 
-      // console.log({ formData });
 
       const uploadImage = async () => {
         const response = await apisImage.uploadImageMutiple(formData);
@@ -252,51 +255,37 @@ const HomestayPage = () => {
     }
   };
 
-  // const handleSubmit = async (e) => {
-  //   // e.preventDefault();
+  const handleSubmit = () => {
+    let dataSubmit:IPropertyCreate = {};
+    dataSubmit.images = selectedImage;
+    dataSubmit.amenities = selectedAmenities;
+    dataSubmit.highlights = selectedHighLight;
+    dataSubmit = {...dataSubmit, ...data};
 
-  //   // if (files.length === 0) {
-  //   //   setError('Please select at least one file');
-  //   //   return;
-  //   // }
+    if (propertyId) {
+      const handleUpdate = async() => {
+        const response = await apisProperty.updateProperty(propertyId, dataSubmit);
 
-  //   // setIsUploading(true);
-  //   // setError(null);
+        console.log(response)
+      }
+      handleUpdate();
+    } else {
+      console.log("handle create");
+      console.log(dataSubmit);
+      const handleSaveData = async() => {
+        const response = await apisProperty.createProperty(dataSubmit);
 
-  //   try {
-  //     const formData = new FormData();
-  //     files.forEach((file) => {
-  //       formData.append("images", file);
-  //     });
+        console.log({response})
+      }
 
-  //     const response = await fetch("/api/upload", {
-  //       method: "POST",
-  //       body: formData,
-  //     });
+      handleSaveData();
+    }
 
-  //     const data = await response.json();
+  }
 
-  //     if (!response.ok) {
-  //       throw new Error(data.error || "Upload failed");
-  //     }
-
-  //     // setUploadResults(data.files);
-  //   } catch (err) {
-  //     // setError(err.message);
-  //   } finally {
-  //     // setIsUploading(false);
-  //   }
-  // };
-
-  // console.log({ data });
-  // console.log({ selectedAmenities });
-  // console.log({ selectedHighLight });
-  // console.log({ highlights });
-  // console.log({ selectedHighLight });
-  console.log({ selectedImage });
-  console.log({ data });
-  console.log({ selectedAmenities });
-  console.log({ selectedHighLight });
+  const handleRemoveImage = (id: string) => {
+    setSelectedImage((prev) => (prev.filter(item => item.id !== id)))
+  }
 
   return (
     <div className="p-8">
@@ -306,12 +295,24 @@ const HomestayPage = () => {
 
       <div className="grid grid-cols-6 gap-2 mt-2">
         {selectedImage?.map((item: { image: string; id: string }) => (
-          <img
-            key={item.id}
-            alt="image"
-            className="h-[160px] w-full rounded-md object-cover"
-            src={item.image}
-          ></img>
+          <div 
+            className="relative" 
+            onMouseEnter={() => setShowTrash(item.id)}
+            onMouseLeave={() => setShowTrash('')}>
+              <img
+                
+                key={item.id}
+                alt="image"
+                className="h-[160px] w-full rounded-md object-cover"
+                src={item.image}
+              ></img>
+
+              {showTrash === item.id && 
+                <button onClick={() => handleRemoveImage(item.id)} className="absolute top-[10px] right-[10px]">
+                  <MdDeleteForever className="text-red-500" size={24}/>
+                </button>
+              }
+            </div>
         ))}
 
         <label
@@ -568,6 +569,13 @@ const HomestayPage = () => {
             />
           ))}
         </div>
+      </div>
+
+      <div className="flex justify-end mt-8">
+        <button onClick={handleSubmit} className="flex items-center gap-2 bg-green-700 py-3 px-8 text-white rounded-md font-semibold hover:opacity-90 transition-300">
+          <VscSaveAs size={20} />
+          <span>{propertyId ? 'Cập nhật thông tin' : 'Tạo thông tin'}</span>
+        </button>
       </div>
     </div>
   );

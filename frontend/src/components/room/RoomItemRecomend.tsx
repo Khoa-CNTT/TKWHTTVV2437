@@ -48,7 +48,7 @@ const RoomItemRecomend: React.FC<IProps> = ({
           <p className="text-sm mt-1">{city}</p>
           <p className="text-md font-semibold mt-2 text-right">
             {" "}
-            {price.toLocaleString("it-IT", {
+            {price?.toLocaleString("it-IT", {
               style: "currency",
               currency: "VND",
             })}

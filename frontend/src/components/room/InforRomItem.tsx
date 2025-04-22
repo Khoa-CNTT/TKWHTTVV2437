@@ -52,7 +52,7 @@ const InforRomItem: React.FC<IProps> = ({
         </h4>
         <p className="text-sm mt-1">{city}</p>
         <p className="text-md font-semibold mt-2">
-          {price.toLocaleString("it-IT", {
+          {price?.toLocaleString("it-IT", {
             style: "currency",
             currency: "VND",
           })}

@@ -3,11 +3,6 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable("HighLightProperties", {
-      id: {
-        allowNull: false,
-        primaryKey: true,
-        type: Sequelize.STRING,
-      },
       idHightlight: {
         type: Sequelize.STRING,
       },
@@ -22,6 +17,13 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
       },
+    });
+
+    // Add composite primary key
+    await queryInterface.addConstraint("HighLightProperties", {
+      fields: ["idHightlight", "idProperty"], // Columns that form the composite key
+      type: "primary key",
+      name: "HighLightProperties_pkey", // Name of the primary key constraint
     });
   },
   async down(queryInterface, Sequelize) {

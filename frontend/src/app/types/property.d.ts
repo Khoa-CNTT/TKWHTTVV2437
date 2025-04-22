@@ -25,3 +25,16 @@ export interface IProperty {
   amenities: IAmenity[];
   idCategory: string;
 }
+
+export interface IPropertyCreate {
+  categoryId?: string;
+  city?: string;
+  country?: string;
+  description?: string;
+  district?: string;
+  street?: string;
+  name?: string;
+  amenities?: string[];
+  highlights?: string[];
+  images?: {id?: string, image?: string}[];
+} 

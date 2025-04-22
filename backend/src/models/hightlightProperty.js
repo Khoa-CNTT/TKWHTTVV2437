@@ -23,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "HighlightProperty",
+      tableName: "HighlightProperties"
     }
   );
   return HighlightProperty;

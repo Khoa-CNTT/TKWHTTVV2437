@@ -1,3 +1,5 @@
+import { IPropertyCreate } from "@/app/types/property";
+
 const apisProperty = {
   getListTop10Rating: async () => {
     const response = await fetch(
@@ -56,6 +58,35 @@ const apisProperty = {
 
     return response.json();
   },
+
+  createProperty: async(data:IPropertyCreate) => {
+    const response = await fetch(
+      `${process.env.URL_SERVER_API}/property`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // Specify JSON content type
+        },
+        body: JSON.stringify(data), // Serialize the data object
+      }
+    );
+
+    return response.json();
+  },
+  updateProperty: async(propertyId: string, data:IPropertyCreate) => {
+    const response = await fetch(
+      `${process.env.URL_SERVER_API}/property/${propertyId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json", // Specify JSON content type
+        },
+        body: JSON.stringify(data), // Serialize the data object
+      }
+    );
+
+    return response.json();
+  }
 };
 
 export default apisProperty;
