@@ -24,22 +24,32 @@ const CheckoutContext = createContext<CheckoutType | undefined>(undefined);
 // Tạo provider component
 export function CheckoutProvider({ children }: { children: ReactNode }) {
   const [propertyId, setPropertyId] = useState<string | number | null>(
-    localStorage.getItem("propertyId") || ""
+    ""
   );
   const [startDate, setStartDate] = useState<Dayjs | null>(
-    localStorage.getItem("startDate")
-      ? dayjs(localStorage.getItem("startDate"))
-      : dayjs(new Date())
+    
   );
   const [endDate, setEndDate] = useState<Dayjs | null>(
-    localStorage.getItem("endDate")
-      ? dayjs(localStorage.getItem("endDate"))
-      : dayjs(new Date().setDate(new Date().getDate() + 2))
+    
   );
 
   const [roomId, setRoomId] = useState<string>(
-    localStorage.getItem("roomId") || ""
+    ""
   );
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setPropertyId(localStorage.getItem("propertyId"));
+      setStartDate(localStorage.getItem("startDate")
+      ? dayjs(localStorage.getItem("startDate"))
+      : dayjs(new Date()));
+      setEndDate(localStorage.getItem("endDate")
+      ? dayjs(localStorage.getItem("endDate"))
+      : dayjs(new Date().setDate(new Date().getDate() + 2)));
+
+      setRoomId(localStorage.getItem("roomId") || "")
+    }
+  }, [])
 
   // Lưu giá trị vào localStorage khi thay đổi
   useEffect(() => {

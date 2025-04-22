@@ -71,7 +71,7 @@ const InforRoomCheckout: React.FC<IProps> = ({ property, room }) => {
       <div className="border-b-[1px] border-x-[1px] rounded-b-md border-gray-300 px-6 py-8">
         <h4 className="font-semibold">{property?.name}</h4>
         <h3 className="font-medium">{room?.name}</h3>
-        <p className="mt-2">{property?.city?.name}</p>
+        <p className="mt-2">{property?.propertyAddress?.city}</p>
         <p className="mt-3">
           <span className="font-semibold">
             {review?.averageRating || 0}/10 Exceptional

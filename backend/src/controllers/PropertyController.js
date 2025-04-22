@@ -44,9 +44,46 @@ const createProperty = async (req, res) => {
   }
 };
 
+const updateProperty = async (req, res) => {
+  try {
+    const response = await PropertyService.updateProperty(req.params.id, req.body);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller: " + (error.message || error), // Nếu có lỗi message, trả về lỗi đó, nếu không thì trả về toàn bộ lỗi.
+    });
+  }
+};
+
 const fetchFullData = async (req, res) => {
   try {
     const response = await PropertyService.fetchFullData();
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
+const getListAmenityByPropertyId = async (req, res) => {
+  try {
+    const response = await PropertyService.getListAmenityByPropertyId(
+      req.params.id
+    );
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
+const getListHightlightByPropertyId = async (req, res) => {
+  try {
+    const response = await PropertyService.getListHightlightByPropertyId(
+      req.params.id
+    );
     return res.status(200).json(response);
   } catch (error) {
     return res.status(404).json({
@@ -61,4 +98,7 @@ module.exports = {
   listTop10HomestayRating,
   getDetailBySlug,
   getDetailProperyById,
+  getListAmenityByPropertyId,
+  getListHightlightByPropertyId,
+  updateProperty,
 };

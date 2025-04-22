@@ -35,6 +35,18 @@ module.exports = (sequelize, DataTypes) => {
         otherKey: "idAmenity", // Khóa ngoại trong bảng trung gian trỏ đến Amenity
         as: "amenities", // Alias để truy cập
       });
+
+      Property.belongsToMany(models.Highlight, {
+        through: "HighlightProperty", // Tên bảng trung gian
+        foreignKey: "idProperty", // Khóa ngoại trong bảng trung gian trỏ đến Room
+        otherKey: "idHighlight", // Khóa ngoại trong bảng trung gian trỏ đến Amenity
+        as: "highlights", // Alias để truy cập
+      });
+
+      Property.hasOne(models.Address, {
+        foreignKey: "idProperty", // Khóa ngoại trong bảng imageRoom
+        as: "propertyAddress", // Alias để truy cập
+      });
     }
   }
   Property.init(

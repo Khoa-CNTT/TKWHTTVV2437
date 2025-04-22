@@ -1,3 +1,7 @@
+import { IAddress } from "./address";
+import { IAmenity } from "./amenity";
+import { IHightlight } from "./highlight";
+
 export interface IImage {
   id: string;
   image: string;
@@ -15,4 +19,23 @@ export interface IProperty {
   slug: string;
   reviewCount: number;
   averageRating: number;
+  description: Text;
+  propertyAddress: IAddress;
+  hightlight: IHightlight[];
+  amenities: IAmenity[];
+  idCategory: string;
+  propertyAddress: IAddress;
 }
+
+export interface IPropertyCreate {
+  categoryId?: string;
+  city?: string;
+  country?: string;
+  description?: string;
+  district?: string;
+  street?: string;
+  name?: string;
+  amenities?: string[];
+  highlights?: string[];
+  images?: {id?: string, image?: string}[];
+} 

@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "AmenityRoom",
+      modelName: "AmenityProperty",
     }
   );
   return AmenityProperty;
