@@ -24,6 +24,7 @@ export interface IProperty {
   hightlight: IHightlight[];
   amenities: IAmenity[];
   idCategory: string;
+  propertyAddress: IAddress;
 }
 
 export interface IPropertyCreate {

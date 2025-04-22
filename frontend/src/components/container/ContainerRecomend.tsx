@@ -16,7 +16,6 @@ interface IProps {
 }
 
 const ContainerRecomend: React.FC<IProps> = ({ properties }) => {
-  console.log({properties});
   return (
     <div>
       <TitleContainer title="Đề xuất cho bạn" />
@@ -40,7 +39,7 @@ const ContainerRecomend: React.FC<IProps> = ({ properties }) => {
               images={item.images}
               title={item.name}
               price={item.price}
-              city={item?.city?.name}
+              city={item?.propertyAddress?.city}
               quantityReview={item.reviewCount}
               rating={item.averageRating || 0}
               slug={item.slug}

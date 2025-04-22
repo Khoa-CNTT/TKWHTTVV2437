@@ -34,12 +34,14 @@ const listTop10HomestayRating = () => {
           {
             model: db.ImageProperty,
             as: "images", // Alias được định nghĩa trong `Room.associate`
-            attributes: ["id", "image"], // Chỉ lấy các cột cần thiết từ ImageRoom
+            attributes: ["id", "image"],
+            limit: 1, // Fetch only the first image
+            order: [["createdAt", "ASC"]], // Chỉ lấy các cột cần thiết từ ImageRoom
           },
           {
-            model: db.City,
-            as: "city", // Alias được định nghĩa trong `Room.associate`
-            attributes: ["id", "name"], // Chỉ lấy các cột cần thiết từ ImageRoom
+            model: db.Address,
+            as: "propertyAddress", // Alias được định nghĩa trong `Room.associate`
+            attributes: ["id", "city"], // Chỉ lấy các cột cần thiết từ ImageRoom
           },
           {
             model: db.Review,
@@ -228,7 +230,17 @@ const getDetailBySlug = (slug) => {
           {
             model: db.Amenity,
             as: "amenities", // Alias được định nghĩa trong Room.associate
+            through: { attributes: [] },
           },
+          {
+            model: db.Highlight,
+            as: "highlights", // Alias được định nghĩa trong Room.associate
+            through: { attributes: [] },
+          },
+          {
+            model: db.Address,
+            as: "propertyAddress"
+          }
         ],
       });
 
@@ -275,6 +287,10 @@ const getDetailProperyById = (propertyId) => {
             attributes: ["name", "id", "icon"],
             through: { attributes: [] },
           },
+          {
+            model: db.Address,
+            as: "propertyAddress"
+          }
         ],
         // attributes: ["name"],
       });

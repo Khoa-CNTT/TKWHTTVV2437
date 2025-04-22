@@ -33,12 +33,12 @@ const InforRomItem: React.FC<IProps> = ({
       className="border border-gray-300 rounded-xl shadow-md hover:shadow-lg transition duration-300 cursor-pointer"
     >
       <img
-        className="min-h-[250px] object-fit rounded-t-xl"
+        className="h-[250px] object-fit rounded-t-xl w-full"
         src={image}
         alt="ảnh"
       />
 
-      <div className="p-2">
+      <div className="p-2 h-[162px]">
         <div className="flex items-center gap-2 mt-1">
           <span className="bg-green-700 font-medium text-sm text-white px-1 rounded-md px-2">
             {rating}

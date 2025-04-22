@@ -43,7 +43,7 @@ const ContainerRoom: React.FC<IProps> = ({ properties }) => {
                 key={index}
                 title={item.name}
                 price={item.price}
-                city={item.city?.name}
+                city={item?.propertyAddress?.city}
                 quantityReview={item.reviewCount}
                 rating={item.averageRating || 0}
                 slug={item.slug}
