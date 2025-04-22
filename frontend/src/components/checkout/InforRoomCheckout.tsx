@@ -24,8 +24,9 @@ interface IProps {
 }
 
 const InforRoomCheckout: React.FC<IProps> = ({ property, room }) => {
-  console.log({ property });
-  const { propertyId, startDate, endDate, guest } = useCheckoutContext(); // Lấy hàm setRoomId từ context
+  // const { propertyId, startDate, endDate, guest } = useCheckoutContext(); // Lấy hàm setRoomId từ context
+  const { propertyId, startDate, endDate } = useCheckoutContext();
+
   const [review, setReview] = useState<IReview>();
 
   useEffect(() => {

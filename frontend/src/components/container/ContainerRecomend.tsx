@@ -32,7 +32,7 @@ const ContainerRecomend: React.FC<IProps> = ({ properties }) => {
         }}
         modules={[Navigation, Autoplay]}
       >
-        {properties.map((item: IProperty, index: number) => (
+        {properties?.map((item: IProperty, index: number) => (
           <SwiperSlide key={index}>
             <RoomItemRecomend
               key={index}

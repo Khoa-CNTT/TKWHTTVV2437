@@ -36,7 +36,7 @@ const ContainerRoom: React.FC<IProps> = ({ properties }) => {
           }}
           modules={[Navigation, Autoplay]}
         >
-          {properties.map((item: IProperty, index: number) => (
+          {properties?.map((item: IProperty, index: number) => (
             <SwiperSlide key={index}>
               <InforRomItem
                 image={item.images[0]?.image}

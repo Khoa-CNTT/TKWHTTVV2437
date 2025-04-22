@@ -6,9 +6,13 @@ const AdminRouter = require("./AdminRouter");
 const RoomRouter = require("./RoomRouter");
 const AIRouter = require("./AIRouter");
 const CategoryRouter = require("./CategoryRouter");
+<<<<<<< HEAD
 const AmenityRouter = require("./AmenityRouter");
 const HighLightRouter = require("./HighLightRouter");
 const ImageRouter = require("./ImageRouter");
+=======
+const ReservationRouter = require("./ReservationRouter");
+>>>>>>> main
 
 const initRoutes = (app) => {
   app.use("/api/user", UserRouter);
@@ -17,13 +21,14 @@ const initRoutes = (app) => {
   app.use("/api/review", ReviewRouter);
   app.use("/api/user", UserRouter);
   app.use("/api/admin", AdminRouter);
-  app.use("/api/room", RoomRouter);
   app.use("/api/ai", AIRouter);
   app.use("/api/category", CategoryRouter);
   app.use("/api/amenity", AmenityRouter);
   app.use("/api/highlight", HighLightRouter);
   app.use("/api/image", ImageRouter);
 
+  app.use("/api/room", RoomRouter);
+  app.use("/api/reservation", ReservationRouter);
   return app.use("/", (req, res) => {
     res.send("server on 123");
   });

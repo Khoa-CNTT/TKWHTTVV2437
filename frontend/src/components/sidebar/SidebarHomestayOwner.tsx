@@ -1,4 +1,9 @@
+"use client";
+import { useRouter } from "next/navigation";
+
 const SidebarHomestayOwner = () => {
+  const router = useRouter();
+
   return (
     <div className="py-4 px-2">
       <div className="flex justify-center font-semibold text-xl">
@@ -14,6 +19,14 @@ const SidebarHomestayOwner = () => {
           </li>
           <li className="font-medium px-4 py-3 rounded-md cursor-pointer">
             Quản lý thông tin thanh toán
+          </li>
+          <li
+            className="font-medium px-4 py-3 rounded-md cursor-pointer"
+            onClick={() => {
+              router.push("/homestay/manage-reservation");
+            }}
+          >
+            Quản lí đơn đặt phòng.
           </li>
           <li className="font-medium px-4 py-3 rounded-md cursor-pointer">
             Cài đặt
