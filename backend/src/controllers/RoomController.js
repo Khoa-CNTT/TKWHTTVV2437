@@ -25,7 +25,32 @@ const getDetailById = async (req, res) => {
   }
 };
 
+const createRoom = async (req, res) => {
+  try {
+    const response = await roomService.createRoom(req.body);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
+const updateRoom = async (req, res) => {
+  try {
+    const response = await roomService.updateRoom(req.params.id, req.body);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
+
 module.exports = {
   getListRoomByPropertyId,
   getDetailById,
+  createRoom,
+  updateRoom
 };

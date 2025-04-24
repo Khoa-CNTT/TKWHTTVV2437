@@ -13,3 +13,15 @@ export interface IRoom {
   amenities: IAmenity[];
   images: { id: string; image: string }[];
 }
+
+export interface IRoomCreate {
+  propertyId?: string;
+  name?: string;
+  maxPerson?: number;
+  code?: string;
+  quantity?: number;
+  status?: string;
+  amenities?: string[];
+  summaries?: string[];
+  images?: {id: string, image: string}[];
+}

@@ -1,8 +1,6 @@
 
 import { IoLocationSharp } from "react-icons/io5";
 import { FaChevronRight } from "react-icons/fa";
-import ReactQuill from "react-quill";
-
 import { CiLogin } from "react-icons/ci";
 import { CiLogout } from "react-icons/ci";
 import { MdPets } from "react-icons/md";
@@ -19,6 +17,7 @@ import ListRoomContainer from "@/components/container/ListRoomContainer";
 import apisRoom from "@/apis/room";
 import ChooseDateContainer from "@/components/container/ChooseDateContainer";
 import ShowDescriptionEditext from "@/components/content/ShowDescriptionEditText";
+import { IRoom } from "@/app/types/room";
 interface IProps {
   params: { slug: string };
 }
@@ -99,7 +98,7 @@ const DetailPage = async (props: IProps) => {
           <div>
             <h5 className="mt-8 font-semibold text-lg">Thông tin phòng</h5>
             <ChooseDateContainer />
-            {rooms.data.map((item: any, index: number) => (
+            {rooms.data.map((item: IRoom, index: number) => (
               <ListRoomContainer
                 key={index}
                 id={item.id}

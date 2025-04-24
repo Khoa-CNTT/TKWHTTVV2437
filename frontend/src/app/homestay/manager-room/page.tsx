@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import { FaCaretDown } from "react-icons/fa";
@@ -10,11 +11,13 @@ import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import apisRoom from "@/apis/room";
 import { IRoom } from "@/app/types/room";
+import Link from "next/link";
 
 const ManagerRoom = () => {
   const [valueSearch, setValueSearch] = useState<string>("");
   const [showDeleteText, setShowDeleteText] = useState<boolean>(false);
   const [rooms, setRooms] = useState<IRoom[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchDataRoom = async () => {
@@ -39,7 +42,11 @@ const ManagerRoom = () => {
   return (
     <div className="w-full">
       <div className="p-10">
-        <h1 className="text-2xl font-bold ">Danh sách các phòng</h1>
+        <div className="flex items-center justify-between">  
+          <h1 className="text-2xl font-bold">Danh sách các phòng</h1>
+
+          <Link className="bg-green-700 py-2 px-5 text-white font-semibold rounded-md cursor-pointer" href={"/homestay/manager-room/create"}>Tạo phòng mới</Link>
+        </div>
         <div className="flex justify-between items-center mt-8">
           <div className="w-[27%] relative">
             <OutlinedInput
@@ -111,6 +118,7 @@ const ManagerRoom = () => {
             <tbody className=" text-[-14] font-semibold">
               {rooms.map((item) => (
                 <tr
+                  onClick={() => router.push(`manager-room/update/${item.id}`)}
                   key={item?.id}
                   className="border-b border-gray-200 cursor-pointer hover:bg-gray-100"
                 >
@@ -121,7 +129,7 @@ const ManagerRoom = () => {
                   <td className="pl-4">
                     <img
                       className="w-[50px] h-[50px] object-cover rounded-md"
-                      src={item?.images[0].image}
+                      src={item?.images[0]?.image}
                     ></img>
                   </td>
                   <td className="pl-4 py-5">{item.name}</td>
@@ -151,6 +159,7 @@ const ManagerRoom = () => {
           </table>
         </div>
       </div>
+
     </div>
   );
 };
