@@ -44,6 +44,8 @@ module.exports = (sequelize, DataTypes) => {
       maxPerson: DataTypes.INTEGER,
       price: DataTypes.DOUBLE,
       status: DataTypes.STRING,
+      code: DataTypes.STRING,
+      quantity: DataTypes.INTEGER,
     },
     {
       sequelize,
