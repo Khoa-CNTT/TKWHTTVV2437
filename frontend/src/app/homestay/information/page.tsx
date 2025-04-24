@@ -296,6 +296,7 @@ const HomestayPage = () => {
       <div className="grid grid-cols-6 gap-2 mt-2">
         {selectedImage?.map((item: { image: string; id: string }) => (
           <div 
+            key={item.id}
             className="relative" 
             onMouseEnter={() => setShowTrash(item.id)}
             onMouseLeave={() => setShowTrash('')}>

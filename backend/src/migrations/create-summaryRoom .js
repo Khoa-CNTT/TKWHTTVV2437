@@ -2,11 +2,11 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("AmenityRooms", {
+    await queryInterface.createTable("SummaryRooms", {
       idRoom: {
         type: Sequelize.STRING,
       },
-      idAmenity: {
+      idSummary: {
         type: Sequelize.STRING,
       },
       status: {
@@ -22,14 +22,14 @@ module.exports = {
       },
     });
 
-    // Add composite primary key
-    await queryInterface.addConstraint("AmenityRooms", {
-      fields: ["idRoom", "idAmenity"], // Columns that form the composite key
+     // Add composite primary key
+     await queryInterface.addConstraint("SummaryRooms", {
+      fields: ["idRoom", "idSummary"], // Columns that form the composite key
       type: "primary key",
-      name: "AmenityRooms_pkey", // Name of the primary key constraint
+      name: "SummaryRooms_pkey", // Name of the primary key constraint
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("AmenityRooms");
+    await queryInterface.dropTable("SummaryRooms");
   },
 };

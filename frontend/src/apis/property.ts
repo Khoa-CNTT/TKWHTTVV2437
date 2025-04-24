@@ -73,6 +73,7 @@ const apisProperty = {
 
     return response.json();
   },
+  
   updateProperty: async(propertyId: string, data:IPropertyCreate) => {
     const response = await fetch(
       `${process.env.URL_SERVER_API}/property/${propertyId}`,
