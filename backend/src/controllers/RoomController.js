@@ -14,6 +14,20 @@ const getListRoomByPropertyId = async (req, res) => {
   }
 };
 
+const searchListRoomForBooking = async (req, res) => {
+  try {
+    const response = await roomService.searchListRoomForBooking(
+      req.params.propertyId
+    );
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
+
 const getDetailById = async (req, res) => {
   try {
     const response = await roomService.getDetailById(req.params.roomId);
@@ -52,5 +66,6 @@ module.exports = {
   getListRoomByPropertyId,
   getDetailById,
   createRoom,
-  updateRoom
+  updateRoom,
+  searchListRoomForBooking
 };
