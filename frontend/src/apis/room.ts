@@ -12,6 +12,17 @@ const apisRoom = {
 
     return response.json();
   },
+  searchListRoomForBooking: async (propertyId: string) => {
+    const response = await fetch(
+      `${process.env.URL_SERVER_API}/room/list-booking/${propertyId}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
+
+    return response.json();
+  },
   getDetailById: async (roomId: string) => {
     const response = await fetch(
       `${process.env.URL_SERVER_API}/room/detail/${roomId}`,
