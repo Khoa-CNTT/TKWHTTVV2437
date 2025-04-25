@@ -222,11 +222,6 @@ const getDetailBySlug = (slug) => {
             attributes: ["id", "image"], // Lấy tất cả các ảnh liên kết
           },
           {
-            model: db.City,
-            as: "city", // Alias được định nghĩa trong `Property.associate`
-            attributes: ["name"], // Chỉ lấy cột "name" từ City
-          },
-          {
             model: db.Amenity,
             as: "amenities", // Alias được định nghĩa trong Room.associate
             through: { attributes: [] },

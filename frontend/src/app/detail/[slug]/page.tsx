@@ -34,9 +34,6 @@ const DetailPage = async (props: IProps) => {
   const property = await apisProperty.getPropertyBySlug(params.slug);
   const rating = await apisReview.getReviewByProperty(property.data.id);
   const properties = await apisProperty.getListTop10Rating();
-  const rooms = await apisRoom.getListRoomByPropertyId(property.data.id);
-
-  console.log({rooms});
 
   return (
     <div className="pt-4 w-[1260px] mx-auto">
@@ -101,19 +98,9 @@ const DetailPage = async (props: IProps) => {
           <div>
             <h5 className="mt-8 font-semibold text-lg">Thông tin phòng</h5>
             <ChooseDateContainer />
-            {rooms.data.map((item: IRoom, index: number) => (
               <ListRoomContainer
-                key={index}
-                id={item.id}
                 propertyId={property.data.id}
-                name={item.name}
-                maxPerson={item.maxPerson}
-                price={item.price}
-                images={item.images}
-                amenities={item.amenities}
-                summaries={item.summaries}
               />
-            ))}
           </div>
 
           <div className="mt-8">
