@@ -18,6 +18,7 @@ import apisRoom from "@/apis/room";
 import ChooseDateContainer from "@/components/container/ChooseDateContainer";
 import ShowDescriptionEditext from "@/components/content/ShowDescriptionEditText";
 import { IRoom } from "@/app/types/room";
+
 interface IProps {
   params: { slug: string };
 }
@@ -34,6 +35,8 @@ const DetailPage = async (props: IProps) => {
   const rating = await apisReview.getReviewByProperty(property.data.id);
   const properties = await apisProperty.getListTop10Rating();
   const rooms = await apisRoom.getListRoomByPropertyId(property.data.id);
+
+  console.log({rooms});
 
   return (
     <div className="pt-4 w-[1260px] mx-auto">
@@ -108,6 +111,7 @@ const DetailPage = async (props: IProps) => {
                 price={item.price}
                 images={item.images}
                 amenities={item.amenities}
+                summaries={item.summaries}
               />
             ))}
           </div>

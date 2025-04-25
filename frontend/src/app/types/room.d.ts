@@ -1,4 +1,5 @@
 import { IAmenity } from "./amenity";
+import { ISummary } from "./summary";
 
 export interface IRoom {
   id: string;
@@ -11,6 +12,7 @@ export interface IRoom {
   code: string;
   quantity: number;
   amenities: IAmenity[];
+  summaries: ISummary[];
   images: { id: string; image: string }[];
 }
 

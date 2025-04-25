@@ -18,6 +18,12 @@ const getListRoomByPropertyId = (propertyId) => {
             as: "images",
             attributes: ["id", "image"],
           },
+          {
+            model: db.Summary,
+            as: "summaries", // Alias được định nghĩa trong Room.associate
+            attributes: ["name", "icon"],
+            through: { attributes: [] },
+          },
         ],
       });
 

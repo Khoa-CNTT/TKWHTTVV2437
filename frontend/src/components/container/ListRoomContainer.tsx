@@ -9,6 +9,15 @@ import { IImage } from "@/app/types/property";
 import { useCheckoutContext } from "@/app/contexts/CheckoutContext";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
+import { ISummary } from "@/app/types/summary";
+
+// import icon summary
+import { LuSalad } from "react-icons/lu";
+import { MdMoneyOff } from "react-icons/md";
+import { FaRegCreditCard } from "react-icons/fa";
+import { SlEnergy } from "react-icons/sl";
+import { FaCheckCircle } from "react-icons/fa";
+
 
 interface IProps {
   amenities: {
@@ -21,7 +30,17 @@ interface IProps {
   maxPerson: number;
   price: number;
   propertyId: string;
+  summaries: ISummary[];
 }
+
+// set icon sumary
+const iconSumary: { [key: string]: JSX.Element } = {
+  LuSalad: <LuSalad />,
+  MdMoneyOff: <MdMoneyOff />,
+  FaRegCreditCard: <FaRegCreditCard />,
+  SlEnergy: <SlEnergy />,
+  FaCheckCircle: <FaCheckCircle />
+};
 
 const ListRoomContainer: React.FC<IProps> = ({
   amenities,
@@ -31,6 +50,7 @@ const ListRoomContainer: React.FC<IProps> = ({
   maxPerson,
   price,
   propertyId,
+  summaries
 }) => {
   const { setPropertyId, setRoomId, setStartDate, setEndDate } =
     useCheckoutContext();
@@ -47,15 +67,13 @@ const ListRoomContainer: React.FC<IProps> = ({
 
   // Delete localStorage when component unmounts
   useEffect(() => {
-    // localStorage.removeItem("propertyId");
-    // localStorage.removeItem("roomId");
-    // localStorage.removeItem("startDate");
-    // localStorage.removeItem("endDate");
     setPropertyId("");
     setRoomId("");
     setStartDate(dayjs(new Date()));
     setEndDate(dayjs(new Date().setDate(new Date().getDate() + 2)));
   }, []);
+
+  console.log({summaries})
 
   return (
     <div className="shadow-md bg-white border-gray-300 rounded-md p-4 mt-2">
@@ -78,20 +96,12 @@ const ListRoomContainer: React.FC<IProps> = ({
           <div className="flex">
             <div className="w-[70%]">
               <p className="font-semibold">Tóm tắt</p>
-              <p className="flex items-center gap-2 mt-4">
-                <IoFastFood size={20} />
-                <span className="text-sm">Bao gồm 2 bữa sáng tuyệt vời</span>
-              </p>
-
-              <p className="flex items-center gap-2 mt-4">
-                <IoFastFood size={20} />
-                <span className="text-sm">Bao gồm 2 bữa sáng tuyệt vời</span>
-              </p>
-
-              <p className="flex items-center gap-2 mt-4">
-                <IoFastFood size={20} />
-                <span className="text-sm">Bao gồm 2 bữa sáng tuyệt vời</span>
-              </p>
+              {summaries.map((item: ISummary) => (
+                <p key={item.id} className="flex items-center gap-2 mt-4">
+                  {iconSumary[item.icon]}
+                  <span className="text-sm">{item.name}</span>
+                </p>
+              ))}
             </div>
 
             <div className="w-[30%] border-l-[1px] border-gray-300 pl-4">
