@@ -12,6 +12,6 @@ router.get("/detail-id/:id", propertyController.getDetailProperyById);
 router.get("/detail/:slug", propertyController.getDetailBySlug);
 router.post("/", propertyController.createProperty);
 router.put("/:id", propertyController.updateProperty);
-router.get("/fetch-full-data", propertyController.fetchFullData);
+
 
 module.exports = router;

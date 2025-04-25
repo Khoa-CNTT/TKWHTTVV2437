@@ -55,16 +55,6 @@ const updateProperty = async (req, res) => {
   }
 };
 
-const fetchFullData = async (req, res) => {
-  try {
-    const response = await PropertyService.fetchFullData();
-    return res.status(200).json(response);
-  } catch (error) {
-    return res.status(404).json({
-      msg: "Error in controller : " + error,
-    });
-  }
-};
 
 const getListAmenityByPropertyId = async (req, res) => {
   try {
@@ -93,7 +83,7 @@ const getListHightlightByPropertyId = async (req, res) => {
 };
 
 module.exports = {
-  fetchFullData,
+  // fetchFullData,
   createProperty,
   listTop10HomestayRating,
   getDetailBySlug,

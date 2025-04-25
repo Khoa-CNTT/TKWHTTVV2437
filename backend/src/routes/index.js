@@ -11,6 +11,7 @@ const HighLightRouter = require("./HighLightRouter");
 const ImageRouter = require("./ImageRouter");
 const ReservationRouter = require("./ReservationRouter");
 const SummaryRouter = require('./SummaryRouter')
+const AIServiceRouter = require("./AIRouter");
 
 const initRoutes = (app) => {
   app.use("/api/user", UserRouter);
@@ -18,6 +19,7 @@ const initRoutes = (app) => {
   app.use("/api/city", CityRouter);
   app.use("/api/review", ReviewRouter);
   app.use("/api/user", UserRouter);
+  app.use("/api/ai", AIServiceRouter);
   app.use("/api/admin", AdminRouter);
   app.use("/api/ai", AIRouter);
   app.use("/api/category", CategoryRouter);

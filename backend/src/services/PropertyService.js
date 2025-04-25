@@ -1,6 +1,5 @@
 const db = require("../models");
-const { fn, col, where } = require("sequelize");
-const { generateEmbeddings } = require("./AIService");
+const { fn, col } = require("sequelize");
 const { v4 } = require("uuid");
 const slugify = require("slugify");
 const hightlightProperty = require("../models/hightlightProperty");
