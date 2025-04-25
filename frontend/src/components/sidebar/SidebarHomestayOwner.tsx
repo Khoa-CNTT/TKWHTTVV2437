@@ -23,10 +23,10 @@ const SidebarHomestayOwner = () => {
           <li
             className="font-medium px-4 py-3 rounded-md cursor-pointer"
             onClick={() => {
-              router.push("/homestay/manage-reservation");
+              router.push("/homestay/list-reservation-approve");
             }}
           >
-            Quản lí đơn đặt phòng.
+            Danh sách cần phê duyệt
           </li>
           <li className="font-medium px-4 py-3 rounded-md cursor-pointer">
             Cài đặt

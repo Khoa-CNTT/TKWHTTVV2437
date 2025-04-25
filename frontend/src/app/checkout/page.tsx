@@ -13,6 +13,8 @@ import dayjs from "dayjs";
 import { useAuth } from "../contexts/AuthContext";
 import SuccessCheckout from "@/components/checkout/SuccessCheckout";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import validate from "@/utils/validateInput";
+import FailedCheckout from "@/components/checkout/FailedCheckout";
 interface IDataEnter {
   firstName: string;
   lastName: string;
@@ -20,36 +22,69 @@ interface IDataEnter {
   phone: string;
   message: string;
   imageBanking: string | null;
+  total?: number | null;
+}
+interface IInvalidField {
+  name: string;
+  mes: string;
 }
 const CheckoutPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-  const isOpen = searchParams.get("status") === "success";
+  const isOpen =
+    searchParams.get("status") === "success" ||
+    searchParams.get("status") === "failed";
   const [show, setShow] = useState(false);
   const [step, setStep] = useState(1);
   const { user } = useAuth();
+
   const { propertyId, roomId, startDate, endDate } = useCheckoutContext(); // Lấy hàm setpropertyId từ context
 
   const [property, setProperty] = useState<IProperty | null>(null);
   const [room, setRoom] = useState<IRoom | null>(null);
-
+  const [invalidFields, setInvalidFields] = useState<IInvalidField[]>([]);
   const [dataEnter, setDataEnter] = useState<IDataEnter>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+    email: user?.email || "",
+    phone: user?.phone || "",
     message: "",
     imageBanking: null,
+    total: null,
   });
-
+  useEffect(() => {
+    setDataEnter({
+      firstName: user?.firstName || "",
+      lastName: user?.lastName || "",
+      email: user?.email || "",
+      phone: user?.phone || "",
+      message: "",
+      imageBanking: null,
+      total:
+        startDate &&
+        endDate &&
+        room?.price &&
+        room?.price * Math.abs(startDate?.diff(endDate, "day")),
+    });
+  }, [user, room]);
   useEffect(() => {
     setShow(isOpen);
   }, [isOpen]);
   const handleStep2 = (value: object) => {
-    setStep(2);
-    console.log("step ", step);
-    console.log("objevt: ", value);
+    const valid = validate(
+      {
+        firstName: dataEnter.firstName,
+        lastName: dataEnter.lastName,
+        email: dataEnter.email,
+        phone: dataEnter.phone,
+      },
+      setInvalidFields
+    );
+
+    if (valid === 0) {
+      setStep(2);
+    }
   };
 
   const handleStep1 = () => {
@@ -88,7 +123,10 @@ const CheckoutPage = () => {
   return (
     <div className="w-[1150px] mx-auto min-h-screen pt-10">
       {show ? (
-        <SuccessCheckout />
+        <div>
+          <SuccessCheckout />
+          <FailedCheckout />
+        </div>
       ) : (
         <div>
           <div className="flex items-center justify-between w-[60%] pr-6">
@@ -103,6 +141,8 @@ const CheckoutPage = () => {
                   handleStep2={handleStep2}
                   dataEnter={dataEnter}
                   onChangeDataEnter={setDataEnter}
+                  invalidFields={invalidFields}
+                  setInvalidFields={setInvalidFields}
                 />
               </div>
             ) : (

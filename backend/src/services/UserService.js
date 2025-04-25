@@ -125,12 +125,23 @@ const detailUser = (id) => {
 const updateUser = (id, payload) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const respone = await db.User.update(
-        { ...payload },
-        {
-          where: { id: id },
-        }
-      );
+      const { password } = payload;
+      let respone;
+      if (password) {
+        respone = await db.User.update(
+          { password: hashPassword(password) },
+          {
+            where: { id: id },
+          }
+        );
+      } else {
+        respone = await db.User.update(
+          { ...payload },
+          {
+            where: { id: id },
+          }
+        );
+      }
 
       resolve({
         status: respone[0] > 0 ? "OK" : "ERR",
@@ -142,7 +153,7 @@ const updateUser = (id, payload) => {
   });
 };
 
-const sendMailOTP = (email) => {
+const sendMailOTP = (email, status) => {
   return new Promise(async (resolve, reject) => {
     try {
       const OTP = generateOTP();
@@ -227,6 +238,13 @@ const sendMailOTP = (email) => {
         html: html,
       });
 
+      if (status) {
+        resolve({
+          status: "OK",
+          msg: "Account is exist",
+          isExist: true,
+        });
+      }
       const checkUser = await db.User.findOne({
         where: { email },
         raw: true,
@@ -253,7 +271,10 @@ const sendMailOTP = (email) => {
 const verifyOTP = (email, OTP) => {
   return new Promise(async (resolve, reject) => {
     try {
-      console.log("oooopp");
+      console.log(email);
+      console.log(OTP);
+      console.log("oooopp123123123");
+
       console.log(otpStore);
       if (
         otpStore[email] &&

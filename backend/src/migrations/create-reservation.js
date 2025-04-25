@@ -29,6 +29,10 @@ module.exports = {
       imageBanking: {
         type: Sequelize.STRING,
       },
+      deposit: {
+        type: Sequelize.DOUBLE,
+        defaultValue: 0,
+      },
       checkIndate: {
         type: Sequelize.DATE,
       },

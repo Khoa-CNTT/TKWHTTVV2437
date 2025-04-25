@@ -1,19 +1,20 @@
 "use client";
 import { useAuth } from "@/app/contexts/AuthContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import InfoField from "./InfoField";
 import { useRouter } from "next/navigation";
-
+import { IUser } from "@/app/types/user";
+import dayjs, { Dayjs } from "dayjs";
 interface IInfoUser {
-  fullName?: string;
-  dateOfBirth?: string;
-  bio?: string;
-  gender?: string;
+  fullName?: string | null;
+  dateOfBirth?: Dayjs | null;
+  bio?: string | null;
+  gender?: string | null;
 
-  phone?: string;
-  email?: string;
-  emergencyPhone?: string;
-  address?: string;
+  phone?: string | null;
+  email?: string | null;
+  emergencyPhone?: string | null;
+  address?: string | null;
 }
 
 const InfoUser = () => {
@@ -32,8 +33,21 @@ const InfoUser = () => {
     address: user?.address,
   });
 
-  const handleEditInfo = () => {
-    router.push(`/account/info?edit=basic-info`);
+  useEffect(() => {
+    setUserInfo({
+      fullName: `${user?.lastName} ${user?.firstName}`,
+      dateOfBirth: user?.dateOfBirth,
+      bio: user?.bio,
+      gender: user?.gender,
+
+      phone: user?.phone,
+      email: user?.email,
+      emergencyPhone: user?.emergencyPhone,
+      address: user?.address,
+    });
+  }, [user]);
+  const handleEditInfo = (value: string) => {
+    router.push(`/account/info?edit=${value}`);
   };
   return (
     <div className="w-full">
@@ -50,7 +64,7 @@ const InfoUser = () => {
               </h1>
               <div
                 className="text-primary font-semibold text-[14] py-2 px-2  rounded-2xl hover:bg-blue-100 cursor-pointer"
-                onClick={handleEditInfo}
+                onClick={() => handleEditInfo("basic-info")}
               >
                 Chỉnh sửa
               </div>
@@ -62,10 +76,15 @@ const InfoUser = () => {
           </div>
 
           <div className="flex flex-wrap ">
-            <InfoField title="Họ tên" label={userInfo?.fullName} />
-            <InfoField title="Tiểu sử" label={userInfo?.bio} />
-            <InfoField title="Ngày sinh" label={userInfo?.dateOfBirth} />
-            <InfoField title="Giới tính" label={userInfo?.gender} />
+            <InfoField title="Họ tên" label={userInfo?.fullName || ""} />
+            <InfoField title="Tiểu sử" label={userInfo?.bio || ""} />
+            <InfoField
+              title="Ngày sinh"
+              label={
+                String(dayjs(userInfo?.dateOfBirth).format("DD/MM/YYYY")) || ""
+              }
+            />
+            <InfoField title="Giới tính" label={userInfo?.gender || ""} />
           </div>
         </div>
 
@@ -77,7 +96,7 @@ const InfoUser = () => {
               </h1>
               <div
                 className="text-primary font-semibold text-[14] py-2 px-2  rounded-2xl hover:bg-blue-100 cursor-pointer"
-                onClick={handleEditInfo}
+                onClick={() => handleEditInfo("address-info")}
               >
                 Chỉnh sửa
               </div>
@@ -89,13 +108,16 @@ const InfoUser = () => {
           </div>
 
           <div className="flex flex-wrap ">
-            <InfoField title="Số điện thoại di động" label={userInfo?.phone} />
-            <InfoField title="Email" label={userInfo?.email} />
+            <InfoField
+              title="Số điện thoại di động"
+              label={userInfo?.phone || ""}
+            />
+            <InfoField title="Email" label={userInfo?.email || ""} />
             <InfoField
               title="Liên lạc khẩn cấp"
-              label={userInfo?.emergencyPhone}
+              label={userInfo?.emergencyPhone || ""}
             />
-            <InfoField title="Địa chỉ" label={userInfo?.address} />
+            <InfoField title="Địa chỉ" label={userInfo?.address || ""} />
           </div>
         </div>
       </div>

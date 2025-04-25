@@ -35,7 +35,7 @@ const getDetailById = (roomId) => {
     try {
       const rooms = await db.Room.findOne({
         where: { id: roomId },
-        attributes: ["name", "price", "maxPerson"],
+        attributes: ["name", "price", "maxPerson", "deposit"],
       });
 
       resolve({
