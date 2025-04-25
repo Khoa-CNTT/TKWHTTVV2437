@@ -69,21 +69,20 @@ class QueryController {
       };
 
       const initialResult = {
-        query: text,
-        matchedItems: matchedItems.slice(0, 3),
-        simpleResponse: generateSimplifiedResponseText(
-          queryResult,
-          previousQuery
-        ),
+        // query: text,
+        // matchedItems: matchedItems.slice(0, 3),
+        // simpleResponse: generateSimplifiedResponseText(
+        //   queryResult,
+        //   previousQuery
+        // ),
         processingTimeMs: Date.now() - startTime,
       };
-      res.write(JSON.stringify(initialResult));
+      // res.write(JSON.stringify(initialResult));
 
       const responseText = generateSimplifiedResponseText(
         queryResult,
         previousQuery
       );
-      console.log("Response text:", responseText);
 
       // Tạo prompt với tất cả intents
       let prompt = `Bạn là một trợ lý du lịch thân thiện. Dựa trên câu hỏi hiện tại: "${text}", và thông tin từ cơ sở dữ liệu (lọc theo các loại: ${intents.join(
@@ -95,7 +94,7 @@ class QueryController {
         prompt += `Ngữ cảnh từ câu hỏi trước:\n- Câu hỏi: "${previousQuery.query}"\n- Câu trả lời: "${previousQuery.response}"\n\n`;
       }
 
-      prompt += `Vui lòng trả lời bằng tiếng Việt, ngắn gọn (tối đa 2-3 câu), đúng trọng tâm và tự nhiên. Nếu có thông tin, hãy phản hồi các thuộc tính liên quan như địa điểm, tiện nghi, giá, v.v. Nếu không có kết quả phù hợp, hãy đưa ra một gợi ý tích cực và lịch sự.Nếu có hình ảnh hãy lấy ("url") đó Tránh sử dụng các cụm như "không có thông tin" hay "không tìm thấy".\n\nCâu trả lời:`;
+      prompt += `Vui lòng trả lời bằng tiếng Việt, ngắn gọn (tối đa 2-3 câu), đúng trọng tâm và tự nhiên. Nếu có thông tin, hãy phản hồi các thuộc tính liên quan như địa điểm, tiện nghi, giá, v.v. Nếu không có kết quả phù hợp, hãy đưa ra một gợi ý tích cực và lịch sự.Tránh sử dụng các cụm như "không có thông tin" hay "không tìm thấy".\n\nCâu trả lời:`;
 
       console.log("Prompt for AI:", prompt);
       const [groqResult, deepSeekResult] = await Promise.all([
