@@ -42,14 +42,14 @@ const ChooseDateContainer = () => {
   };
 
   const handleSubmit = () => {
-    console.log("Start Date:", selectedDateRange[0]?.format("YYYY-MM-DD"));
-    console.log("End Date:", selectedDateRange[1]?.format("YYYY-MM-DD"));
     setStartDate(selectedDateRange[0] || null);
     setEndDate(selectedDateRange[1] || null);
     setShowDateRange(false); // Ẩn lịch sau khi chọn
   };
 
-  const handleSearchRoom = () => {};
+  // const handleSearchRoom = () => {
+    
+  // };
 
   return (
     <div className="flex gap-2 items-center mt-2">
@@ -100,13 +100,13 @@ const ChooseDateContainer = () => {
         )}
       </div>
 
-      <button
+      {/* <button
         onClick={handleSearchRoom}
         className="text-white font-medium bg-blue-700 px-8 py-2 rounded-md flex items-center gap-2 hover:opacity-90 transition-all duration-200"
       >
         <RxUpdate className="text-white" size={20} />
         Thay đổi tìm kiếm
-      </button>
+      </button> */}
     </div>
   );
 };

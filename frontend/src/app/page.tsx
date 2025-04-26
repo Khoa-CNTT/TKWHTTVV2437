@@ -13,7 +13,7 @@ export default async function Home() {
 
   return (
     <div className="relative">
-      <div className="fixed bottom-[80px] right-[80px] shadow-lg z-10">
+      <div className="fixed bottom-[80px] right-[80px] z-10">
         <IconChat />
       </div>
       <Banner />

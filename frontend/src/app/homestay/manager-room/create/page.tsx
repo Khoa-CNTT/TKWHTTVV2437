@@ -1,0 +1,455 @@
+"use client";
+
+import React, { ChangeEvent, useEffect, useState } from "react";
+import { IImage } from "@/app/types/property";
+import { v4 as uuidv4 } from "uuid";
+import FormControl from '@mui/material/FormControl';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import InputAdornment from '@mui/material/InputAdornment';
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import { IRoomCreate } from "@/app/types/room";
+import { VscSaveAs } from "react-icons/vsc";
+
+
+import { MdDeleteForever } from "react-icons/md";
+import { FaPlus } from "react-icons/fa6";
+import apisImage from "@/apis/image";
+import TextField from "@mui/material/TextField";
+import Checkbox from "@mui/material/Checkbox";
+import { ISummary } from "@/app/types/summary";
+import { LuPlus } from "react-icons/lu";
+import { LuMinus } from "react-icons/lu";
+
+// import icon summary
+import { LuSalad } from "react-icons/lu";
+import { MdMoneyOff } from "react-icons/md";
+import { FaRegCreditCard } from "react-icons/fa";
+import { SlEnergy } from "react-icons/sl";
+import { FaCheckCircle } from "react-icons/fa";
+
+// import icon
+import { FaSwimmer } from "react-icons/fa";
+import { TbSmokingNo } from "react-icons/tb";
+import { FaWifi } from "react-icons/fa";
+import { LuCircleParking } from "react-icons/lu";
+import { FaUmbrellaBeach } from "react-icons/fa";
+import { MdRestaurant } from "react-icons/md";
+import { TbBus } from "react-icons/tb";
+import { MdFamilyRestroom } from "react-icons/md";
+import { IAmenity } from "@/app/types/amenity";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import apisAmenity from "@/apis/amenity";
+import apisSummary from "@/apis/summary";
+import apisRoom from "@/apis/room";
+
+// set icon map
+const iconMap: { [key: string]: JSX.Element } = {
+  FaSwimmer: <FaSwimmer />,
+  TbSmokingNo: <TbSmokingNo />,
+  FaWifi: <FaWifi />,
+  LuCircleParking: <LuCircleParking />,
+  FaUmbrellaBeach: <FaUmbrellaBeach />,
+  MdRestaurant: <MdRestaurant />,
+  TbBus: <TbBus />,
+  MdFamilyRestroom: <MdFamilyRestroom />,
+};
+
+// set icon sumary
+const iconSumary: { [key: string]: JSX.Element } = {
+  LuSalad: <LuSalad />,
+  MdMoneyOff: <MdMoneyOff />,
+  FaRegCreditCard: <FaRegCreditCard />,
+  SlEnergy: <SlEnergy />,
+  FaCheckCircle: <FaCheckCircle />
+};
+
+const listStatus = [
+  {
+    key: "0",
+    value: "Chọn trạng thái"
+  },
+  {
+    key: "active",
+    value: "Đang hoạt động"
+  },
+  {
+    key: "inactive",
+    value: "Không hoạt động"
+  }
+]
+
+interface IProps {
+  id: string;
+}
+
+const InformationRoom:React.FC<IProps> = ({id}) => {
+  const [selectedImage, setSelectedImage] = useState<IImage[]>([]);
+  const [showTrash, setShowTrash] = useState<string>("");
+  const [data, setData] = useState<{ name?: string, maxPerson?: number, price?: string, status?: string, code?: string, quantity?: number}>({
+    name: "",
+    maxPerson: 1,
+    price: "",
+    status: "0",
+    code: "",
+    quantity: 1,
+  });
+  const [amenities, setAmenities] = useState<IAmenity[]>([]);
+  const [summaries, setSummaries] = useState<ISummary[]>([]);
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [selectedSummaries, setSelectedSummaries] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchDataAmenities = async () => {
+          const response = await apisAmenity.getAllList();
+    
+          if (response?.data) {
+            setAmenities(response.data);
+          }
+        };
+    const fetchDataSummaries = async() => {
+      const response = await apisSummary.getAllList();
+
+      if (response?.data) {
+        setSummaries(response.data)
+      }
+    }
+
+    fetchDataAmenities();
+    fetchDataSummaries();
+  }, [])
+
+  useEffect(() => {
+    const fetchDataRoom = async () => {
+      const response = await apisRoom.getDetailById(id);
+
+      if (response.data) {
+        setData({
+          name: response.data.name,
+          maxPerson: response.data.maxPerson,
+          price: response.data.price,
+          status: response.data.status,
+          code: response.data.code,
+          quantity: response.data.quantity,
+        })
+
+        setSelectedImage(response.data.images.map((item:{id: string, image: string}) => ({id: item.id, image: item.image})));
+
+        setSelectedAmenities(response.data.amenities.map((item:{id: string}) => item.id));
+
+        setSelectedSummaries(response.data.summaries.map((item:{id: string}) => item.id));
+      }
+    }
+
+    fetchDataRoom();
+
+  }, [id])
+
+  const handleRemoveImage = (id: string) => {
+    setSelectedImage((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const formData = new FormData();
+      Array.from(e.target.files).forEach((file) => {
+        formData.append("images", file);
+      });
+
+      const uploadImage = async () => {
+        const response = await apisImage.uploadImageMutiple(formData);
+
+        if (response.files) {
+          const newImages = response.files.map((item: { url: string }) => ({
+            id: uuidv4(),
+            image: item.url,
+          }));
+          setSelectedImage((prev) => [...prev, ...newImages]);
+        }
+      };
+
+      uploadImage();
+    }
+  };
+
+  // function handle
+  const handleCheckboxChange = (id: string) => {
+    setSelectedAmenities((prev) => {
+      if (prev.includes(id)) {
+        // Nếu đã chọn, loại bỏ khỏi danh sách
+        return prev.filter((amenityId) => amenityId !== id);
+      } else {
+        // Nếu chưa chọn, thêm vào danh sách
+        return [...prev, id];
+      }
+    });
+  };
+
+  // function onchage checkbox summary
+  const handleCheckboxChangeSummary = (id: string) => {
+    setSelectedSummaries((prev) => {
+      if (prev.includes(id)) {
+        // Nếu đã chọn, loại bỏ khỏi danh sách
+        return prev.filter((summaryId) => summaryId !== id);
+      } else {
+        // Nếu chưa chọn, thêm vào danh sách
+        return [...prev, id];
+      }
+    });
+  };
+
+
+  const handleSubmit = () => {
+    let dataSubmit:IRoomCreate = {};
+    dataSubmit.images = selectedImage;
+    dataSubmit.amenities = selectedAmenities;
+    dataSubmit.summaries = selectedSummaries;
+
+    dataSubmit = {...dataSubmit, ...data};
+
+      if (id) {
+        console.log("handle update");
+        const handleUpdateData = async() => {
+          const response = await apisRoom.updateRoom(id, dataSubmit);
+
+          console.log(response);
+        }
+
+        handleUpdateData();
+      } else {
+        console.log("handle create");
+        const handleCreateData = async() => {
+          const response = await apisRoom.createRoom(dataSubmit);
+  
+          console.log({response})
+        }
+  
+        handleCreateData();
+      }
+  }
+
+  return (
+    <div className="p-8">
+      <h1 className="text-2xl font-semibold">Thông tin phòng</h1>
+
+      <h3 className="mt-8 text-md font-semibold">Thông tin ảnh</h3>
+
+      <div className="grid grid-cols-6 gap-2 mt-2">
+        {selectedImage?.map((item: { image: string; id: string }) => (
+          <div
+            key={item.id}
+            className="relative"
+            onMouseEnter={() => setShowTrash(item.id)}
+            onMouseLeave={() => setShowTrash("")}
+          >
+            <img
+              key={item.id}
+              alt="image"
+              className="h-[160px] w-full rounded-md object-cover"
+              src={item.image}
+            ></img>
+
+            {showTrash === item.id && (
+              <button
+                onClick={() => handleRemoveImage(item.id)}
+                className="absolute top-[10px] right-[10px]"
+              >
+                <MdDeleteForever className="text-red-500" size={24} />
+              </button>
+            )}
+          </div>
+        ))}
+
+        <label
+          htmlFor="file-input"
+          className="border-[2px] border-blue-700 flex items-center justify-center border-dashed cursor-pointer h-[160px]"
+        >
+          <div>
+            <div className="flex justify-center pb-3">
+              <FaPlus size={22} className="text-blue-700" />
+            </div>
+            <span className="font-semibold">Chọn thêm ảnh</span>
+          </div>
+        </label>
+        <input
+          id="file-input"
+          type="file"
+          name="images"
+          multiple
+          accept="image/*"
+          onChange={handleFileChange}
+          hidden
+        />
+      </div>
+
+      <h4 className="mt-8 text-2xl font-semibold">Thông tin chi tiết phòng</h4>
+
+      <div className="mt-4 flex items-center gap-8">
+        <div className="flex flex-col gap-2 w-[70%]">
+          <label className="font-semibold text-md">Tên homestay</label>
+          <TextField
+            value={data?.name}
+            onChange={(e) => setData({ ...data, name: e.target.value })}
+            sx={{
+              "& .MuiInputBase-input": {
+                padding: "10px", // Padding cho nội dung input
+              },
+            }}
+            id="outlined-basic"
+            variant="outlined"
+          />
+        </div>
+
+        <div className="flex flex-col gap-2 w-[20%]">
+          <label className="font-semibold text-md">Mã phòng</label>
+          <TextField
+            value={data?.code}
+            onChange={(e) => setData({ ...data, code: e.target.value })}
+            sx={{
+              "& .MuiInputBase-input": {
+                padding: "10px", // Padding cho nội dung input
+              },
+            }}
+            id="outlined-basic"
+            variant="outlined"
+          />
+        </div>
+      </div>
+
+      <div className="mt-4 flex items-center gap-4">
+        <div className="flex flex-col gap-2">
+            <label className="font-semibold text-md">Giá / 1 đêm (VND)</label>
+
+            <OutlinedInput
+              value={data.price}
+              onChange={(e) => {
+                if (isNaN(Number(e.target.value))) {
+                  return;
+                } 
+
+                setData((prev) => ({...prev, price: e.target.value}))
+              }}
+              id="outlined-adornment-amount"
+              startAdornment={<InputAdornment position="start">$</InputAdornment>}
+              sx={{
+                "& .MuiInputBase-input": {
+                  padding: "10px", // Padding cho nội dung input
+                },
+              }}
+            />
+        </div>
+
+        <div className="w-[15%] flex flex-col gap-2">
+          <label className="font-semibold text-md">Trạng thái</label>
+
+          <FormControl fullWidth>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={data.status || "0"} // Giá trị mặc định từ state
+              onChange={(e) => setData({ ...data, status: e.target.value })}
+              sx={{
+                "& .MuiSelect-select": {
+                  padding: "10px", // Tùy chỉnh padding
+                },
+              }}
+            >
+              {listStatus.map((item: { key: string; value: string }) => (
+                <MenuItem key={item.key} value={item.key}>
+                  {item.value}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="font-semibold text-md">Sức chứa/ người</label>
+          <div className="flex text-sm items-center gap-4 h-[43px] border px-6 rounded-md border-gray-300">
+              <LuMinus onClick={() => {
+                if (data.maxPerson === 1) {
+                  return;
+                } else {
+                  setData((prev) => ({...prev, maxPerson: prev.maxPerson - 1}))
+                }
+              }} size={25} className="text-gray-600 cursor-pointer" />
+              <p className="w-[50px] font-semibold no-selecter text-center">{data.maxPerson}</p>
+              <LuPlus onClick={() => setData((prev) => ({...prev, maxPerson: prev.maxPerson + 1}))} size={22} className="text-gray-600 cursor-pointer" />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="font-semibold text-md">Số lượng phòng</label>
+          <div className="flex text-sm items-center gap-4 h-[43px] border px-6 rounded-md border-gray-300">
+              <LuMinus onClick={() => {
+                if (data.quantity === 1) {
+                  return;
+                } else {
+                  setData((prev) => ({...prev, quantity: prev.quantity - 1}))
+                }
+              }} size={22} className="text-gray-600 cursor-pointer" />
+              <p className="w-[70px] font-semibold no-selecter text-center">{data.quantity}</p>
+              <LuPlus onClick={() => setData((prev) => ({...prev, quantity: prev.quantity + 1}))} size={22} className="text-gray-600 cursor-pointer" />
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6 flex flex-col gap-2">
+        <label className="font-semibold text-md">Thông tin các tiện ích</label>
+
+        <div className="grid grid-cols-6 gap-4">
+          {amenities.map((item: IAmenity) => (
+            <FormControlLabel
+              key={item.id}
+              control={
+                <Checkbox
+                  checked={selectedAmenities.includes(item.id)}
+                  onChange={() => handleCheckboxChange(item.id)}
+                ></Checkbox>
+              }
+              label={
+                <div className="text-green-700 flex items-center gap-2 text-sm font-medium">
+                  <div className="text-xl">{iconMap[item.icon]}</div>
+                  <span>{item.name}</span>
+                </div>
+              }
+            />
+          ))}
+        </div>
+        <div className="mt-6 flex flex-col gap-2">
+          <label className="font-semibold text-md">Thông tin tóm tắt</label>
+
+          <div className="grid grid-cols-6 gap-4">
+          {summaries.map((item: ISummary) => (
+            <FormControlLabel
+              key={item.id}
+              control={
+                <Checkbox
+                  checked={selectedSummaries.includes(item.id)}
+                  onChange={() => handleCheckboxChangeSummary(item.id)}
+                ></Checkbox>
+              }
+              label={
+                <div className="text-green-700 flex items-center gap-2 text-sm font-medium">
+                  <div className="text-xl">{iconSumary[item.icon]}</div>
+                  <span>{item.name}</span>
+                </div>
+              }
+            />
+          ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-end mt-8">
+        <button onClick={handleSubmit} className="flex items-center gap-2 bg-green-700 py-3 px-8 text-white rounded-md font-semibold hover:opacity-90 transition-300">
+          <VscSaveAs size={20} />
+          <span>{id ? "Cập nhật thông tin phòng" : "Tạo loại phòng"}</span>
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default InformationRoom;

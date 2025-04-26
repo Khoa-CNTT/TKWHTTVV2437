@@ -1,0 +1,578 @@
+[33mcommit 8f47992aa5562752d751fc8901ababfa184ac202[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfix/feature-ai-integration[m[33m)[m
+Author: VoVanBa <bavo4585@gmail.com>
+Date:   Fri Apr 25 19:27:39 2025 +0700
+
+    Fix AI integration and remove .env from tracking
+
+[33mcommit f29d1ae10279d754ee545d120fae38628549526d[m
+Author: VoVanBa <bavo4585@gmail.com>
+Date:   Fri Apr 25 10:21:07 2025 +0700
+
+    Resolve conflict sau khi stash pop
+
+[33mcommit ea2b1d7785dc5c929c2658735add04528c2fc0e3[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Merge: c2bb9a0 4040f1c
+Author: tangducvinh <132068824+tangducvinh@users.noreply.github.com>
+Date:   Fri Apr 25 08:34:43 2025 +0700
+
+    Merge pull request #8 from Khoa-CNTT/feature/manager-room
+    
+    add summeires detail page
+
+[33mcommit 4040f1c0b885ca82c18d1a140d848b868cd55ea2[m
+Author: vinhtd1 <vinhtd1@runsystem.net>
+Date:   Fri Apr 25 08:32:20 2025 +0700
+
+    add summeires detail page
+
+[33mcommit c2bb9a05f6d2a45417f64d6de215144cd1bc70c7[m
+Merge: 59c4725 ccdf180
+Author: tangducvinh <132068824+tangducvinh@users.noreply.github.com>
+Date:   Thu Apr 24 16:48:43 2025 +0700
+
+    Merge pull request #7 from Khoa-CNTT/feature/manager-room
+    
+    handle create and update room
+
+[33mcommit ccdf180b95a9bbd6ad910320f2f6481b33e00a87[m
+Author: vinhtd1 <ducvinh100503@gmail.com>
+Date:   Thu Apr 24 16:46:12 2025 +0700
+
+    handle create and update room
+
+[33mcommit 59c4725c2ef5e943022d0eb10a6c481871d23b93[m
+Merge: 1137aaa 37ebc78
+Author: tangducvinh <132068824+tangducvinh@users.noreply.github.com>
+Date:   Thu Apr 24 08:07:44 2025 +0700
+
+    Merge pull request #6 from Khoa-CNTT/feature/manage-room
+    
+    build list room and ui edit room
+
+[33mcommit 37ebc78a766342dfb6a0cd169be8051722d87c7b[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Wed Apr 23 22:52:24 2025 +0700
+
+    build list room and ui edit room
+
+[33mcommit 1137aaa74de9ef8c8fddd6963dc16d17e598dde0[m
+Merge: 3306a04 116cf35
+Author: tangducvinh <132068824+tangducvinh@users.noreply.github.com>
+Date:   Tue Apr 22 20:50:31 2025 +0700
+
+    Merge pull request #5 from Khoa-CNTT/feature/information-homestay
+    
+    Feature/information homestay
+
+[33mcommit 116cf35ca69c0eb33043d89f817c84e4c9baf6eb[m
+Merge: 868d200 3306a04
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Tue Apr 22 20:48:16 2025 +0700
+
+    handle conflict
+
+[33mcommit 3306a04cf212f77ac96152f6e45aeb8d47201f20[m
+Merge: da8e29e 14336c2
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Tue Apr 22 20:45:18 2025 +0700
+
+    handle confict
+
+[33mcommit 868d200112a6322297794b8961c54e8207f2dd6f[m
+Author: vinhtd1 <ducvinh100503@gmail.com>
+Date:   Tue Apr 22 16:13:54 2025 +0700
+
+    fix ui
+
+[33mcommit a0f67552f867289708bbdef87141e2b0fe2f9065[m
+Author: vinhtd1 <ducvinh100503@gmail.com>
+Date:   Tue Apr 22 13:37:58 2025 +0700
+
+    handle create and update
+
+[33mcommit 8ac2df6053380d89c215f1306e6b7572dcd7ccad[m
+Merge: e814695 cdad9b1
+Author: vinhtd1 <ducvinh100503@gmail.com>
+Date:   Tue Apr 22 08:06:18 2025 +0700
+
+    Merge branch 'feature/information-homestay' of https://github.com/Khoa-CNTT/TKWHTTVV2437 into feature/information-homestay
+
+[33mcommit cdad9b16a556c9db3bd8624696fba6d14da05362[m[33m ([m[1;31morigin/feature/information-homestay[m[33m)[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Tue Apr 22 06:55:03 2025 +0700
+
+    api upload image
+
+[33mcommit 22f8ccab54e87c49315e7efa7eeec7d97a7bc9dc[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Sun Apr 20 20:41:20 2025 +0700
+
+    handle change some input
+
+[33mcommit 14336c226ca8ff8dae706a23ad288c4adf0124dc[m
+Author: NgocPhucDn03 <ngocphucdn06@gmail.com>
+Date:   Sat Apr 19 17:23:13 2025 +0700
+
+    Update
+
+[33mcommit 6a9a03d742f189c33610c806205a67678a7df634[m
+Author: NgocPhucDn03 <ngocphucdn06@gmail.com>
+Date:   Sat Apr 19 17:11:04 2025 +0700
+
+    .
+
+[33mcommit 3827a7cfbcbc61fa6faeb5d0cf8a3fde48a330ea[m[33m ([m[1;31morigin/feature/admin[m[33m)[m
+Author: NgocPhucDn03 <ngocphucdn06@gmail.com>
+Date:   Sat Apr 19 16:32:27 2025 +0700
+
+    Update User UI
+
+[33mcommit 1eef75cfef090bc09ef7e6a489d5e9c43d54d1bd[m
+Author: NgocPhucDn03 <ngocphucdn06@gmail.com>
+Date:   Sat Apr 19 13:52:54 2025 +0700
+
+    More BE and User FE of Admin
+
+[33mcommit cfd3ca50f275d5add781f63242e638d2a345bf5f[m
+Merge: acda96a 90089b3
+Author: NgocPhucDn03 <ngocphucdn06@gmail.com>
+Date:   Fri Apr 18 17:39:30 2025 +0700
+
+    Merge branch 'main' of https://github.com/Khoa-CNTT/TKWHTTVV2437 into Phuc
+
+[33mcommit acda96aa7e2b3ed751d3c57bdefdb7947c8140f3[m
+Author: NgocPhucDn03 <ngocphucdn06@gmail.com>
+Date:   Fri Apr 18 17:36:28 2025 +0700
+
+    Config update
+
+[33mcommit 90089b336b64ece94b2413ccdb3c205e3be2622c[m
+Author: tranvanthinh <badagor999@gmail.com>
+Date:   Fri Apr 18 16:33:46 2025 +0700
+
+    form quan ly
+
+[33mcommit 91fd3b83ccd94dee5812e2c0da72ff53b4ecb852[m
+Merge: 3ae88d5 fe51409
+Author: tranvanthinh <badagor999@gmail.com>
+Date:   Fri Apr 18 14:59:59 2025 +0700
+
+    Resovle conflict when merge feature/checkoutPayment
+
+[33mcommit e8146959c72fc598537356cd3f73ab69c17f990e[m
+Merge: da8e29e c9cc0e0
+Author: tangducvinh <132068824+tangducvinh@users.noreply.github.com>
+Date:   Thu Apr 17 22:36:26 2025 +0700
+
+    Merge pull request #4 from Khoa-CNTT/feature/ui-chatbot
+    
+    build ui chat bot
+
+[33mcommit 3ae88d5517c8045a789d379ad36cf1dbdbccd27b[m
+Merge: 862e65d 1990fe2
+Author: tangducvinh <132068824+tangducvinh@users.noreply.github.com>
+Date:   Thu Apr 17 22:36:26 2025 +0700
+
+    Merge pull request #4 from Khoa-CNTT/feature/ui-chatbot
+    
+    build ui chat bot
+
+[33mcommit c9cc0e01815a30222fd158351447f6c940a6d7dd[m[33m ([m[1;31morigin/feature/ui-chatbot[m[33m)[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Thu Apr 17 22:34:49 2025 +0700
+
+    build ui chat bot
+
+[33mcommit 1990fe2345a0cc28e3c2134d7de2b65fbdf8a73d[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Thu Apr 17 22:34:49 2025 +0700
+
+    build ui chat bot
+
+[33mcommit da8e29e5c63041c538b9c048035ae10a80a1fd22[m
+Merge: 50b536b 07ef3fd
+Author: tangducvinh <132068824+tangducvinh@users.noreply.github.com>
+Date:   Thu Apr 17 20:46:14 2025 +0700
+
+    Merge pull request #3 from Khoa-CNTT/feature/information-homestay
+    
+    Feature/information homestay
+
+[33mcommit 862e65d97d4d141456bcff77b80f66f5a183ad9d[m
+Merge: 81578f8 a57357d
+Author: tangducvinh <132068824+tangducvinh@users.noreply.github.com>
+Date:   Thu Apr 17 20:46:14 2025 +0700
+
+    Merge pull request #3 from Khoa-CNTT/feature/information-homestay
+    
+    Feature/information homestay
+
+[33mcommit 07ef3fdbf1470399e62f5e45b9ad0007f21920b0[m
+Merge: 4baf484 50b536b
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Thu Apr 17 20:44:24 2025 +0700
+
+    add table address
+
+[33mcommit a57357d4325b8b10300bd6a000ccec77bf2d02c2[m
+Merge: bfeb2ba 81578f8
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Thu Apr 17 20:44:24 2025 +0700
+
+    add table address
+
+[33mcommit fe51409ee072bbb89435866014ab93ddab97849b[m
+Author: tranvanthinh <badagor999@gmail.com>
+Date:   Thu Apr 17 17:42:55 2025 +0700
+
+    build checkoutPayment
+
+[33mcommit 50b536b2e2b50baa31b5f106d4c5016a6798b981[m
+Merge: e32fcc9 7f65c3e
+Author: VoBa <104675836+VoVanBa@users.noreply.github.com>
+Date:   Thu Apr 17 10:52:52 2025 +0700
+
+    Merge pull request #2 from Khoa-CNTT/feature/ai-integration
+    
+    feat(ai): handle AI response and map to chat message
+
+[33mcommit 81578f84d621401aa79be5e3ec9b9fbfbaa6960e[m
+Merge: ba41512 34a9a4b
+Author: VoBa <104675836+VoVanBa@users.noreply.github.com>
+Date:   Thu Apr 17 10:52:52 2025 +0700
+
+    Merge pull request #2 from Khoa-CNTT/feature/ai-integration
+    
+    feat(ai): handle AI response and map to chat message
+
+[33mcommit 7f65c3ecf62c2ce95885a7e9090cb685dcfb59ba[m
+Author: VoVanBa <bavo4585@gmail.com>
+Date:   Thu Apr 17 10:48:29 2025 +0700
+
+    feat(ai): handle AI response and map to chat message (no .env)
+
+[33mcommit 34a9a4b0dade8a2fb5165c12641511748105a2f3[m
+Author: VoVanBa <bavo4585@gmail.com>
+Date:   Thu Apr 17 10:48:29 2025 +0700
+
+    feat(ai): handle AI response and map to chat message (no .env)
+
+[33mcommit 4baf4847754e0b7dae16d2f2d7c365863e3f2a96[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Wed Apr 16 22:30:58 2025 +0700
+
+    code ui information homestay
+
+[33mcommit bfeb2ba89985fb51dea4f240721ca138ccd78727[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Wed Apr 16 22:30:58 2025 +0700
+
+    code ui information homestay
+
+[33mcommit ba415129192ea5277a67862d5b6387c697d1859c[m
+Merge: 0d5ecf4 f9eae1d
+Author: tranvanthinh <badagor999@gmail.com>
+Date:   Wed Apr 16 13:00:27 2025 +0700
+
+    Resolve merge conflict
+
+[33mcommit e32fcc99bcb78b450ddf39387136b9f573fffa1b[m
+Merge: 1950b89 515fb8d
+Author: tranvanthinh <badagor999@gmail.com>
+Date:   Wed Apr 16 13:00:27 2025 +0700
+
+    Resolve merge conflict
+
+[33mcommit f9eae1db831fc7476b6a8225adae6f20696f694c[m
+Author: tranvanthinh <badagor999@gmail.com>
+Date:   Wed Apr 16 11:56:18 2025 +0700
+
+    Buildmenu and manage user
+
+[33mcommit 515fb8dd73158e980f38cd45764c4b6e2b7f212c[m[33m ([m[1;31morigin/feature/user[m[33m)[m
+Author: tranvanthinh <badagor999@gmail.com>
+Date:   Wed Apr 16 11:56:18 2025 +0700
+
+    Buildmenu and manage user
+
+[33mcommit 1950b897ade3e2df2062ccf529ec262fc9cc07b3[m
+Merge: 003a27e ef213b6
+Author: tangducvinh <132068824+tangducvinh@users.noreply.github.com>
+Date:   Tue Apr 15 22:41:59 2025 +0700
+
+    Merge pull request #1 from Khoa-CNTT/feature/checkout
+    
+    Feature/checkout
+
+[33mcommit 0d5ecf42a4e7a76831ddb334f2a35f4ce1e9a070[m
+Merge: b08d43b bfe4f3a
+Author: tangducvinh <132068824+tangducvinh@users.noreply.github.com>
+Date:   Tue Apr 15 22:41:59 2025 +0700
+
+    Merge pull request #1 from Khoa-CNTT/feature/checkout
+    
+    Feature/checkout
+
+[33mcommit ef213b6721010c344b76e581ea5e47f10c5cb7a8[m[33m ([m[1;31morigin/feature/checkout[m[33m)[m
+Merge: 5cff0b5 003a27e
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Tue Apr 15 22:40:33 2025 +0700
+
+    merge
+
+[33mcommit bfe4f3a82bb0f2f03acdff1cd8e6c3129d060ed9[m
+Merge: 4c52257 b08d43b
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Tue Apr 15 22:40:33 2025 +0700
+
+    merge
+
+[33mcommit 5cff0b5cbab978957663cd6404107c2a7c08df02[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Tue Apr 15 22:36:47 2025 +0700
+
+    handle save data to localstorage and onchange input and textarea
+
+[33mcommit 4c52257a93709610709dae40a90f4384df0f28b9[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Tue Apr 15 22:36:47 2025 +0700
+
+    handle save data to localstorage and onchange input and textarea
+
+[33mcommit 488324ac42d3996693a99c471d3a9ef2cf7331b5[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Mon Apr 14 23:45:24 2025 +0700
+
+    add choose room
+
+[33mcommit fca7d7ddd7af0690748d44ed03ddc54593c36318[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Mon Apr 14 23:45:24 2025 +0700
+
+    add choose room
+
+[33mcommit b08d43be09fd566f3262c7ce7d4964cb0786133c[m
+Author: tranvanthinh <badagor999@gmail.com>
+Date:   Sat Apr 12 15:56:26 2025 +0700
+
+    update header
+
+[33mcommit 003a27e0a056acf7a95dd66d841cd59044412804[m
+Author: tranvanthinh <badagor999@gmail.com>
+Date:   Sat Apr 12 15:56:26 2025 +0700
+
+    update header
+
+[33mcommit cafa79ba1d6fc1b39e610d1f86ff3ae920e0c292[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Fri Apr 11 12:51:59 2025 +0700
+
+    fetch api checkout page
+
+[33mcommit 9bdceb2ccbea053eb40530f5cf7a0d4e2886bff6[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Fri Apr 11 12:51:59 2025 +0700
+
+    fetch api checkout page
+
+[33mcommit b27063ca67f356584134f0d690c35e99bacd6803[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Thu Apr 10 06:01:33 2025 +0700
+
+    build ui
+
+[33mcommit a142c2354cc1b26af82cd4f981f984363edab0e7[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Thu Apr 10 06:01:33 2025 +0700
+
+    build ui
+
+[33mcommit 8b71cbb2f9dd4a6deccbc9fbf5703fa83d520b34[m
+Author: tangducvinh <132068824+tangducvinh@users.noreply.github.com>
+Date:   Sat Apr 5 14:15:35 2025 +0700
+
+    Delete backend.rar
+
+[33mcommit d1773809772656a61d66083b938d3461fe352e0a[m
+Author: tangducvinh <132068824+tangducvinh@users.noreply.github.com>
+Date:   Sat Apr 5 14:15:35 2025 +0700
+
+    Delete backend.rar
+
+[33mcommit c00272727506df61b6df8cd78c32c9c3fd391a69[m
+Merge: 211eba6 0923223
+Author: tangducvinh <132068824+tangducvinh@users.noreply.github.com>
+Date:   Sat Apr 5 13:57:11 2025 +0700
+
+    Merge pull request #2 from tranvanthinh2509/feature/home
+    
+    Feature/home
+
+[33mcommit 05bb7deceffa135d2479904f1ab49baaf5da3e1f[m
+Merge: 548cce4 fc79fd6
+Author: tangducvinh <132068824+tangducvinh@users.noreply.github.com>
+Date:   Sat Apr 5 13:57:11 2025 +0700
+
+    Merge pull request #2 from tranvanthinh2509/feature/home
+    
+    Feature/home
+
+[33mcommit 0923223f3d970191c5fc5466a9d7e4358b9c68d7[m
+Merge: bcbbaed 698041b
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Sat Apr 5 13:54:00 2025 +0700
+
+    handle confict
+
+[33mcommit fc79fd6f049bf163aa49b9c04d156cf06d42386e[m
+Merge: bcbbaed def91df
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Sat Apr 5 13:54:00 2025 +0700
+
+    handle confict
+
+[33mcommit 698041be202cdfb27a9d9c21468476db6a78fd2f[m
+Author: NgocPhucDn03 <ngocphucdn06@gmail.com>
+Date:   Fri Apr 4 22:56:15 2025 +0700
+
+    Update_ADMIN_BA
+
+[33mcommit def91dff566290742d9ee689f881acd69463e8f2[m
+Author: Phuc <ngocphucdn03@gmail.com>
+Date:   Fri Apr 4 22:56:15 2025 +0700
+
+    Update_ADMIN_BA
+
+[33mcommit 211eba6edaa7c05c28d2bf91ce49ab7784a285fe[m
+Merge: 321a205 bcbbaed
+Author: tangducvinh <132068824+tangducvinh@users.noreply.github.com>
+Date:   Fri Apr 4 21:33:12 2025 +0700
+
+    Merge pull request #1 from tranvanthinh2509/feature/home
+    
+    Feature/home
+
+[33mcommit 548cce41b14430621587319d8170b750bbd24db3[m
+Merge: 321a205 bcbbaed
+Author: tangducvinh <132068824+tangducvinh@users.noreply.github.com>
+Date:   Fri Apr 4 21:33:12 2025 +0700
+
+    Merge pull request #1 from tranvanthinh2509/feature/home
+    
+    Feature/home
+
+[33mcommit bcbbaed59718dc7226931ff35a6e17d315783a67[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Fri Apr 4 21:32:20 2025 +0700
+
+    remove file
+
+[33mcommit 4cd6f2aeddb8655665a27f6d27fd512b73172186[m
+Merge: 20a54d6 2dc74e2
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Fri Apr 4 21:30:47 2025 +0700
+
+    handle confict merge
+
+[33mcommit 2dc74e2cb44bb8ad8a8b4d326af95a9e0e8da097[m
+Merge: 321a205 07a01b0
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Fri Apr 4 21:26:01 2025 +0700
+
+    handle conflict
+
+[33mcommit 07a01b098e07da76f87257c7536e1aa8055172b1[m
+Author: tranvanthinh <badagor999@gmail.com>
+Date:   Fri Apr 4 20:40:37 2025 +0700
+
+    Thinh commit
+
+[33mcommit 20a54d63084871266847643eb5f2c15c9a2ac969[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Fri Apr 4 20:20:50 2025 +0700
+
+    build detail page
+
+[33mcommit 27141ccf706be0cd2554103fe657fac96184437a[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Wed Apr 2 22:40:52 2025 +0700
+
+    build api detail, rating and fetch api
+
+[33mcommit 4451b2e9059c190059d8a3df28e0d29b4c568a88[m
+Author: NgocPhucDn03 <ngocphucdn06@gmail.com>
+Date:   Wed Apr 2 22:32:23 2025 +0700
+
+    changeagai
+
+[33mcommit 34c0c5230a4eacaaf20731ca8e57e3d01cfd9ca6[m
+Author: Phuc <ngocphucdn03@gmail.com>
+Date:   Wed Apr 2 22:32:23 2025 +0700
+
+    changeagai
+
+[33mcommit 5823bf8d26a194321c92f74c74832aa6155572ea[m
+Author: NgocPhucDn03 <ngocphucdn06@gmail.com>
+Date:   Wed Apr 2 22:04:42 2025 +0700
+
+    Change 2/4
+
+[33mcommit 5e4fcc3e613ac81492d3d25a4910dd79cabef97c[m
+Author: Phuc <ngocphucdn03@gmail.com>
+Date:   Wed Apr 2 22:04:42 2025 +0700
+
+    Change 2/4
+
+[33mcommit 47b0d255254e7cb92123a0fec05179b2f0abd2c3[m
+Author: NgocPhucDn03 <ngocphucdn06@gmail.com>
+Date:   Wed Apr 2 21:57:05 2025 +0700
+
+    Backend Admin
+
+[33mcommit 8189207613c6c7ee960551b730208b6be929c5e1[m
+Author: Phuc <ngocphucdn03@gmail.com>
+Date:   Wed Apr 2 21:57:05 2025 +0700
+
+    Backend Admin
+
+[33mcommit 8a55274918a7e9453c475dd74c5830bfef6ef56d[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Tue Apr 1 22:13:31 2025 +0700
+
+    fetch api home and build api detail room
+
+[33mcommit 9179997a1133224760367f417b014700c7d4d4c2[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Mon Mar 31 23:37:01 2025 +0700
+
+    fetch api home
+
+[33mcommit c0a3c3c1d5ff021d7523be47206417815f0a350e[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Mon Mar 31 23:35:23 2025 +0700
+
+    build api home
+
+[33mcommit 321a205a8dd45e639a7bc020c9b3cb056dbd61f2[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Sun Mar 30 15:49:42 2025 +0700
+
+    build detail homestay
+
+[33mcommit 9e8e736778373123f61454ad4743d54f8e2b16f8[m
+Author: unknown <ducvinh100503@gmail.com>
+Date:   Sat Mar 29 21:35:57 2025 +0700
+
+    build ui home page
+
+[33mcommit ed9ac180d73047072d98f37cb2817b6d05160dac[m
+Author: tranvanthinh <badagor999@gmail.com>
+Date:   Thu Mar 27 12:55:41 2025 +0700
+
+    backend user
+
+[33mcommit 0fac78b71cc33ab8de3733ce23e4692a7d891e35[m
+Author: tranvanthinh <badagor999@gmail.com>
+Date:   Sun Mar 23 21:53:25 2025 +0700
+
+    first commit

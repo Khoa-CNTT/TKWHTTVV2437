@@ -18,10 +18,9 @@ const BoxChat: React.FC<IProps> = ({ onSetBox }) => {
   const [messages, setMessages] = useState<IMessage[]>([
     {
       id: 1,
-      text: "Tôi có thể hỗ trợ bạn đặt phòng khách sạn với các thông tin chi tiết như sau:  \n\n### **1. December Hoi An Villa (Hội An)**  \n📍 **Địa chỉ:** 99 Phạm Văn Đồng, Tân An, Hội An  \n⭐ **Hạng sao:** 3 sao  \n💖 **Đánh giá cặp đôi:** 8.4/10  \n🌿 **Tiện ích nổi bật:**  \n- Hồ bơi ngoài trời, Wifi miễn phí  \n- Xe đạp miễn phí, bãi đậu xe riêng  \n- Nhà hàng phục vụ ẩm thực Mỹ, Việt, Âu  \n- Dịch vụ đưa đón sân bay, trông trẻ  \n\n**Phòng & Giá:**  \n- **Phòng Hai Giường Cổ Điển** (500,000 VNĐ/đêm, tối đa 2 người)  \n- **Phòng Cổ Điển** (300,000 VNĐ/đêm, 1 người)  \n\n---  \n\n### **2. Happy Day Riverside Hotel & Spa (Đà Nẵng)**  \n📍 **Địa chỉ:** 160 Bạch Đằng, Đà Nẵng  \n💖 **Đánh giá cặp đôi:** 9.6/10  \n🌿 **Tiện ích nổi bật:**  \n- Wifi miễn phí, gần chợ Hàn, cầu Rồng  \n- Dịch vụ spa, lễ tân 24/24  \n- Cách biển Phạm Văn Đồng 3km  \n\n**Phòng & Giá:**  \n- **Phòng Deluxe Giường King** (500,000 VNĐ/đêm, 2 người)  \n- **Phòng Hai Giường Hạng Sang** (600,000 VNĐ/đêm, 2 người)  \n\n### **Tôi có thể giúp bạn:**  \n✅ Tìm phòng phù hợp ngân sách & số lượng khách  \n✅ Kiểm tra ưu đãi (giảm giá Genius, bữa sáng...)  \n✅ Đặt phòng ngay hoặc tư vấn thêm  \n\nBạn muốn đặt phòng ở **Hội An** hay **Đà Nẵng**? Cần phòng cho bao nhiêu người và ngày nhận/phòng cụ thể? 😊",
+      text: "Xin chào tôi có thể hỗ trợ được gì cho bạn?",
       sender: "bot",
     },
-    { id: 2, text: "Hi, I need assistance.", sender: "user" },
   ]);
   const [inputValue, setInputValue] = useState<string>("");
 
