@@ -10,12 +10,11 @@ const AmenityRouter = require("./AmenityRouter");
 const HighLightRouter = require("./HighLightRouter");
 const ImageRouter = require("./ImageRouter");
 const ReservationRouter = require("./ReservationRouter");
-const SummaryRouter = require('./SummaryRouter')
+const SummaryRouter = require("./SummaryRouter");
 
 const AIServiceRouter = require("./AIRouter");
 
-const RoomAvailabilityRouter = require('./RoomAvailibityRouter')
-
+const RoomAvailabilityRouter = require("./RoomAvailibityRouter");
 
 const initRoutes = (app) => {
   app.use("/api/user", UserRouter);

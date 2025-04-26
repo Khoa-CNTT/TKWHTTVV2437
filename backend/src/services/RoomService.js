@@ -94,13 +94,13 @@ const getDetailById = (roomId) => {
             model: db.Summary,
             as: "summaries",
             through: { attributes: [] },
-          }
+          },
         ],
       });
 
       resolve({
         status: room ? "OK" : "ERR",
-        data: room ,
+        data: room,
       });
     } catch (error) {
       reject(error);
@@ -154,17 +154,17 @@ const createRoom = (data) => {
         price: data.price,
         status: data.status,
         quantity: data.quantity,
-        code: data.code
+        code: data.code,
       });
-     
-        const images = await db.ImageRoom.bulkCreate(
-          data.images.map((item) => ({
-            id: item.id,
-            idRoom: room.id,
-            image: item.image,
-          }))
-        );
-   
+
+      const images = await db.ImageRoom.bulkCreate(
+        data.images.map((item) => ({
+          id: item.id,
+          idRoom: room.id,
+          image: item.image,
+        }))
+      );
+
       const amenities = await db.AmenityRoom.bulkCreate(
         data.amenities.map((item) => ({
           idRoom: room.id,
@@ -179,7 +179,12 @@ const createRoom = (data) => {
         }))
       );
 
-      const newdata = [{room: room}, {amenities: amenities}, {images: images}, {summaries: summaries}];
+      const newdata = [
+        { room: room },
+        { amenities: amenities },
+        { images: images },
+        { summaries: summaries },
+      ];
 
       resolve({
         status: "OK",
@@ -198,14 +203,17 @@ const createRoom = (data) => {
 const updateRoom = (roomId, data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const room = await db.Room.update({
-        name: data.name,
-        maxPerson: data.maxPerson,
-        price: data.price,
-        status: data.status,
-        quantity: data.quantity,
-        code: data.code
-      }, {where: {id: roomId}});
+      const room = await db.Room.update(
+        {
+          name: data.name,
+          maxPerson: data.maxPerson,
+          price: data.price,
+          status: data.status,
+          quantity: data.quantity,
+          code: data.code,
+        },
+        { where: { id: roomId } }
+      );
 
       await db.ImageRoom.destroy({ where: { idRoom: roomId } });
       const images = await db.ImageRoom.bulkCreate(
@@ -232,7 +240,12 @@ const updateRoom = (roomId, data) => {
         }))
       );
 
-      const newdata = [{room: room}, {amenities: amenities}, {images: images}, {summaries: summaries}];
+      const newdata = [
+        { room: room },
+        { amenities: amenities },
+        { images: images },
+        { summaries: summaries },
+      ];
 
       resolve({
         status: "OK",
@@ -253,5 +266,5 @@ module.exports = {
   getDetailById,
   createRoom,
   updateRoom,
-  searchListRoomForBooking
+  searchListRoomForBooking,
 };

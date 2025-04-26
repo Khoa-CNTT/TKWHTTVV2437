@@ -16,19 +16,19 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// app.use(bodyParser.json());
-app.use((req, res, next) => {
-  let sessionId = req.headers["x-session-id"] || req.query.sessionId;
-  if (!sessionId) {
-    sessionId = uuidv4();
-    console.log("Generated new sessionId:", sessionId);
-  } else {
-    console.log("Reusing sessionId from client:", sessionId);
-  }
-  req.sessionId = sessionId;
-  res.setHeader("x-session-id", sessionId);
-  next();
-});
+app.use(bodyParser.json());
+// app.use((req, res, next) => {
+//   let sessionId = req.headers["x-session-id"] || req.query.sessionId;
+//   if (!sessionId) {
+//     sessionId = uuidv4();
+//     console.log("Generated new sessionId:", sessionId);
+//   } else {
+//     console.log("Reusing sessionId from client:", sessionId);
+//   }
+//   req.sessionId = sessionId;
+//   res.setHeader("x-session-id", sessionId);
+//   next();
+// });
 
 app.use(cookieParser());
 

@@ -13,6 +13,11 @@ interface IDataEnter {
   imageBanking: string | null;
 }
 
+interface IInvalidField {
+  name: string;
+  mes: string;
+}
+
 interface IProps {
   property: IProperty | null;
   handleStep2: (data: object) => void;
@@ -20,6 +25,8 @@ interface IProps {
   onChangeDataEnter: (
     newData: IDataEnter | ((prev: IDataEnter) => IDataEnter)
   ) => void;
+  invalidFields?: IInvalidField[];
+  setInvalidFields?: React.Dispatch<React.SetStateAction<IInvalidField[]>>;
 }
 
 const ContentCheckout: React.FC<IProps> = ({
@@ -27,6 +34,8 @@ const ContentCheckout: React.FC<IProps> = ({
   handleStep2,
   dataEnter,
   onChangeDataEnter,
+  invalidFields,
+  setInvalidFields,
 }) => {
   // const [dataEnter, setDataEnter] = React.useState({
   //   firstName: "",
@@ -40,9 +49,14 @@ const ContentCheckout: React.FC<IProps> = ({
   //   console.log("Data entered:", dataEnter);
   // }, [dataEnter]);
 
+  const haddleOnFocus = () => {
+    if (setInvalidFields) {
+      setInvalidFields([]);
+    }
+  };
   return (
     <div>
-      <div className="border-[1px] border-gray-300 rounded-lg p-8 mt-4">
+      <div className="border-[1px] border-gray-300 rounded-lg p-8 mt-4 w-full">
         <h3 className="font-semibold text-lg mb-8">Nhập thông tin liên lạc</h3>
 
         <Box
@@ -51,61 +65,96 @@ const ContentCheckout: React.FC<IProps> = ({
           noValidate
           autoComplete="off"
         >
-          <div className="flex justify-between items-center gap-2">
-            <TextField
-              className="flex-1"
-              id="outlined-basic"
-              label="Tên"
-              variant="outlined"
-              value={dataEnter.firstName}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                onChangeDataEnter((prev) => ({
-                  ...prev,
-                  firstName: event.target.value,
-                }));
-              }}
-            />
-            <TextField
-              className="flex-1"
-              id="filled-basic"
-              label="Họ"
-              variant="outlined"
-              value={dataEnter.lastName}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                onChangeDataEnter((prev) => ({
-                  ...prev,
-                  lastName: event.target.value,
-                }));
-              }}
-            />
+          <div className="flex justify-between items-start gap-2">
+            <div className="w-2/5">
+              <TextField
+                className="w-full"
+                id="outlined-basic"
+                label="Tên"
+                variant="outlined"
+                value={dataEnter.firstName}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  onChangeDataEnter((prev) => ({
+                    ...prev,
+                    firstName: event.target.value,
+                  }));
+                }}
+                onFocus={haddleOnFocus}
+              />
+              {invalidFields?.some((el) => el.name === "firstName") && (
+                <p className="mt-0.5 text-[-12] text-red-600 italic">
+                  {invalidFields.find((el) => el.name === "firstName")?.mes}
+                </p>
+              )}
+            </div>
+
+            <div className="w-3/5">
+              <TextField
+                className="w-full"
+                id="filled-basic"
+                label="Họ"
+                variant="outlined"
+                value={dataEnter.lastName}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  onChangeDataEnter((prev) => ({
+                    ...prev,
+                    lastName: event.target.value,
+                  }));
+                }}
+                onFocus={haddleOnFocus}
+              />
+              {invalidFields?.some((el) => el.name === "lastName") && (
+                <p className="mt-0.5 text-[-12] text-red-600 italic">
+                  {invalidFields.find((el) => el.name === "lastName")?.mes}
+                </p>
+              )}
+            </div>
           </div>
-          <div className="flex justify-between items-center gap-2 pt-2">
-            <TextField
-              className="flex-1"
-              id="standard-basic"
-              label="Email"
-              variant="outlined"
-              value={dataEnter.email}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                onChangeDataEnter((prev) => ({
-                  ...prev,
-                  email: event.target.value,
-                }));
-              }}
-            />
-            <TextField
-              className="flex-1"
-              id="standard-basic"
-              label="Sô điện thoại"
-              variant="outlined"
-              value={dataEnter.phone}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                onChangeDataEnter((prev) => ({
-                  ...prev,
-                  phone: event.target.value,
-                }));
-              }}
-            />
+
+          <div className="flex justify-between items-start gap-2 pt-2">
+            <div className="w-3/5">
+              <TextField
+                className="w-full"
+                id="standard-basic"
+                label="Email"
+                variant="outlined"
+                value={dataEnter.email}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  onChangeDataEnter((prev) => ({
+                    ...prev,
+                    email: event.target.value,
+                  }));
+                }}
+                onFocus={haddleOnFocus}
+              />
+              {invalidFields?.some((el) => el.name === "email") && (
+                <p className="mt-0.5 text-[-12] text-red-600 italic">
+                  {invalidFields.find((el) => el.name === "email")?.mes}
+                </p>
+              )}
+            </div>
+
+            <div className="w-2/5">
+              <TextField
+                className="w-full"
+                id="standard-basic"
+                label="Sô điện thoại"
+                variant="outlined"
+                value={dataEnter.phone}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  onChangeDataEnter((prev) => ({
+                    ...prev,
+                    phone: event.target.value,
+                  }));
+                }}
+                onFocus={haddleOnFocus}
+              />
+              {invalidFields?.some((el) => el.name === "phone") && (
+                <p className="mt-0.5 text-[-12] text-red-600 italic">
+                  {invalidFields.find((el) => el.name === "phone")?.mes}
+                </p>
+              )}
+            </div>
           </div>
         </Box>
       </div>

@@ -10,11 +10,31 @@ import { MdNewspaper } from "react-icons/md";
 import { IoSettingsOutline } from "react-icons/io5";
 
 const links = [
-  { href: "/homestay/information", label: "Thông tin Homestay", icon: <MdOutlineMapsHomeWork size={20} />},
-  { href: "/homestay/manager-room", label: "Quản lý phòng", icon: <MdOutlineBedroomParent size={22} /> },
-  { href: "/homestay/payment-info", label: "Quản lý thanh toán", icon: <FaRegCreditCard size={22} /> },
-  { href: "/homestay/manage-reservation", label: "Quản lí đơn đặt phòng", icon: <MdNewspaper size={22} /> },
-  { href: "/homestay/settings", label: "Cài đặt", icon: <IoSettingsOutline size={25} /> },
+  {
+    href: "/homestay/information",
+    label: "Thông tin Homestay",
+    icon: <MdOutlineMapsHomeWork size={20} />,
+  },
+  {
+    href: "/homestay/manager-room",
+    label: "Quản lý phòng",
+    icon: <MdOutlineBedroomParent size={22} />,
+  },
+  {
+    href: "/homestay/payment-info",
+    label: "Quản lý thanh toán",
+    icon: <FaRegCreditCard size={22} />,
+  },
+  {
+    href: "/homestay/list-reservation-approve",
+    label: "Quản lí đơn đặt phòng",
+    icon: <MdNewspaper size={22} />,
+  },
+  {
+    href: "/homestay/settings",
+    label: "Cài đặt",
+    icon: <IoSettingsOutline size={25} />,
+  },
 ];
 
 const SidebarHomestayOwner = () => {
@@ -26,7 +46,7 @@ const SidebarHomestayOwner = () => {
         Trang quản lý
       </div>
       <div className="mt-4 w-full">
-      {links.map((link) => (
+        {links.map((link) => (
           <Link
             key={link.href}
             href={link.href}

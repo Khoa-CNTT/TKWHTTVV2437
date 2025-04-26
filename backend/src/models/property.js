@@ -24,11 +24,6 @@ module.exports = (sequelize, DataTypes) => {
         as: "reviews", // Alias để truy cập
       });
 
-      Property.belongsTo(models.City, {
-        foreignKey: "idCity", // Khóa ngoại trong bảng imageRoom
-        as: "city", // Alias để truy cập
-      });
-
       Property.belongsToMany(models.Amenity, {
         through: "AmenityProperty", // Tên bảng trung gian
         foreignKey: "idProperty", // Khóa ngoại trong bảng trung gian trỏ đến Room

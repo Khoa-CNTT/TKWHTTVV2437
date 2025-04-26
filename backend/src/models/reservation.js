@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Reservation.belongsTo(models.Room, {
+        foreignKey: "idRoom", // Khóa ngoại trong bảng imageRoom
+        as: "rooms", // Alias để truy cập
+      });
     }
   }
   Reservation.init(
@@ -23,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
       checkIndate: DataTypes.DATE,
       checkOutdate: DataTypes.DATE,
       numGuest: DataTypes.INTEGER,
+      deposit: DataTypes.DOUBLE,
       totalPrice: DataTypes.DOUBLE,
       status: DataTypes.STRING,
     },

@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "@/components/header/Header";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CheckoutProvider } from "./contexts/CheckoutContext";
+import { ReservationProvider } from "./contexts/ReservationContext";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,10 +19,12 @@ export default function RootLayout({
     <html lang="en">
       <AuthProvider>
         <CheckoutProvider>
-          <body className={`font-roboto antialiased `}>
-            <Header />
-            <div>{children}</div>
-          </body>
+          <ReservationProvider>
+            <body className={`font-roboto antialiased `}>
+              <Header />
+              <div>{children}</div>
+            </body>
+          </ReservationProvider>
         </CheckoutProvider>
       </AuthProvider>
     </html>

@@ -122,8 +122,9 @@ const updateUser = async (req, res) => {
 
 const sendMailOTP = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, status } = req.body;
     console.log("email", email);
+    console.log("status", status);
     if (!email) {
       return res.status(200).json({
         status: "ERR",
@@ -131,7 +132,7 @@ const sendMailOTP = async (req, res) => {
       });
     }
 
-    const respone = await UserService.sendMailOTP(email);
+    const respone = await UserService.sendMailOTP(email, status);
 
     return res.status(200).json(respone);
   } catch (error) {
