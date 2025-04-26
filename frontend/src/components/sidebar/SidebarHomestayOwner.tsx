@@ -26,7 +26,7 @@ const links = [
     icon: <FaRegCreditCard size={22} />,
   },
   {
-    href: "/homestay/manage-reservation",
+    href: "/homestay/list-reservation-approve",
     label: "Quản lí đơn đặt phòng",
     icon: <MdNewspaper size={22} />,
   },
@@ -45,31 +45,6 @@ const SidebarHomestayOwner = () => {
       <div className="flex justify-center font-semibold text-xl">
         Trang quản lý
       </div>
-<<<<<<< HEAD
-      <div className="mt-4">
-        <ul>
-          <li className="bg-blue-800 text-white font-medium px-4 py-3 rounded-md cursor-pointer">
-            Thông tin Homestay
-          </li>
-          <li className="font-medium px-4 py-3 rounded-md cursor-pointer">
-            Quản lý phòng
-          </li>
-          <li className="font-medium px-4 py-3 rounded-md cursor-pointer">
-            Quản lý thông tin thanh toán
-          </li>
-          <li
-            className="font-medium px-4 py-3 rounded-md cursor-pointer"
-            onClick={() => {
-              router.push("/homestay/list-reservation-approve");
-            }}
-          >
-            Danh sách cần phê duyệt
-          </li>
-          <li className="font-medium px-4 py-3 rounded-md cursor-pointer">
-            Cài đặt
-          </li>
-        </ul>
-=======
       <div className="mt-4 w-full">
         {links.map((link) => (
           <Link
@@ -88,7 +63,6 @@ const SidebarHomestayOwner = () => {
             </div>
           </Link>
         ))}
->>>>>>> main
       </div>
     </div>
   );

@@ -4,7 +4,6 @@ const CityRouter = require("./CityRouter");
 const ReviewRouter = require("./ReviewRouter");
 const AdminRouter = require("./AdminRouter");
 const RoomRouter = require("./RoomRouter");
-const ReservationRouter = require("./ReservationRouter");
 const AIRouter = require("./AIRouter");
 const CategoryRouter = require("./CategoryRouter");
 const AmenityRouter = require("./AmenityRouter");

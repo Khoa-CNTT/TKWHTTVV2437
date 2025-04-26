@@ -14,25 +14,6 @@ module.exports = {
       idRoom: {
         type: Sequelize.STRING,
       },
-      firstName: {
-        type: Sequelize.STRING,
-      },
-      lastName: {
-        type: Sequelize.STRING,
-      },
-      email: {
-        type: Sequelize.STRING,
-      },
-      phone: {
-        type: Sequelize.STRING,
-      },
-      imageBanking: {
-        type: Sequelize.STRING,
-      },
-      deposit: {
-        type: Sequelize.DOUBLE,
-        defaultValue: 0,
-      },
       checkIndate: {
         type: Sequelize.DATE,
       },
