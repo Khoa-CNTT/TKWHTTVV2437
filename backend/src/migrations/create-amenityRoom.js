@@ -3,11 +3,6 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable("AmenityRooms", {
-      id: {
-        allowNull: false,
-        primaryKey: true,
-        type: Sequelize.STRING,
-      },
       idRoom: {
         type: Sequelize.STRING,
       },
@@ -25,6 +20,13 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
       },
+    });
+
+    // Add composite primary key
+    await queryInterface.addConstraint("AmenityRooms", {
+      fields: ["idRoom", "idAmenity"], // Columns that form the composite key
+      type: "primary key",
+      name: "AmenityRooms_pkey", // Name of the primary key constraint
     });
   },
   async down(queryInterface, Sequelize) {

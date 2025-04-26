@@ -5,7 +5,7 @@ import { SiChatbot } from "react-icons/si";
 import BoxChat from "./BoxChat";
 
 const IconChat = () => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleShowBox = () => {
     setIsOpen((prev) => !prev);

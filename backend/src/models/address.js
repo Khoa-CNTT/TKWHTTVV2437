@@ -7,7 +7,13 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {}
+    static associate(models) {
+      // define association here
+      Address.belongsTo(models.Property, {
+        foreignKey: "idProperty",
+        as: "property",
+      });
+    }
   }
   Address.init(
     {
@@ -16,10 +22,12 @@ module.exports = (sequelize, DataTypes) => {
       district: DataTypes.STRING,
       ward: DataTypes.STRING,
       country: DataTypes.STRING,
+      idProperty: DataTypes.STRING,
     },
     {
       sequelize,
       modelName: "Address",
+      tableName: "Address",
     }
   );
   return Address;

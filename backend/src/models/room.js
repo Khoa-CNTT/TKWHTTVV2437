@@ -34,6 +34,13 @@ module.exports = (sequelize, DataTypes) => {
         otherKey: "idAmenity", // Khóa ngoại trong bảng trung gian trỏ đến Amenity
         as: "amenities", // Alias để truy cập
       });
+
+      Room.belongsToMany(models.Summary, {
+        through: "SummaryRoom", // Tên bảng trung gian
+        foreignKey: "idRoom", // Khóa ngoại trong bảng trung gian trỏ đến Room
+        otherKey: "idSummary", // Khóa ngoại trong bảng trung gian trỏ đến Amenity
+        as: "summaries", // Alias để truy cập
+      });
     }
   }
   Room.init(
@@ -45,6 +52,8 @@ module.exports = (sequelize, DataTypes) => {
       deposit: DataTypes.DOUBLE,
       price: DataTypes.DOUBLE,
       status: DataTypes.STRING,
+      code: DataTypes.STRING,
+      quantity: DataTypes.INTEGER,
     },
     {
       sequelize,

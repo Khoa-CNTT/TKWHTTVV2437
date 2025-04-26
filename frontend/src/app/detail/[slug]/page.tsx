@@ -1,6 +1,6 @@
+
 import { IoLocationSharp } from "react-icons/io5";
 import { FaChevronRight } from "react-icons/fa";
-
 import { CiLogin } from "react-icons/ci";
 import { CiLogout } from "react-icons/ci";
 import { MdPets } from "react-icons/md";
@@ -16,6 +16,8 @@ import AnmenityContainer from "@/components/container/AmenityContainer";
 import ListRoomContainer from "@/components/container/ListRoomContainer";
 import apisRoom from "@/apis/room";
 import ChooseDateContainer from "@/components/container/ChooseDateContainer";
+import ShowDescriptionEditext from "@/components/content/ShowDescriptionEditText";
+import { IRoom } from "@/app/types/room";
 
 interface IProps {
   params: { slug: string };
@@ -32,13 +34,12 @@ const DetailPage = async (props: IProps) => {
   const property = await apisProperty.getPropertyBySlug(params.slug);
   const rating = await apisReview.getReviewByProperty(property.data.id);
   const properties = await apisProperty.getListTop10Rating();
-  const rooms = await apisRoom.getListRoomByPropertyId(property.data.id);
 
   return (
     <div className="pt-4 w-[1260px] mx-auto">
       <div className="grid grid-cols-2 gap-1">
         <img
-          className="w-full rounded-md"
+          className="w-full h-[418px] rounded-md"
           src={property.data?.images[0]?.image}
           alt="anh"
         />
@@ -49,7 +50,7 @@ const DetailPage = async (props: IProps) => {
               index > 0 && (
                 <img
                   key={index}
-                  className="w-full rounded-md"
+                  className="w-full h-[207px] rounded-md"
                   src={item.image}
                   alt=""
                 />
@@ -64,7 +65,7 @@ const DetailPage = async (props: IProps) => {
 
           <div className="flex items-center gap-1 mt-1">
             <IoLocationSharp size={22} className="text-blue-600" />
-            <p className="text-sm">{property.data.address}</p>
+            <p className="text-sm">{`${property.data.propertyAddress.street}, ${property.data.propertyAddress.district}, ${property.data.propertyAddress.city}, ${property.data.propertyAddress.country}`}</p>
           </div>
 
           <div className="mt-5">
@@ -83,8 +84,10 @@ const DetailPage = async (props: IProps) => {
             </div>
           </div>
 
-          <p className="mt-4 text-sm">{property.data.description}</p>
-
+          <div className="mt-4">
+            <ShowDescriptionEditext description={property.data.description} />
+          </div>
+          
           <div>
             <h5 className="mt-4 font-semibold text-lg">
               Các tiện nghi được ưa chuộng nhất
@@ -95,18 +98,9 @@ const DetailPage = async (props: IProps) => {
           <div>
             <h5 className="mt-8 font-semibold text-lg">Thông tin phòng</h5>
             <ChooseDateContainer />
-            {rooms.data.map((item: any, index: number) => (
               <ListRoomContainer
-                key={index}
-                id={item.id}
                 propertyId={property.data.id}
-                name={item.name}
-                maxPerson={item.maxPerson}
-                price={item.price}
-                images={item.images}
-                amenities={item.amenities}
               />
-            ))}
           </div>
 
           <div className="mt-8">
@@ -167,7 +161,7 @@ const DetailPage = async (props: IProps) => {
         </div>
         <div className="flex-3 ralative">
           <div className="sticky top-0">
-            <HighlightProperty />
+            <HighlightProperty highlights={property.data.highlights}/>
           </div>
         </div>
       </div>

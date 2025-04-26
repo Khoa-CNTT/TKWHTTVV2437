@@ -140,7 +140,11 @@ const LoginForm = () => {
     const decoded: { id: string } = jwtDecode(access_token);
     const dataUser = await apiUser.getDetailUser(decoded?.id, access_token);
     setUser(dataUser.data);
-    router.push("/");
+    if (dataUser.data.role === "1") {
+      router.push("/admin/dashboard"); // Điều hướng đến trang admin
+    } else {
+      router.push("/"); // Điều hướng đến trang user
+    }
   };
 
   const handleVerifyPassword = async () => {
