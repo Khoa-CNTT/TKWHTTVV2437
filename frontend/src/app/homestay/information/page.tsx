@@ -74,7 +74,7 @@ interface IData {
   selectedAmenities?: string[];
 }
 
-const propertyId = null;
+const propertyId = "e0925e5e-945f-4659-9f72-8260c2197c90";
 
 const HomestayPage = () => {
   const [cities, setCities] = useState<{ name: string; code: string }[]>([]);
@@ -143,9 +143,9 @@ const HomestayPage = () => {
           name: response.data?.name,
           categoryId: response.data?.idCategory,
           country: response.data?.propertyAddress?.country,
-          city: response.data?.propertyAddress.city,
-          district: response.data?.propertyAddress.district,
-          street: response.data?.propertyAddress.street,
+          city: response.data?.propertyAddress?.city,
+          district: response.data?.propertyAddress?.district,
+          street: response.data?.propertyAddress?.street,
           description: response.data?.description,
         });
 
@@ -238,7 +238,6 @@ const HomestayPage = () => {
         formData.append("images", file);
       });
 
-
       const uploadImage = async () => {
         const response = await apisImage.uploadImageMutiple(formData);
 
@@ -256,36 +255,38 @@ const HomestayPage = () => {
   };
 
   const handleSubmit = () => {
-    let dataSubmit:IPropertyCreate = {};
+    let dataSubmit: IPropertyCreate = {};
     dataSubmit.images = selectedImage;
     dataSubmit.amenities = selectedAmenities;
     dataSubmit.highlights = selectedHighLight;
-    dataSubmit = {...dataSubmit, ...data};
+    dataSubmit = { ...dataSubmit, ...data };
 
     if (propertyId) {
-      const handleUpdate = async() => {
-        const response = await apisProperty.updateProperty(propertyId, dataSubmit);
+      const handleUpdate = async () => {
+        const response = await apisProperty.updateProperty(
+          propertyId,
+          dataSubmit
+        );
 
-        console.log(response)
-      }
+        console.log(response);
+      };
       handleUpdate();
     } else {
       console.log("handle create");
       console.log(dataSubmit);
-      const handleSaveData = async() => {
+      const handleSaveData = async () => {
         const response = await apisProperty.createProperty(dataSubmit);
 
-        console.log({response})
-      }
+        console.log({ response });
+      };
 
       handleSaveData();
     }
-
-  }
+  };
 
   const handleRemoveImage = (id: string) => {
-    setSelectedImage((prev) => (prev.filter(item => item.id !== id)))
-  }
+    setSelectedImage((prev) => prev.filter((item) => item.id !== id));
+  };
 
   return (
     <div className="p-8">
@@ -295,25 +296,28 @@ const HomestayPage = () => {
 
       <div className="grid grid-cols-6 gap-2 mt-2">
         {selectedImage?.map((item: { image: string; id: string }) => (
-          <div 
+          <div
             key={item.id}
-            className="relative" 
+            className="relative"
             onMouseEnter={() => setShowTrash(item.id)}
-            onMouseLeave={() => setShowTrash('')}>
-              <img
-                
-                key={item.id}
-                alt="image"
-                className="h-[160px] w-full rounded-md object-cover"
-                src={item.image}
-              ></img>
+            onMouseLeave={() => setShowTrash("")}
+          >
+            <img
+              key={item.id}
+              alt="image"
+              className="h-[160px] w-full rounded-md object-cover"
+              src={item.image}
+            ></img>
 
-              {showTrash === item.id && 
-                <button onClick={() => handleRemoveImage(item.id)} className="absolute top-[10px] right-[10px]">
-                  <MdDeleteForever className="text-red-500" size={24}/>
-                </button>
-              }
-            </div>
+            {showTrash === item.id && (
+              <button
+                onClick={() => handleRemoveImage(item.id)}
+                className="absolute top-[10px] right-[10px]"
+              >
+                <MdDeleteForever className="text-red-500" size={24} />
+              </button>
+            )}
+          </div>
         ))}
 
         <label
@@ -573,9 +577,12 @@ const HomestayPage = () => {
       </div>
 
       <div className="flex justify-end mt-8">
-        <button onClick={handleSubmit} className="flex items-center gap-2 bg-green-700 py-3 px-8 text-white rounded-md font-semibold hover:opacity-90 transition-300">
+        <button
+          onClick={handleSubmit}
+          className="flex items-center gap-2 bg-green-700 py-3 px-8 text-white rounded-md font-semibold hover:opacity-90 transition-300"
+        >
           <VscSaveAs size={20} />
-          <span>{propertyId ? 'Cập nhật thông tin' : 'Tạo thông tin'}</span>
+          <span>{propertyId ? "Cập nhật thông tin" : "Tạo thông tin"}</span>
         </button>
       </div>
     </div>
