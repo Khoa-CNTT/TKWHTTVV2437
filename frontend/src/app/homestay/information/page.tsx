@@ -74,7 +74,7 @@ interface IData {
   selectedAmenities?: string[];
 }
 
-const propertyId = "e0925e5e-945f-4659-9f72-8260c2197c90";
+const propertyId = null;
 
 const HomestayPage = () => {
   const [cities, setCities] = useState<{ name: string; code: string }[]>([]);

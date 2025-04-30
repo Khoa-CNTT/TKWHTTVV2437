@@ -1,8 +1,9 @@
 const db = require("../models");
-const { fn, col } = require("sequelize");
+const { fn, col, Op } = require("sequelize");
 const { v4 } = require("uuid");
 const slugify = require("slugify");
 const hightlightProperty = require("../models/hightlightProperty");
+const { sequelize } = require("../models");
 
 const listTop10HomestayRating = () => {
   return new Promise(async (resolve, reject) => {
@@ -65,6 +66,138 @@ const listTop10HomestayRating = () => {
       });
     } catch (error) {
       reject(error);
+    }
+  });
+};
+
+const getListProperty = (filter, limit = 12, page = 1) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { minPrice, maxPrice, amenities, city, category } = filter;
+
+      console.log({ amenities });
+
+      // Tính toán offset cho phân trang
+      const offset = (page - 1) * limit;
+
+      // Xây dựng điều kiện lọc
+      const whereConditions = {};
+
+      if (minPrice) {
+        whereConditions["$rooms.price$"] = {
+          [Op.gte]: parseFloat(minPrice), // Giá lớn hơn hoặc bằng
+        };
+      }
+
+      if (maxPrice) {
+        whereConditions["$rooms.price$"] = {
+          ...whereConditions["$rooms.price$"],
+          [Op.lte]: parseFloat(maxPrice), // Giá nhỏ hơn hoặc bằng
+        };
+      }
+
+      // Điều kiện lọc theo city trong bảng Address
+      const addressConditions = {};
+      if (city) {
+        addressConditions["slug"] = slugify(city, {
+          lower: true, // chuyển thành chữ thường
+          strict: true, // bỏ các ký tự đặc biệt
+        }); // So sánh với cột city trong bảng Address
+      }
+
+      if (category) {
+        whereConditions["idCategory"] = category; // Lọc theo danh mục
+      }
+
+      // Điều kiện lọc theo amenities
+      // Điều kiện lọc theo amenities (chỉ lấy property có ít nhất tất cả amenities truyền vào)
+      if (amenities && amenities.length > 0) {
+        const amenityIds = amenities.split(",").map((id) => parseInt(id));
+
+        whereConditions[Op.and] = amenityIds.map((id) => ({
+          [Op.and]: [
+            sequelize.literal(`EXISTS (
+              SELECT 1 FROM \`AmenityProperties\` 
+              WHERE \`AmenityProperties\`.\`idProperty\` = \`Property\`.\`id\`
+              AND \`AmenityProperties\`.\`idAmenity\` = ${id}
+            )`),
+          ],
+        }));
+      }
+
+      const properties = await db.Property.findAndCountAll({
+        where: whereConditions,
+        attributes: {
+          include: [
+            [
+              fn(
+                "COALESCE",
+                fn("ROUND", fn("AVG", col("reviews.rating")), 1),
+                0
+              ),
+              "averageRating",
+            ],
+            [fn("COUNT", fn("DISTINCT", col("reviews.id"))), "reviewCount"],
+            [fn("MIN", col("rooms.price")), "price"],
+          ],
+        },
+        include: [
+          {
+            model: db.ImageProperty,
+            as: "images",
+            attributes: ["id", "image"],
+            limit: 1,
+            order: [["createdAt", "ASC"]],
+          },
+          {
+            model: db.Address,
+            as: "propertyAddress",
+            attributes: ["id", "city", "slug"],
+            where: addressConditions,
+          },
+          {
+            model: db.Review,
+            as: "reviews",
+            attributes: [],
+          },
+          {
+            model: db.Room,
+            as: "rooms",
+            attributes: [],
+          },
+          {
+            model: db.Amenity,
+            as: "amenities", // Alias được định nghĩa trong model
+            attributes: ["id", "name"],
+            through: { attributes: [] }, // Không lấy dữ liệu từ bảng trung gian
+            // where: amenityConditions, // Áp dụng điều kiện lọc theo amenities
+          },
+        ],
+        group: ["Property.id"],
+        subQuery: false,
+        order: [
+          ["advertising", "DESC"], // Sắp xếp theo cột advertising giảm dần
+        ],
+        limit,
+        offset,
+      });
+
+      // Trả về kết quả với phân trang
+      resolve({
+        status: properties.rows.length > 0 ? "OK" : "ERR",
+        data: properties.rows || [],
+        pagination: {
+          totalItems: properties.count.length,
+          totalPages: Math.ceil(properties.count.length / limit),
+          currentPage: page,
+          pageSize: limit,
+        },
+      });
+    } catch (error) {
+      reject({
+        status: "ERR",
+        message: `Error fetching properties: ${error.message || error}`,
+      });
     }
   });
 };
@@ -455,4 +588,5 @@ module.exports = {
   getListAmenityByPropertyId,
   getListHightlightByPropertyId,
   updateProperty,
+  getListProperty,
 };

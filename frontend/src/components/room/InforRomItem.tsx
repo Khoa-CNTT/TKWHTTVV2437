@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 
-import { ratingText } from "@/helper/ratingText";
+import { advertisingText, ratingText } from "@/helper/ratingText";
 
 interface IProps {
   title: string;
@@ -10,6 +10,7 @@ interface IProps {
   quantityReview: number;
   rating: number;
   slug: string;
+  advertising?: number;
 }
 
 const InforRomItem: React.FC<IProps> = ({
@@ -20,6 +21,7 @@ const InforRomItem: React.FC<IProps> = ({
   quantityReview,
   rating,
   slug,
+  advertising,
 }) => {
   const router = useRouter(); // Khởi tạo useRouter
 
@@ -38,14 +40,23 @@ const InforRomItem: React.FC<IProps> = ({
         alt="ảnh"
       />
 
-      <div className="p-2 h-[162px]">
-        <div className="flex items-center gap-2 mt-1">
-          <span className="bg-green-700 font-medium text-sm text-white px-1 rounded-md px-2">
+      <div className="p-2 h-[170px]">
+        <div className="flex items-center gap-2 mt-1  h-[30px]">
+          <span className="bg-green-700 font-medium text-sm text-white rounded-md px-2">
             {rating}
           </span>
-          <p className="text-sm">
-            {ratingText(Number(rating))} <span>({quantityReview} reviews)</span>
-          </p>
+          <div className="text-sm flex items-center justify-between w-full">
+            <div>
+              {ratingText(Number(rating))}{" "}
+              <span>({quantityReview} reviews)</span>
+            </div>
+
+            {advertising !== 0 && (
+              <div className="font-semibold text-blue-900 border rounded-md px-2 py-1 border-blue-900">
+                {advertisingText(Number(advertising))}
+              </div>
+            )}
+          </div>
         </div>
         <h4 className="text-[16px] min-h-[48px] font-semibold mt-1">
           {title.length > 50 ? title.slice(0, 50) + "..." : title}

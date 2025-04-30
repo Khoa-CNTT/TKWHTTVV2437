@@ -48,15 +48,16 @@ module.exports = (sequelize, DataTypes) => {
     {
       idUser: DataTypes.STRING,
       idCategory: DataTypes.STRING,
-      idCity: DataTypes.STRING,
       name: DataTypes.STRING,
       description: DataTypes.STRING,
       address: DataTypes.STRING,
       slug: DataTypes.STRING,
+      advertising: DataTypes.INTEGER,
     },
     {
       sequelize,
       modelName: "Property",
+      tableName: "Properties",
     }
   );
   return Property;

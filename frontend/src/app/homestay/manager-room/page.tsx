@@ -13,6 +13,8 @@ import apisRoom from "@/apis/room";
 import { IRoom } from "@/app/types/room";
 import Link from "next/link";
 
+const propertyId = "7d7d8961-7095-4be9-8b5b-0cfd0dec1a3c";
+
 const ManagerRoom = () => {
   const [valueSearch, setValueSearch] = useState<string>("");
   const [showDeleteText, setShowDeleteText] = useState<boolean>(false);
@@ -21,7 +23,7 @@ const ManagerRoom = () => {
 
   useEffect(() => {
     const fetchDataRoom = async () => {
-      const response = await apisRoom.getListRoomByPropertyId("1");
+      const response = await apisRoom.getListRoomByPropertyId(propertyId);
 
       if (response?.data) {
         setRooms(response.data);
@@ -42,10 +44,15 @@ const ManagerRoom = () => {
   return (
     <div className="w-full">
       <div className="p-10">
-        <div className="flex items-center justify-between">  
+        <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Danh sách các phòng</h1>
 
-          <Link className="bg-green-700 py-2 px-5 text-white font-semibold rounded-md cursor-pointer" href={"/homestay/manager-room/create"}>Tạo phòng mới</Link>
+          <Link
+            className="bg-green-700 py-2 px-5 text-white font-semibold rounded-md cursor-pointer"
+            href={"/homestay/manager-room/create"}
+          >
+            Tạo phòng mới
+          </Link>
         </div>
         <div className="flex justify-between items-center mt-8">
           <div className="w-[27%] relative">
@@ -159,7 +166,6 @@ const ManagerRoom = () => {
           </table>
         </div>
       </div>
-
     </div>
   );
 };

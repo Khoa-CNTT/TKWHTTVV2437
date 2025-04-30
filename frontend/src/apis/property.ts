@@ -12,6 +12,22 @@ const apisProperty = {
 
     return response.json();
   },
+  getListProperty: async (query: Record<string, string | number>) => {
+    // Tạo query string từ object query
+    const queryString = new URLSearchParams(
+      query as Record<string, string>
+    ).toString();
+
+    const response = await fetch(
+      `${process.env.URL_SERVER_API}/property?${queryString}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
+
+    return response.json();
+  },
   getPropertyBySlug: async (slug: string) => {
     const response = await fetch(
       `${process.env.URL_SERVER_API}/property/detail/${slug}`,
@@ -59,22 +75,19 @@ const apisProperty = {
     return response.json();
   },
 
-  createProperty: async(data:IPropertyCreate) => {
-    const response = await fetch(
-      `${process.env.URL_SERVER_API}/property`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json", // Specify JSON content type
-        },
-        body: JSON.stringify(data), // Serialize the data object
-      }
-    );
+  createProperty: async (data: IPropertyCreate) => {
+    const response = await fetch(`${process.env.URL_SERVER_API}/property`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json", // Specify JSON content type
+      },
+      body: JSON.stringify(data), // Serialize the data object
+    });
 
     return response.json();
   },
-  
-  updateProperty: async(propertyId: string, data:IPropertyCreate) => {
+
+  updateProperty: async (propertyId: string, data: IPropertyCreate) => {
     const response = await fetch(
       `${process.env.URL_SERVER_API}/property/${propertyId}`,
       {
@@ -87,7 +100,7 @@ const apisProperty = {
     );
 
     return response.json();
-  }
+  },
 };
 
 export default apisProperty;

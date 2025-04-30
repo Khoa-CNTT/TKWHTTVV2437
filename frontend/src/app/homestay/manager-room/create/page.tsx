@@ -3,15 +3,14 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { IImage } from "@/app/types/property";
 import { v4 as uuidv4 } from "uuid";
-import FormControl from '@mui/material/FormControl';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
-import InputAdornment from '@mui/material/InputAdornment';
+import FormControl from "@mui/material/FormControl";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import InputLabel from "@mui/material/InputLabel";
+import InputAdornment from "@mui/material/InputAdornment";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import { IRoomCreate } from "@/app/types/room";
 import { VscSaveAs } from "react-icons/vsc";
-
 
 import { MdDeleteForever } from "react-icons/md";
 import { FaPlus } from "react-icons/fa6";
@@ -62,32 +61,41 @@ const iconSumary: { [key: string]: JSX.Element } = {
   MdMoneyOff: <MdMoneyOff />,
   FaRegCreditCard: <FaRegCreditCard />,
   SlEnergy: <SlEnergy />,
-  FaCheckCircle: <FaCheckCircle />
+  FaCheckCircle: <FaCheckCircle />,
 };
 
 const listStatus = [
   {
     key: "0",
-    value: "Chọn trạng thái"
+    value: "Chọn trạng thái",
   },
   {
     key: "active",
-    value: "Đang hoạt động"
+    value: "Đang hoạt động",
   },
   {
     key: "inactive",
-    value: "Không hoạt động"
-  }
-]
+    value: "Không hoạt động",
+  },
+];
 
 interface IProps {
   id: string;
 }
 
-const InformationRoom:React.FC<IProps> = ({id}) => {
+const propertyId = "be42d3df-8f63-46c1-82ec-41daa726b14f";
+
+const InformationRoom: React.FC<IProps> = ({ id }) => {
   const [selectedImage, setSelectedImage] = useState<IImage[]>([]);
   const [showTrash, setShowTrash] = useState<string>("");
-  const [data, setData] = useState<{ name?: string, maxPerson?: number, price?: string, status?: string, code?: string, quantity?: number}>({
+  const [data, setData] = useState<{
+    name?: string;
+    maxPerson?: number;
+    price?: string;
+    status?: string;
+    code?: string;
+    quantity?: number;
+  }>({
     name: "",
     maxPerson: 1,
     price: "",
@@ -102,23 +110,23 @@ const InformationRoom:React.FC<IProps> = ({id}) => {
 
   useEffect(() => {
     const fetchDataAmenities = async () => {
-          const response = await apisAmenity.getAllList();
-    
-          if (response?.data) {
-            setAmenities(response.data);
-          }
-        };
-    const fetchDataSummaries = async() => {
+      const response = await apisAmenity.getAllList();
+
+      if (response?.data) {
+        setAmenities(response.data);
+      }
+    };
+    const fetchDataSummaries = async () => {
       const response = await apisSummary.getAllList();
 
       if (response?.data) {
-        setSummaries(response.data)
+        setSummaries(response.data);
       }
-    }
+    };
 
     fetchDataAmenities();
     fetchDataSummaries();
-  }, [])
+  }, []);
 
   useEffect(() => {
     const fetchDataRoom = async () => {
@@ -132,19 +140,27 @@ const InformationRoom:React.FC<IProps> = ({id}) => {
           status: response.data.status,
           code: response.data.code,
           quantity: response.data.quantity,
-        })
+        });
 
-        setSelectedImage(response.data.images.map((item:{id: string, image: string}) => ({id: item.id, image: item.image})));
+        setSelectedImage(
+          response.data.images.map((item: { id: string; image: string }) => ({
+            id: item.id,
+            image: item.image,
+          }))
+        );
 
-        setSelectedAmenities(response.data.amenities.map((item:{id: string}) => item.id));
+        setSelectedAmenities(
+          response.data.amenities.map((item: { id: string }) => item.id)
+        );
 
-        setSelectedSummaries(response.data.summaries.map((item:{id: string}) => item.id));
+        setSelectedSummaries(
+          response.data.summaries.map((item: { id: string }) => item.id)
+        );
       }
-    }
+    };
 
     fetchDataRoom();
-
-  }, [id])
+  }, [id]);
 
   const handleRemoveImage = (id: string) => {
     setSelectedImage((prev) => prev.filter((item) => item.id !== id));
@@ -199,35 +215,35 @@ const InformationRoom:React.FC<IProps> = ({id}) => {
     });
   };
 
-
   const handleSubmit = () => {
-    let dataSubmit:IRoomCreate = {};
+    let dataSubmit: IRoomCreate = {};
     dataSubmit.images = selectedImage;
     dataSubmit.amenities = selectedAmenities;
     dataSubmit.summaries = selectedSummaries;
 
-    dataSubmit = {...dataSubmit, ...data};
+    dataSubmit = { ...dataSubmit, ...data };
 
-      if (id) {
-        console.log("handle update");
-        const handleUpdateData = async() => {
-          const response = await apisRoom.updateRoom(id, dataSubmit);
+    if (id) {
+      console.log("handle update");
+      const handleUpdateData = async () => {
+        const response = await apisRoom.updateRoom(id, dataSubmit);
 
-          console.log(response);
-        }
+        console.log(response);
+      };
 
-        handleUpdateData();
-      } else {
-        console.log("handle create");
-        const handleCreateData = async() => {
-          const response = await apisRoom.createRoom(dataSubmit);
-  
-          console.log({response})
-        }
-  
-        handleCreateData();
-      }
-  }
+      handleUpdateData();
+    } else {
+      console.log("handle create");
+      dataSubmit.propertyId = propertyId;
+      const handleCreateData = async () => {
+        const response = await apisRoom.createRoom(dataSubmit);
+
+        console.log({ response });
+      };
+
+      handleCreateData();
+    }
+  };
 
   return (
     <div className="p-8">
@@ -319,25 +335,25 @@ const InformationRoom:React.FC<IProps> = ({id}) => {
 
       <div className="mt-4 flex items-center gap-4">
         <div className="flex flex-col gap-2">
-            <label className="font-semibold text-md">Giá / 1 đêm (VND)</label>
+          <label className="font-semibold text-md">Giá / 1 đêm (VND)</label>
 
-            <OutlinedInput
-              value={data.price}
-              onChange={(e) => {
-                if (isNaN(Number(e.target.value))) {
-                  return;
-                } 
+          <OutlinedInput
+            value={data.price}
+            onChange={(e) => {
+              if (isNaN(Number(e.target.value))) {
+                return;
+              }
 
-                setData((prev) => ({...prev, price: e.target.value}))
-              }}
-              id="outlined-adornment-amount"
-              startAdornment={<InputAdornment position="start">$</InputAdornment>}
-              sx={{
-                "& .MuiInputBase-input": {
-                  padding: "10px", // Padding cho nội dung input
-                },
-              }}
-            />
+              setData((prev) => ({ ...prev, price: e.target.value }));
+            }}
+            id="outlined-adornment-amount"
+            startAdornment={<InputAdornment position="start">$</InputAdornment>}
+            sx={{
+              "& .MuiInputBase-input": {
+                padding: "10px", // Padding cho nội dung input
+              },
+            }}
+          />
         </div>
 
         <div className="w-[15%] flex flex-col gap-2">
@@ -367,30 +383,57 @@ const InformationRoom:React.FC<IProps> = ({id}) => {
         <div className="flex flex-col gap-2">
           <label className="font-semibold text-md">Sức chứa/ người</label>
           <div className="flex text-sm items-center gap-4 h-[43px] border px-6 rounded-md border-gray-300">
-              <LuMinus onClick={() => {
+            <LuMinus
+              onClick={() => {
                 if (data.maxPerson === 1) {
                   return;
                 } else {
-                  setData((prev) => ({...prev, maxPerson: prev.maxPerson - 1}))
+                  setData((prev) => ({
+                    ...prev,
+                    maxPerson: prev.maxPerson - 1,
+                  }));
                 }
-              }} size={25} className="text-gray-600 cursor-pointer" />
-              <p className="w-[50px] font-semibold no-selecter text-center">{data.maxPerson}</p>
-              <LuPlus onClick={() => setData((prev) => ({...prev, maxPerson: prev.maxPerson + 1}))} size={22} className="text-gray-600 cursor-pointer" />
+              }}
+              size={25}
+              className="text-gray-600 cursor-pointer"
+            />
+            <p className="w-[50px] font-semibold no-selecter text-center">
+              {data.maxPerson}
+            </p>
+            <LuPlus
+              onClick={() =>
+                setData((prev) => ({ ...prev, maxPerson: prev.maxPerson + 1 }))
+              }
+              size={22}
+              className="text-gray-600 cursor-pointer"
+            />
           </div>
         </div>
 
         <div className="flex flex-col gap-2">
           <label className="font-semibold text-md">Số lượng phòng</label>
           <div className="flex text-sm items-center gap-4 h-[43px] border px-6 rounded-md border-gray-300">
-              <LuMinus onClick={() => {
+            <LuMinus
+              onClick={() => {
                 if (data.quantity === 1) {
                   return;
                 } else {
-                  setData((prev) => ({...prev, quantity: prev.quantity - 1}))
+                  setData((prev) => ({ ...prev, quantity: prev.quantity - 1 }));
                 }
-              }} size={22} className="text-gray-600 cursor-pointer" />
-              <p className="w-[70px] font-semibold no-selecter text-center">{data.quantity}</p>
-              <LuPlus onClick={() => setData((prev) => ({...prev, quantity: prev.quantity + 1}))} size={22} className="text-gray-600 cursor-pointer" />
+              }}
+              size={22}
+              className="text-gray-600 cursor-pointer"
+            />
+            <p className="w-[70px] font-semibold no-selecter text-center">
+              {data.quantity}
+            </p>
+            <LuPlus
+              onClick={() =>
+                setData((prev) => ({ ...prev, quantity: prev.quantity + 1 }))
+              }
+              size={22}
+              className="text-gray-600 cursor-pointer"
+            />
           </div>
         </div>
       </div>
@@ -421,29 +464,32 @@ const InformationRoom:React.FC<IProps> = ({id}) => {
           <label className="font-semibold text-md">Thông tin tóm tắt</label>
 
           <div className="grid grid-cols-6 gap-4">
-          {summaries.map((item: ISummary) => (
-            <FormControlLabel
-              key={item.id}
-              control={
-                <Checkbox
-                  checked={selectedSummaries.includes(item.id)}
-                  onChange={() => handleCheckboxChangeSummary(item.id)}
-                ></Checkbox>
-              }
-              label={
-                <div className="text-green-700 flex items-center gap-2 text-sm font-medium">
-                  <div className="text-xl">{iconSumary[item.icon]}</div>
-                  <span>{item.name}</span>
-                </div>
-              }
-            />
-          ))}
+            {summaries.map((item: ISummary) => (
+              <FormControlLabel
+                key={item.id}
+                control={
+                  <Checkbox
+                    checked={selectedSummaries.includes(item.id)}
+                    onChange={() => handleCheckboxChangeSummary(item.id)}
+                  ></Checkbox>
+                }
+                label={
+                  <div className="text-green-700 flex items-center gap-2 text-sm font-medium">
+                    <div className="text-xl">{iconSumary[item.icon]}</div>
+                    <span>{item.name}</span>
+                  </div>
+                }
+              />
+            ))}
           </div>
         </div>
       </div>
 
       <div className="flex justify-end mt-8">
-        <button onClick={handleSubmit} className="flex items-center gap-2 bg-green-700 py-3 px-8 text-white rounded-md font-semibold hover:opacity-90 transition-300">
+        <button
+          onClick={handleSubmit}
+          className="flex items-center gap-2 bg-green-700 py-3 px-8 text-white rounded-md font-semibold hover:opacity-90 transition-300"
+        >
           <VscSaveAs size={20} />
           <span>{id ? "Cập nhật thông tin phòng" : "Tạo loại phòng"}</span>
         </button>
