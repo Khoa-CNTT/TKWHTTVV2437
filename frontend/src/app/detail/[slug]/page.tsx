@@ -1,4 +1,3 @@
-
 import { IoLocationSharp } from "react-icons/io5";
 import { FaChevronRight } from "react-icons/fa";
 import { CiLogin } from "react-icons/ci";
@@ -87,7 +86,7 @@ const DetailPage = async (props: IProps) => {
           <div className="mt-4">
             <ShowDescriptionEditext description={property.data.description} />
           </div>
-          
+
           <div>
             <h5 className="mt-4 font-semibold text-lg">
               Các tiện nghi được ưa chuộng nhất
@@ -98,9 +97,7 @@ const DetailPage = async (props: IProps) => {
           <div>
             <h5 className="mt-8 font-semibold text-lg">Thông tin phòng</h5>
             <ChooseDateContainer />
-              <ListRoomContainer
-                propertyId={property.data.id}
-              />
+            <ListRoomContainer propertyId={property.data.id} />
           </div>
 
           <div className="mt-8">
@@ -161,7 +158,7 @@ const DetailPage = async (props: IProps) => {
         </div>
         <div className="flex-3 ralative">
           <div className="sticky top-0">
-            <HighlightProperty highlights={property.data.highlights}/>
+            <HighlightProperty highlights={property.data.highlights} />
           </div>
         </div>
       </div>

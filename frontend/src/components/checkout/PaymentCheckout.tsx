@@ -12,6 +12,9 @@ interface IDataEnter {
   message: string;
   imageBanking: string | null;
   total?: number | null;
+  nameAccount: string;
+  numberAccount: string;
+  nameBank: string;
 }
 interface IProps {
   handleStep1: () => void;

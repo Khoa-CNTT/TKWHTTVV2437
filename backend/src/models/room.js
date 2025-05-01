@@ -49,7 +49,7 @@ module.exports = (sequelize, DataTypes) => {
       name: DataTypes.STRING,
       description: DataTypes.STRING,
       maxPerson: DataTypes.INTEGER,
-      deposit: DataTypes.DOUBLE,
+      // deposit: DataTypes.DOUBLE,
       price: DataTypes.DOUBLE,
       status: DataTypes.STRING,
       code: DataTypes.STRING,

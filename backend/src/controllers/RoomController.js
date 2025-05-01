@@ -27,7 +27,6 @@ const searchListRoomForBooking = async (req, res) => {
   }
 };
 
-
 const getDetailById = async (req, res) => {
   try {
     const response = await roomService.getDetailById(req.params.roomId);
@@ -61,11 +60,10 @@ const updateRoom = async (req, res) => {
   }
 };
 
-
 module.exports = {
   getListRoomByPropertyId,
   getDetailById,
   createRoom,
   updateRoom,
-  searchListRoomForBooking
+  searchListRoomForBooking,
 };
