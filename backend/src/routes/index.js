@@ -15,6 +15,7 @@ const SummaryRouter = require("./SummaryRouter");
 const AIServiceRouter = require("./AIRouter");
 
 const RoomAvailabilityRouter = require("./RoomAvailibityRouter");
+const AccountPaymentRouter = require("./AccountPaymentRouter");
 
 const initRoutes = (app) => {
   app.use("/api/user", UserRouter);
@@ -34,6 +35,7 @@ const initRoutes = (app) => {
 
   app.use("/api/room", RoomRouter);
   app.use("/api/reservation", ReservationRouter);
+  app.use("/api/account-payment", AccountPaymentRouter);
   return app.use("/", (req, res) => {
     res.send("server on 123");
   });

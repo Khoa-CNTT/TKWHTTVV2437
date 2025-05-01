@@ -23,6 +23,9 @@ interface IDataEnter {
   message: string;
   imageBanking: string | null;
   total?: number | null;
+  nameAccount: string;
+  numberAccount: string;
+  nameBank: string;
 }
 interface IInvalidField {
   name: string;
@@ -52,6 +55,9 @@ const CheckoutPage = () => {
     message: "",
     imageBanking: null,
     total: null,
+    nameAccount: "",
+    numberAccount: "",
+    nameBank: "",
   });
   useEffect(() => {
     setDataEnter({
@@ -66,6 +72,9 @@ const CheckoutPage = () => {
         endDate &&
         room?.price &&
         room?.price * Math.abs(startDate?.diff(endDate, "day")),
+      nameAccount: "",
+      numberAccount: "",
+      nameBank: "",
     });
   }, [user, room]);
   useEffect(() => {
@@ -78,6 +87,9 @@ const CheckoutPage = () => {
         lastName: dataEnter.lastName,
         email: dataEnter.email,
         phone: dataEnter.phone,
+        nameAccount: dataEnter.nameAccount,
+        numberAccount: dataEnter.numberAccount,
+        nameBank: dataEnter.nameBank,
       },
       setInvalidFields
     );

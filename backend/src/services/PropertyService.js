@@ -101,21 +101,27 @@ const createProperty = (data) => {
         }))
       );
 
-        const amenities = await db.AmenityProperty.bulkCreate(
-          data.amenities.map((item) => ({
-            idProperty: property.id,
-            idAmenity: item,
-          }))
-        );
-     
+      const amenities = await db.AmenityProperty.bulkCreate(
+        data.amenities.map((item) => ({
+          idProperty: property.id,
+          idAmenity: item,
+        }))
+      );
+
       const highlights = await db.HighlightProperty.bulkCreate(
         data.highlights.map((item) => ({
           idProperty: property.id,
           idHighlight: item,
         }))
       );
-     
-      const newdata = [{property: property}, {address: address}, {amenities: amenities}, {highlights: highlights}, {images: images}];
+
+      const newdata = [
+        { property: property },
+        { address: address },
+        { amenities: amenities },
+        { highlights: highlights },
+        { images: images },
+      ];
 
       resolve({
         status: "OK",
@@ -233,8 +239,8 @@ const getDetailBySlug = (slug) => {
           },
           {
             model: db.Address,
-            as: "propertyAddress"
-          }
+            as: "propertyAddress",
+          },
         ],
       });
 
@@ -259,11 +265,11 @@ const getDetailProperyById = (propertyId) => {
             as: "images", // Alias được định nghĩa trong `property.associate`
             attributes: ["id", "image"], // Lấy tất cả các ảnh liên kết
           },
-          {
-            model: db.City,
-            as: "city", // Alias được định nghĩa trong `Property.associate`
-            attributes: ["name"], // Chỉ lấy cột "name" từ City
-          },
+          // {
+          //   model: db.City,
+          //   as: "city", // Alias được định nghĩa trong `Property.associate`
+          //   attributes: ["name"], // Chỉ lấy cột "name" từ City
+          // },
           {
             model: db.Address,
             as: "propertyAddress", // Alias được định nghĩa trong Room.associate
@@ -283,8 +289,8 @@ const getDetailProperyById = (propertyId) => {
           },
           {
             model: db.Address,
-            as: "propertyAddress"
-          }
+            as: "propertyAddress",
+          },
         ],
         // attributes: ["name"],
       });
@@ -445,5 +451,5 @@ module.exports = {
   createProperty,
   getListAmenityByPropertyId,
   getListHightlightByPropertyId,
-  updateProperty
+  updateProperty,
 };
