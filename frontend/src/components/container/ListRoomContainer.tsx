@@ -95,9 +95,6 @@ const ListRoomContainer: React.FC<IProps> = ({ propertyId }) => {
     setEndDate(dayjs(new Date().setDate(new Date().getDate() + 2)));
   }, []);
 
-  console.log({ rooms });
-  console.log({ listRoomAvailability });
-
   return (
     <div>
       {rooms.map((item: IRoom) => (

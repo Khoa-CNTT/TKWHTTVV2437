@@ -33,6 +33,7 @@ const DetailPage = async (props: IProps) => {
   const property = await apisProperty.getPropertyBySlug(params.slug);
   const rating = await apisReview.getReviewByProperty(property.data.id);
   const properties = await apisProperty.getListTop10Rating();
+  const reviews = await apisReview.getListReviewByPropertyId(property.data.id);
 
   return (
     <div className="pt-4 w-[1260px] mx-auto">
@@ -169,7 +170,7 @@ const DetailPage = async (props: IProps) => {
         <div>
           <div className="mt-4">
             <p className="text-4xl text-green-700 font-semibold">
-              {rating.data.averageRating || 0}/10
+              {rating.data.averageRating || 0}/5
             </p>
             <p className="font-semibold">
               {ratingText(rating.data.averageRating)}
@@ -181,13 +182,10 @@ const DetailPage = async (props: IProps) => {
           </div>
 
           <div className="mt-4">
-            <ReviewContainer />
-          </div>
-
-          <div className="flex justify-center mt-4">
-            <button className="border-[1px] border-gray-400 rounded-3xl py-2 px-5 text-blue-600 font-semibold">
-              See more reviews
-            </button>
+            <ReviewContainer
+              reviews={reviews.data}
+              propertyId={property.data.id}
+            />
           </div>
         </div>
       </div>
