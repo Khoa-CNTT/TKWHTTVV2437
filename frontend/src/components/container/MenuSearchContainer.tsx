@@ -48,7 +48,7 @@ interface IProps {
 }
 
 const MenuSearchContainer: React.FC<IProps> = ({ provinces }) => {
-  const [isModalOpen, setIsModalOpen] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
 
   const [value, setValue] = React.useState<number[]>([0, 100]);
@@ -152,6 +152,7 @@ const MenuSearchContainer: React.FC<IProps> = ({ provinces }) => {
       <div className="flex items-center gap-6">
         {menuCategory.map((item) => (
           <div
+            key={item.id}
             onClick={() => handleClickCategory(item.categoryId)}
             className={clsx("flex flex-col items-center cursor-pointer pb-2", {
               "border-b-2 border-black":
@@ -210,6 +211,7 @@ const MenuSearchContainer: React.FC<IProps> = ({ provinces }) => {
           >
             <div className="relative px-4 py-6 border-b">
               <IoMdClose
+                onClick={() => setIsModalOpen(false)}
                 size={30}
                 className="rounded-full text-blue-500 cursor-pointer hover:bg-gray-200 absolute"
               />

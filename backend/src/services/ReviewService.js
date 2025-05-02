@@ -7,7 +7,10 @@ const getRatingByPropertyId = (propertyId) => {
       const result = await db.Review.findOne({
         attributes: [
           // Tính trung bình rating và làm tròn đến 1 chữ số thập phân
-          [fn("ROUND", fn("AVG", col("rating")), 1), "averageRating"],
+          [
+            fn("COALESCE", fn("ROUND", fn("AVG", col("rating")), 1), 0),
+            "averageRating",
+          ],
           // Đếm số lượng review
           [fn("COUNT", col("id")), "reviewCount"],
         ],

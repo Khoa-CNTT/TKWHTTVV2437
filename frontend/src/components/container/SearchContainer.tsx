@@ -1,21 +1,32 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+
+import { IoIosSearch } from "react-icons/io";
 import { IoLocationOutline } from "react-icons/io5";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import CitySearchContainer from "./CitySearchContainer";
+import SearchTextContainer from "./SearchTextContainer";
 
 import apisCategory from "@/apis/category";
 
 const SearchContainer = () => {
-  const [data, setData] = useState<{ search: string; categoryId: string }>({
-    search: "",
-    categoryId: "0",
+  const router = useRouter();
+  const [data, setData] = useState<{
+    text: string;
+    status: number;
+    slug?: string;
+  }>({
+    text: "",
+    status: 0,
+    slug: "",
   });
+  const [categoryId, setCategoryId] = useState<string>("");
   const [categories, setCategories] = useState([]);
-  const [showChooseCity, setShowChooseCity] = useState<boolean>(false);
+  const [showChooseSearch, setShowChooseSearch] = useState<boolean>(false);
 
   const containerRef = useRef<HTMLInputElement>(null); // Tham chiếu đến thành phần chứa input
 
@@ -37,7 +48,7 @@ const SearchContainer = () => {
         containerRef.current &&
         !containerRef.current.contains(event.target as Node)
       ) {
-        setShowChooseCity(false); // Đóng CitySearchContainer khi click bên ngoài
+        setShowChooseSearch(false); // Đóng CitySearchContainer khi click bên ngoài
       }
     };
 
@@ -46,6 +57,28 @@ const SearchContainer = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const handleSubmitSearch = () => {
+    if (data.status === 1) {
+      router.push(`detail/${data.slug}`);
+    } else {
+      const query: { city?: string; category?: string } = {};
+
+      if (data?.text) {
+        query.city = data.text;
+      }
+
+      if (categoryId) {
+        query.category = categoryId;
+      }
+
+      const queryString = new URLSearchParams(
+        query as Record<string, string>
+      ).toString();
+
+      router.push(`/search?${queryString}`);
+    }
+  };
 
   return (
     <div className="bg-white py-4 px-6 rounded-xl flex items-center gap-4 w-[850px]">
@@ -57,16 +90,30 @@ const SearchContainer = () => {
         <div className="w-full">
           <p className="font-semibold text-sm">Điểm đến</p>
           <input
-            onClick={() => setShowChooseCity(true)}
-            value={data?.search}
+            onClick={() => setShowChooseSearch(true)}
+            value={data?.text}
+            onChange={(e) => setData({ text: e.target.value, status: 0 })}
             className="outline-none w-full"
             placeholder="Nhập địa điểm muốn đi!"
           ></input>
         </div>
 
-        {showChooseCity && data?.search.length === 0 && (
+        {showChooseSearch && data?.text.length === 0 && (
           <div className="absolute top-[110%] left-0">
-            <CitySearchContainer />
+            <CitySearchContainer
+              onShowChooseSearch={setShowChooseSearch}
+              onSetData={setData}
+            />
+          </div>
+        )}
+
+        {showChooseSearch && data?.text.length > 0 && (
+          <div className="absolute top-[110%] left-0">
+            <SearchTextContainer
+              onShowChooseSearch={setShowChooseSearch}
+              onSetData={setData}
+              text={data?.text}
+            />
           </div>
         )}
       </div>
@@ -75,8 +122,8 @@ const SearchContainer = () => {
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          value={data.categoryId || "0"} // Giá trị mặc định từ state
-          onChange={(e) => setData({ ...data, categoryId: e.target.value })}
+          value={categoryId || "0"} // Giá trị mặc định từ state
+          onChange={(e) => setCategoryId(e.target.value)}
           sx={{
             "& .MuiSelect-select": {
               padding: "20px", // Tùy chỉnh padding
@@ -95,7 +142,11 @@ const SearchContainer = () => {
           ))}
         </Select>
       </FormControl>
-      <button className="bg-blue-600 text-white font-semibold px-8 py-3 rounded-3xl">
+      <button
+        onClick={handleSubmitSearch}
+        className="flex items-center gap-2 border-blue-700 border text-blue-800 hover:bg-blue-200 font-semibold px-8 py-3 rounded-md"
+      >
+        <IoIosSearch className="text-blue-800" size={27} />
         Tìm kiếm
       </button>
     </div>

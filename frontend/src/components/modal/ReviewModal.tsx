@@ -59,17 +59,23 @@ const sortMapping = {
 interface IProps {
   propertyId: string;
   onShowModalReview: (x: boolean) => void;
+  avgRating: string;
+  reviewCount: number;
 }
 
 type SortKey = keyof typeof sortMapping; // Lấy kiểu từ các key của sortMapping
 
-const ReviewModal: React.FC<IProps> = ({ propertyId, onShowModalReview }) => {
+const ReviewModal: React.FC<IProps> = ({
+  propertyId,
+  onShowModalReview,
+  avgRating,
+  reviewCount,
+}) => {
   const [reviews, setReviews] = useState<IReview[]>([]);
   const [page, setPage] = useState<number>(1);
   const [totalItem, setTotalItem] = useState<number>(0);
   const [sort, setSort] = useState<SortKey>("highest");
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -121,10 +127,10 @@ const ReviewModal: React.FC<IProps> = ({ propertyId, onShowModalReview }) => {
         </div>
 
         <div className="mt-6">
-          <p className="text-xl font-semibold text-green-800">{`3.5/5 ${ratingText(5)}`}</p>
+          <p className="text-xl font-semibold text-green-800">{`${avgRating}/5 ${ratingText(5)}`}</p>
 
           <div className="flex items-center gap-1 text-sm text-gray-600 mt-1">
-            <p>{`120 đánh giá`}</p>
+            <p>{`${reviewCount} đánh giá`}</p>
             <PiWarningCircleLight className="text-gray-700" size={18} />
           </div>
         </div>

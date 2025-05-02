@@ -17,6 +17,7 @@ import { IAmenity } from "@/app/types/amenity";
 import { v4 as uuidv4 } from "uuid";
 import { VscSaveAs } from "react-icons/vsc";
 import { IPropertyCreate } from "@/app/types/property";
+import { toast } from "react-toastify";
 
 // import icon
 import { FaSwimmer } from "react-icons/fa";
@@ -36,11 +37,11 @@ import { MdDeleteForever } from "react-icons/md";
 import { IoIosHeartEmpty } from "react-icons/io";
 import { SlPicture } from "react-icons/sl";
 import { FaBusAlt } from "react-icons/fa";
-import { listItemSecondaryActionClasses } from "@mui/material";
 import { IImage, IProperty } from "@/app/types/property";
 import apisCategory from "@/apis/category";
 import apisAddress from "@/apis/address";
 import apisImage from "@/apis/image";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 // set icon map
 const iconMap: { [key: string]: JSX.Element } = {
@@ -72,11 +73,18 @@ interface IData {
   street: string;
   description: string;
   selectedAmenities?: string[];
+  id: string;
 }
 
-const propertyId = null;
-
 const HomestayPage = () => {
+  const [initialData, setInitialData] = useState<IData | null>(null);
+  const [initialAmenities, setInitialAmenities] = useState<string[]>([]);
+  const [initialHighLight, setInitialHighLight] = useState<string[]>([]);
+  const [initialImage, setInitialImage] = useState<IImage[]>([]);
+  const [check, setCheck] = useState<boolean>(false);
+  const [spinner, setSpinner] = useState<boolean>(false);
+  const [propertyId, setPropertyId] = useState<string>("");
+
   const [cities, setCities] = useState<{ name: string; code: string }[]>([]);
   const [districts, setDistricts] = useState<{ name: string; code: string }[]>(
     []
@@ -90,6 +98,7 @@ const HomestayPage = () => {
   const [provinceCode, setProvinceCode] = useState<string>("");
   const [showTrash, setShowTrash] = useState<string>("");
   const [data, setData] = useState<IData>({
+    id: "",
     name: "",
     categoryId: "",
     country: "",
@@ -98,6 +107,20 @@ const HomestayPage = () => {
     street: "",
     description: "",
   });
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const fetchPropertyId = async (id: string) => {
+      const response = await apisProperty.getPropertyIdByUserId(id);
+
+      if (response.data) {
+        setPropertyId(response.data.id);
+      }
+    };
+    if (user?.id) {
+      fetchPropertyId(user.id);
+    }
+  }, [user?.id, check]);
 
   useEffect(() => {
     const fetchDataAmenities = async () => {
@@ -123,6 +146,22 @@ const HomestayPage = () => {
       }
     };
 
+    const fetchAllData = async () => {
+      try {
+        await Promise.all([
+          fetchDataAmenities(),
+          fetchDataHighLight(),
+          fetchDataCategories(),
+        ]);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchAllData();
+  }, []);
+
+  useEffect(() => {
     const fetchDataCities = async () => {
       const response = await apisAddress.getListProvince();
       if (response?.data) {
@@ -135,11 +174,20 @@ const HomestayPage = () => {
       }
     };
 
+    if (data?.country === "0") {
+      setCities([]);
+    }
+
+    if (data?.country && data?.country !== "0") {
+      fetchDataCities();
+    }
+  }, [data?.country]);
+
+  useEffect(() => {
     const fetchDataProperty = async () => {
-      const response = await apisProperty.getPropertyById(propertyId);
+      const response = await apisProperty.getPropertyByUserId(user?.id);
       if (response?.data) {
-        console.log({ dataResponse: response.data });
-        setData({
+        const propertyData = {
           name: response.data?.name,
           categoryId: response.data?.idCategory,
           country: response.data?.propertyAddress?.country,
@@ -147,39 +195,34 @@ const HomestayPage = () => {
           district: response.data?.propertyAddress?.district,
           street: response.data?.propertyAddress?.street,
           description: response.data?.description,
-        });
+          id: response?.data?.id,
+        };
+        setData(propertyData);
+        setInitialData(propertyData);
 
-        setSelectedAmenities(
-          response.data.amenities.map((item: IAmenity) => item.id)
+        const amenities = response.data.amenities.map(
+          (item: IAmenity) => item.id
         );
-        setSelectedHighLight(
-          response.data.highlights.map((item: IHightlight) => item.id)
+        setSelectedAmenities(amenities);
+        setInitialAmenities(amenities);
+
+        const highlights = response.data.highlights.map(
+          (item: IHightlight) => item.id
         );
-        setSelectedImage(
-          response.data.images.map((item: IImage) => ({
-            image: item.image,
-            id: item.id,
-          }))
-        );
+        setSelectedHighLight(highlights);
+        setInitialHighLight(highlights);
+
+        const images = response.data.images.map((item: IImage) => ({
+          image: item.image,
+          id: item.id,
+        }));
+        setSelectedImage(images);
+        setInitialImage(images);
       }
     };
 
-    const fetchAllData = async () => {
-      try {
-        await Promise.all([
-          fetchDataAmenities(),
-          fetchDataHighLight(),
-          fetchDataCategories(),
-          fetchDataCities(),
-          fetchDataProperty(),
-        ]);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchAllData();
-  }, []);
+    fetchDataProperty();
+  }, [propertyId, check]);
 
   // function handle
   const handleCheckboxChange = (id: string) => {
@@ -197,8 +240,12 @@ const HomestayPage = () => {
   // get province code when select city
   useEffect(() => {
     const selectedCity = cities.find((city) => city.name === data.city);
-    if (selectedCity) {
+    if (selectedCity && data.city !== "0") {
       setProvinceCode(selectedCity.code); // Lưu `code` vào state
+    }
+
+    if (data.city === "0") {
+      setDistricts([]);
     }
   }, [data.city, cities]);
 
@@ -254,30 +301,83 @@ const HomestayPage = () => {
     }
   };
 
+  const isFormValid = () => {
+    return (
+      data.name.trim() !== "" &&
+      data.categoryId.trim() !== "" &&
+      data.country.trim() !== "" &&
+      data.city.trim() !== "" &&
+      data.district.trim() !== "" &&
+      data.street.trim() !== "" &&
+      selectedAmenities.length > 0 &&
+      selectedHighLight.length > 0 &&
+      selectedImage.length > 0
+    );
+  };
+
+  // Hàm kiểm tra xem có thay đổi dữ liệu không
+  const hasChanges = () => {
+    return (
+      JSON.stringify(data) !== JSON.stringify(initialData) ||
+      JSON.stringify(selectedAmenities) !== JSON.stringify(initialAmenities) ||
+      JSON.stringify(selectedHighLight) !== JSON.stringify(initialHighLight) ||
+      JSON.stringify(selectedImage) !== JSON.stringify(initialImage)
+    );
+  };
+
   const handleSubmit = () => {
+    if (!hasChanges()) return;
+
     let dataSubmit: IPropertyCreate = {};
     dataSubmit.images = selectedImage;
     dataSubmit.amenities = selectedAmenities;
     dataSubmit.highlights = selectedHighLight;
     dataSubmit = { ...dataSubmit, ...data };
 
-    if (propertyId) {
+    if (data?.id) {
       const handleUpdate = async () => {
-        const response = await apisProperty.updateProperty(
-          propertyId,
-          dataSubmit
-        );
+        try {
+          setSpinner(true);
+          const response = await apisProperty.updateProperty(
+            data?.id,
+            dataSubmit
+          );
 
-        console.log(response);
+          if (response?.status === "OK") {
+            toast.success("Cập nhật thông tin thành công!");
+            setCheck((prev) => !prev);
+            setSpinner(false);
+          } else {
+            toast.error("Cập nhật thông tin thất bại!");
+          }
+        } catch (error) {
+          console.error("Error updating property:", error);
+          toast.error("Đã xảy ra lỗi khi cập nhật thông tin!");
+          setSpinner(false);
+          setCheck((prev) => !prev);
+        }
       };
       handleUpdate();
     } else {
-      console.log("handle create");
-      console.log(dataSubmit);
       const handleSaveData = async () => {
-        const response = await apisProperty.createProperty(dataSubmit);
+        try {
+          setSpinner(true);
+          dataSubmit.userId = user?.id;
+          const response = await apisProperty.createProperty(dataSubmit);
 
-        console.log({ response });
+          if (response?.status === "OK") {
+            toast.success("Tạo thông tin thành công!");
+            setCheck((prev) => !prev);
+            setSpinner(false);
+          } else {
+            toast.error("Cập nhật thông tin thất bại!");
+            setSpinner(false);
+          }
+        } catch (error) {
+          console.error("Error updating property:", error);
+          toast.error("Đã xảy ra lỗi khi tạo thông tin!");
+          setCheck((prev) => !prev);
+        }
       };
 
       handleSaveData();
@@ -287,6 +387,8 @@ const HomestayPage = () => {
   const handleRemoveImage = (id: string) => {
     setSelectedImage((prev) => prev.filter((item) => item.id !== id));
   };
+
+  console.log({ city: data.city });
 
   return (
     <div className="p-8">
@@ -423,21 +525,18 @@ const HomestayPage = () => {
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
-              // value={100}
-              // label="Age"
-              // onChange={handleChange}
               value={data.city || "0"} // Giá trị mặc định từ state
               onChange={(e) => {
                 const selectedCity = cities.find(
                   (city) => city.name === e.target.value
                 );
                 if (selectedCity) {
-                  setData({
-                    ...data,
-                    city: selectedCity.name, // Lưu `name` vào state
-                  });
                   setProvinceCode(selectedCity.code); // Lưu `code` vào state
                 }
+                setData({
+                  ...data,
+                  city: e.target.value, // Lưu `name` vào state
+                });
               }}
               sx={{
                 "& .MuiSelect-select": {
@@ -446,8 +545,6 @@ const HomestayPage = () => {
               }}
             >
               <MenuItem value={"0"}>Chọn tỉnh / thành phố</MenuItem>
-              {/* <MenuItem value={10}>Đà Nẵng</MenuItem>
-              <MenuItem value={20}>Hội An</MenuItem> */}
               {cities?.map((item: { name: string; code: string }) => (
                 <MenuItem key={item.code} value={item.name}>
                   {item.name}
@@ -579,9 +676,37 @@ const HomestayPage = () => {
       <div className="flex justify-end mt-8">
         <button
           onClick={handleSubmit}
-          className="flex items-center gap-2 bg-green-700 py-3 px-8 text-white rounded-md font-semibold hover:opacity-90 transition-300"
+          disabled={user?.id ? !isFormValid() && !hasChanges() : !hasChanges()}
+          className={`flex items-center gap-2 py-3 px-8 text-white rounded-md font-semibold transition-300 ${
+            user?.id
+              ? isFormValid() && hasChanges()
+                ? "bg-green-700 hover:opacity-90"
+                : "bg-gray-400 cursor-not-allowed"
+              : isFormValid()
+                ? "bg-green-700 hover:opacity-90"
+                : "bg-gray-400 cursor-not-allowed"
+          }`}
         >
+          {spinner && (
+            <svg
+              aria-hidden="true"
+              className="w-5 h-5 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+              viewBox="0 0 100 101"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                fill="currentColor"
+              />
+              <path
+                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                fill="currentFill"
+              />
+            </svg>
+          )}
           <VscSaveAs size={20} />
+
           <span>{propertyId ? "Cập nhật thông tin" : "Tạo thông tin"}</span>
         </button>
       </div>

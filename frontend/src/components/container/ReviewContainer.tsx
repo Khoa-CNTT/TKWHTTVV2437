@@ -16,9 +16,16 @@ import ReviewModal from "../modal/ReviewModal";
 interface IProps {
   reviews: IReview[];
   propertyId: string;
+  avgRating: string;
+  reviewCount: number;
 }
 
-const ReviewContainer: React.FC<IProps> = ({ reviews, propertyId }) => {
+const ReviewContainer: React.FC<IProps> = ({
+  reviews,
+  propertyId,
+  avgRating,
+  reviewCount,
+}) => {
   const [showModalReview, setShowModalReview] = useState<boolean>(false);
 
   return (
@@ -59,6 +66,8 @@ const ReviewContainer: React.FC<IProps> = ({ reviews, propertyId }) => {
         <ReviewModal
           onShowModalReview={setShowModalReview}
           propertyId={propertyId}
+          avgRating={avgRating}
+          reviewCount={reviewCount}
         />
       )}
     </div>

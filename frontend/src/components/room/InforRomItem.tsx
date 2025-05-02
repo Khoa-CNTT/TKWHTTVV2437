@@ -40,7 +40,7 @@ const InforRomItem: React.FC<IProps> = ({
         alt="ảnh"
       />
 
-      <div className="p-2 h-[170px]">
+      <div className="p-2 h-[172px]">
         <div className="flex items-center gap-2 mt-1  h-[30px]">
           <span className="bg-green-700 font-medium text-sm text-white rounded-md px-2">
             {rating}

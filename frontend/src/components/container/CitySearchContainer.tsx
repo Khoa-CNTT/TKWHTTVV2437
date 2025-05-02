@@ -4,7 +4,15 @@ import { useState, useEffect } from "react";
 import apisCity from "@/apis/city";
 import { ICity } from "@/app/types/city";
 
-const CitySearchContainer = () => {
+interface IProps {
+  onSetData: (data: { text: string; status: number; slug?: string }) => void;
+  onShowChooseSearch: (x: boolean) => void;
+}
+
+const CitySearchContainer: React.FC<IProps> = ({
+  onSetData,
+  onShowChooseSearch,
+}) => {
   const [cities, setCities] = useState<ICity[]>([]);
 
   useEffect(() => {
@@ -19,19 +27,27 @@ const CitySearchContainer = () => {
     fetchDataCities();
   }, []);
 
-  console.log({ cities });
-
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className="bg-white p-4 rounded-md shadow-lg"
+      className="bg-white p-4 rounded-md shadow-lg w-[408px] min-h-[200px]"
     >
       <h4 className="font-semibold text-sm">Tìm kiếm theo khu vực</h4>
 
       <div className="grid grid-cols-3 gap-2 mt-2">
         {cities.map((item) => (
-          <div key={item.id} className="cursor-pointer">
-            <img className="rounded-md" src={item.image}></img>
+          <div
+            onClick={() => {
+              onSetData({ text: item.name, status: 2 });
+              onShowChooseSearch(false);
+            }}
+            key={item.id}
+            className="cursor-pointer"
+          >
+            <img
+              className="rounded-md h-[96px] object-cover"
+              src={item.image}
+            ></img>
             <p className="text-sm font-semibold mt-1">{item.name}</p>
           </div>
         ))}

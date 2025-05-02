@@ -31,6 +31,7 @@ export interface IProperty {
 
 export interface IPropertyCreate {
   categoryId?: string;
+  userId?: string;
   city?: string;
   country?: string;
   description?: string;

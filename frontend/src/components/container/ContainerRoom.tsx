@@ -47,6 +47,7 @@ const ContainerRoom: React.FC<IProps> = ({ properties }) => {
                 quantityReview={item.reviewCount}
                 rating={item.averageRating || 0}
                 slug={item.slug}
+                advertising={Number(item?.advertising)}
               />
             </SwiperSlide>
           ))}

@@ -9,39 +9,38 @@ const apisAdmin = {
   registerOwner: (data: any) => http.post(`admin/register-owner`, data),
 
   // Quản lý người dùng
-    listUsers: () =>
-      http.get(`admin/list-users`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-      }),
-  
-    // Tạo user mới
-    createUser: (data: any) =>
-      http.post(`admin/create-user`, data, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-      }),
-  
-    // Cập nhật thông tin user
-    updateUser: (id: string, data: any) =>
-      http.put(`admin/update-user/${id}`, data, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-      }),
-  
-    // Xóa user
-    deleteUser: (id: string) =>
-      http.delete(`admin/delete-user/${id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-      }),
-  
+  listUsers: () =>
+    http.get(`admin/list-users`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+    }),
 
-  lockAccount: (id: string) => http.put(`admin/lock-account/${id}`,{}),
+  // Tạo user mới
+  createUser: (data: any) =>
+    http.post(`admin/create-user`, data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+    }),
+
+  // Cập nhật thông tin user
+  updateUser: (id: string, data: any) =>
+    http.put(`admin/update-user/${id}`, data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+    }),
+
+  // Xóa user
+  deleteUser: (id: string) =>
+    http.delete(`admin/delete-user/${id}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+    }),
+
+  lockAccount: (id: string) => http.put(`admin/lock-account/${id}`, {}),
 
   // Quản lý danh mục
   createCategory: (data: any) => http.post(`admin/create-category`, data),
@@ -74,9 +73,9 @@ const apisAdmin = {
   listAmenities: () => http.get(`admin/list-amenities`),
 
   // Quản lý homestay
-  approveHomestay: (id: string) => http.put(`admin/approve-homestay/${id}`,{}),
+  approveHomestay: (id: string) => http.put(`admin/approve-homestay/${id}`, {}),
 
-  rejectHomestay: (id: string) => http.put(`admin/reject-homestay/${id}`,{}),
+  rejectHomestay: (id: string) => http.put(`admin/reject-homestay/${id}`, {}),
 
   updateHomestay: (id: string, data: any) =>
     http.put(`admin/update-homestay/${id}`, data),
@@ -86,14 +85,14 @@ const apisAdmin = {
   // Quản lý thanh toán
   listPayments: () => http.get(`admin/list-payments`),
 
-  refundPayment: (id: string) => http.put(`admin/refund-payment/${id}`,{}),
+  refundPayment: (id: string) => http.put(`admin/refund-payment/${id}`, {}),
 
   // Quản lý đặt phòng
   listBookings: () => http.get(`admin/list-bookings`),
 
-  confirmBooking: (id: string) => http.put(`admin/confirm-booking/${id}`,{}),
+  confirmBooking: (id: string) => http.put(`admin/confirm-booking/${id}`, {}),
 
-  cancelBooking: (id: string) => http.put(`admin/cancel-booking/${id}`,{}),
+  cancelBooking: (id: string) => http.put(`admin/cancel-booking/${id}`, {}),
 };
 
 export default apisAdmin;

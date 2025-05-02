@@ -24,8 +24,8 @@ const ReviewItem: React.FC<IProps> = ({
   user,
 }) => {
   return (
-    <div className="border-gray-500 rounded-xl p-2 shadow-md">
-      <h2 className="font-medium">{`${rating}/5 ${ratingText(rating)}`}</h2>
+    <div className="border-gray-300 rounded-xl p-2 shadow-md border">
+      <h2 className="font-semibold text-blue-900">{`${rating}/5 ${ratingText(rating)}`}</h2>
       <p className="mt-4 text-sm h-[90px]">
         {text.length <= 150 ? text : text.slice(0, 200) + "..."}
       </p>

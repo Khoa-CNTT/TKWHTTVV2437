@@ -12,14 +12,31 @@ import { MdDelete } from "react-icons/md";
 import apisRoom from "@/apis/room";
 import { IRoom } from "@/app/types/room";
 import Link from "next/link";
-
-const propertyId = "7d7d8961-7095-4be9-8b5b-0cfd0dec1a3c";
+import { useAuth } from "@/app/contexts/AuthContext";
+import apisProperty from "@/apis/property";
 
 const ManagerRoom = () => {
   const [valueSearch, setValueSearch] = useState<string>("");
   const [showDeleteText, setShowDeleteText] = useState<boolean>(false);
   const [rooms, setRooms] = useState<IRoom[]>([]);
+  const [propertyId, setPropertyId] = useState<string>("");
+  const { user } = useAuth();
+
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchPropertyId = async (id: string) => {
+      const response = await apisProperty.getPropertyIdByUserId(id);
+
+      if (response?.data) {
+        setPropertyId(response.data.id);
+      }
+    };
+
+    if (user?.id) {
+      fetchPropertyId(user?.id);
+    }
+  }, [user?.id]);
 
   useEffect(() => {
     const fetchDataRoom = async () => {
@@ -31,7 +48,7 @@ const ManagerRoom = () => {
     };
 
     fetchDataRoom();
-  }, []);
+  }, [propertyId]);
 
   useEffect(() => {
     if (valueSearch.length > 0) {
@@ -48,7 +65,7 @@ const ManagerRoom = () => {
           <h1 className="text-2xl font-bold">Danh sách các phòng</h1>
 
           <Link
-            className="bg-green-700 py-2 px-5 text-white font-semibold rounded-md cursor-pointer"
+            className="bg-green-700 py-2 px-5 text-white font-semibold rounded-md cursor-pointer hover:opacity-90"
             href={"/homestay/manager-room/create"}
           >
             Tạo phòng mới
@@ -109,9 +126,6 @@ const ManagerRoom = () => {
           <table className="min-w-full text-black">
             <thead className="bg-gray-200 text-sm text-gray-500 font-bold ">
               <tr>
-                <th className="px-4 py-3 text-left">
-                  <input type="checkbox" />
-                </th>
                 <th className="px-4 py-3 text-left">Mã phòng</th>
                 <th className="pl-4 py-3 text-left">Ảnh</th>
                 <th className="px-4 py-3 text-left ">Tên</th>
@@ -129,9 +143,6 @@ const ManagerRoom = () => {
                   key={item?.id}
                   className="border-b border-gray-200 cursor-pointer hover:bg-gray-100"
                 >
-                  <td className="px-4 py-5">
-                    <input type="checkbox" />
-                  </td>
                   <td className="px-4 py-5">{item?.code}</td>
                   <td className="pl-4">
                     <img
@@ -158,7 +169,7 @@ const ManagerRoom = () => {
                   <td className="px-4 py-5 ">{item?.status}</td>
                   <td className="flex items-center gap-4 justify-end mr-4">
                     <FaEdit size={23} className="cursor-pointer" />
-                    <MdDelete size={23} className="cursor-pointer" />
+                    {/* <MdDelete size={23} className="cursor-pointer" /> */}
                   </td>
                 </tr>
               ))}

@@ -202,6 +202,70 @@ const getListProperty = (filter, limit = 12, page = 1) => {
   });
 };
 
+const getPropertyIdByUserId = (userId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const property = await db.Property.findOne({
+        where: { idUser: userId },
+        attributes: ["id"],
+      });
+
+      resolve({
+        status: property ? "OK" : "ERR",
+        data: property || null,
+      });
+    } catch (error) {
+      reject({
+        status: "ERR",
+        message: `Error fetching properties: ${error.message || error}`,
+      });
+    }
+  });
+};
+
+const getListSearchText = (text) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!text || typeof text !== "string") {
+        return resolve({
+          status: "ERR",
+          data: [],
+        });
+      }
+
+      const properties = await db.Property.findAll({
+        where: {
+          [Op.or]: [
+            { name: { [Op.like]: `%${text}%` } },
+            { "$propertyAddress.city$": { [Op.like]: `%${text}%` } },
+            { "$propertyAddress.country$": { [Op.like]: `%${text}%` } },
+          ],
+        },
+        attributes: ["id", "name", "slug"],
+        include: [
+          {
+            model: db.Address,
+            as: "propertyAddress",
+            attributes: ["id", "city", "slug", "country"],
+            required: true, // Chỉ lấy properties có address
+          },
+        ],
+        limit: 10, // Giới hạn kết quả trả về
+      });
+
+      resolve({
+        status: properties.length > 0 ? "OK" : "ERR",
+        data: properties || [],
+      });
+    } catch (error) {
+      reject({
+        status: "ERR",
+        message: `Error fetching properties: ${error.message || error}`,
+      });
+    }
+  });
+};
+
 const createProperty = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -209,7 +273,7 @@ const createProperty = (data) => {
         id: v4(),
         name: data.name,
         description: data.description,
-        idUser: data.idUser,
+        idUser: data.userId,
         idCategory: data.categoryId,
         slug: slugify(data.name, {
           lower: true, // chuyển thành chữ thường
@@ -293,7 +357,7 @@ const updateProperty = (propertyId, data) => {
       );
 
       // Update the address
-      const address = await db.Address.create(
+      const address = await db.Address.update(
         {
           street: data.street,
           district: data.district,
@@ -365,29 +429,46 @@ const getDetailBySlug = (slug) => {
         include: [
           {
             model: db.ImageProperty,
-            as: "images", // Alias được định nghĩa trong `Room.associate`
-            attributes: ["id", "image"], // Lấy tất cả các ảnh liên kết
+            as: "images",
+            attributes: ["id", "image"],
           },
           {
             model: db.Amenity,
-            as: "amenities", // Alias được định nghĩa trong Room.associate
+            as: "amenities",
             through: { attributes: [] },
           },
           {
             model: db.Highlight,
-            as: "highlights", // Alias được định nghĩa trong Room.associate
+            as: "highlights",
             through: { attributes: [] },
           },
           {
             model: db.Address,
             as: "propertyAddress",
           },
+          {
+            model: db.Room,
+            as: "rooms",
+            attributes: ["price"], // Remove individual room attributes since we're aggregating
+          },
         ],
       });
 
+      let price = property?.rooms[0].price;
+
+      for (let i = 1; i < property?.rooms?.length; i++) {
+        price = Math.min(price, property?.rooms[i].price);
+      }
+
+      // Gộp kết quả
+      const result = {
+        ...property.toJSON(),
+        price,
+      };
+
       resolve({
-        status: property ? "OK" : "ERR",
-        data: property || null,
+        status: result ? "OK" : "ERR",
+        data: result || null,
       });
     } catch (error) {
       reject(error);
@@ -400,6 +481,53 @@ const getDetailProperyById = (propertyId) => {
     try {
       const property = await db.Property.findOne({
         where: { id: propertyId },
+        include: [
+          {
+            model: db.ImageProperty,
+            as: "images", // Alias được định nghĩa trong `property.associate`
+            attributes: ["id", "image"], // Lấy tất cả các ảnh liên kết
+          },
+          {
+            model: db.Address,
+            as: "propertyAddress", // Alias được định nghĩa trong Room.associate
+            attributes: ["street", "district", "ward", "country", "id", "city"],
+          },
+          {
+            model: db.Highlight,
+            as: "highlights", // Alias được định nghĩa trong Room.associate
+            attributes: ["name", "id", "icon", "description"],
+            through: { attributes: [] },
+          },
+          {
+            model: db.Amenity,
+            as: "amenities", // Alias được định nghĩa trong Room.associate
+            attributes: ["name", "id", "icon"],
+            through: { attributes: [] },
+          },
+          {
+            model: db.Address,
+            as: "propertyAddress",
+          },
+        ],
+        // attributes: ["name"],
+      });
+
+      resolve({
+        status: property ? "OK" : "ERR",
+        data: property || null,
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const getDetailProperyByUserId = (userId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log({ userId });
+      const property = await db.Property.findOne({
+        where: { idUser: userId },
         include: [
           {
             model: db.ImageProperty,
@@ -589,4 +717,7 @@ module.exports = {
   getListHightlightByPropertyId,
   updateProperty,
   getListProperty,
+  getListSearchText,
+  getDetailProperyByUserId,
+  getPropertyIdByUserId,
 };
