@@ -1,11 +1,22 @@
 const db = require("../models");
 const { v4 } = require("uuid");
 
-const getListRoomByPropertyId = (propertyId) => {
+const getListRoomByPropertyId = (propertyId, filters = {}) => {
   return new Promise(async (resolve, reject) => {
     try {
+      const { text, status } = filters;
+
       const rooms = await db.Room.findAll({
-        where: { idProperty: propertyId },
+        where: {
+          idProperty: propertyId,
+          ...(text && {
+            [db.Sequelize.Op.or]: [
+              { name: { [db.Sequelize.Op.like]: `%${text}%` } }, // Tìm kiếm theo tên
+              { code: { [db.Sequelize.Op.like]: `%${text}%` } }, // Tìm kiếm theo mã
+            ],
+          }),
+          ...(status && { status }), // Tìm kiếm theo trạng thái
+        },
         include: [
           {
             model: db.Amenity,
@@ -41,7 +52,7 @@ const searchListRoomForBooking = (propertyId) => {
   return new Promise(async (resolve, reject) => {
     try {
       const rooms = await db.Room.findAll({
-        where: { idProperty: propertyId },
+        where: { idProperty: propertyId, status: "active" },
         include: [
           {
             model: db.Amenity,
@@ -261,10 +272,31 @@ const updateRoom = (roomId, data) => {
   });
 };
 
+const updateStatusRoom = (roomId, status) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const room = await db.Room.update(
+        {
+          status: status,
+        },
+        { where: { id: roomId } }
+      );
+
+      resolve({
+        status: "OK",
+        data: room,
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   getListRoomByPropertyId,
   getDetailById,
   createRoom,
   updateRoom,
   searchListRoomForBooking,
+  updateStatusRoom,
 };

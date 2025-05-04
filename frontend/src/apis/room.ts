@@ -1,9 +1,16 @@
 import { IRoom, IRoomCreate } from "@/app/types/room";
 
 const apisRoom = {
-  getListRoomByPropertyId: async (propertyId: string) => {
+  getListRoomByPropertyId: async (
+    propertyId: string,
+    query: Record<string, string | number>
+  ) => {
+    const queryString = new URLSearchParams(
+      query as Record<string, string>
+    ).toString();
+
     const response = await fetch(
-      `${process.env.URL_SERVER_API}/room/list-room/${propertyId}`,
+      `${process.env.URL_SERVER_API}/room/list-room/${propertyId}?${queryString}`,
       {
         method: "GET",
         cache: "no-store",
@@ -35,22 +42,19 @@ const apisRoom = {
     return response.json();
   },
 
-  createRoom: async(data:IRoomCreate) => {
-      const response = await fetch(
-        `${process.env.URL_SERVER_API}/room`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json", // Specify JSON content type
-          },
-          body: JSON.stringify(data), // Serialize the data object
-        }
-      );
-  
-      return response.json();
-    },
+  createRoom: async (data: IRoomCreate) => {
+    const response = await fetch(`${process.env.URL_SERVER_API}/room`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json", // Specify JSON content type
+      },
+      body: JSON.stringify(data), // Serialize the data object
+    });
 
-  updateRoom: async(roomId: string, data:IRoomCreate) => {
+    return response.json();
+  },
+
+  updateRoom: async (roomId: string, data: IRoomCreate) => {
     const response = await fetch(
       `${process.env.URL_SERVER_API}/room/${roomId}`,
       {
@@ -63,7 +67,22 @@ const apisRoom = {
     );
 
     return response.json();
-  }
+  },
+
+  updateStatusRoom: async (roomId: string, status: string) => {
+    const response = await fetch(
+      `${process.env.URL_SERVER_API}/room/update-status/${roomId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json", // Specify JSON content type
+        },
+        body: JSON.stringify({ status }), // Serialize the data object
+      }
+    );
+
+    return response.json();
+  },
 };
 
 export default apisRoom;

@@ -8,6 +8,8 @@ import { MdOutlineBedroomParent } from "react-icons/md";
 import { FaRegCreditCard } from "react-icons/fa";
 import { MdNewspaper } from "react-icons/md";
 import { IoSettingsOutline } from "react-icons/io5";
+import { FaRegCalendarCheck } from "react-icons/fa";
+import { MdOutlineAdsClick } from "react-icons/md";
 
 const links = [
   {
@@ -21,6 +23,11 @@ const links = [
     icon: <MdOutlineBedroomParent size={22} />,
   },
   {
+    href: "/homestay/status-room",
+    label: "Theo dõi phòng",
+    icon: <FaRegCalendarCheck size={25} />,
+  },
+  {
     href: "/homestay/payment-info",
     label: "Quản lý thanh toán",
     icon: <FaRegCreditCard size={22} />,
@@ -29,6 +36,11 @@ const links = [
     href: "/homestay/list-reservation-approve",
     label: "Quản lí đơn đặt phòng",
     icon: <MdNewspaper size={22} />,
+  },
+  {
+    href: "/homestay/advertising",
+    label: "Dịch vụ quảng cáo",
+    icon: <MdOutlineAdsClick size={22} />,
   },
   {
     href: "/homestay/settings",
