@@ -156,29 +156,7 @@ const InforRoomCheckout: React.FC<IProps> = ({ property, room }) => {
                 })}
             </p>
           </div>
-          <div>
-            {room?.deposit !== null && room?.deposit != 0 ? (
-              <div className="p-4 border-[1px] border-red-700 rounded-lg my-8 text-red-700 flex items-center justify-between gap-4">
-                <p className="text-sm w-1/2">
-                  Bạn cần thanh toán khoảng cọc ngay bây giờ, hoàn trả lại toàn
-                  bộ khi thanh toán phòng.
-                </p>
-                <p className="text-sm1/2">
-                  <p className="text-lg font-semibold">
-                    {room?.deposit &&
-                      Number(room?.deposit).toLocaleString("it-IT", {
-                        style: "currency",
-                        currency: "VND",
-                      })}
-                  </p>
-                </p>
-              </div>
-            ) : (
-              <div className="p-4 border-[1px] border-red-700 rounded-lg my-8 text-red-700 flex items-center gap-4">
-                <p className="text-sm ">Bạn có thể thanh toán khi nhận phòng</p>
-              </div>
-            )}
-          </div>
+
           {/* <div className="mt-3 border-t-[1px] border-gray-300 pt-4 flex justify-between items-center">
             <p className="font-semibold">Còn lại</p>
             <p className="text-lg font-semibold">

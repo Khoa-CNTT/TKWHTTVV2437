@@ -26,7 +26,25 @@ module.exports = {
       lastName: {
         type: Sequelize.STRING,
       },
+      bio: {
+        type: Sequelize.STRING,
+      },
+      gender: {
+        type: Sequelize.STRING,
+      },
+      dateOfBirth: {
+        type: Sequelize.DATE,
+      },
+      emergencyPhone: {
+        type: Sequelize.STRING,
+      },
+      address: {
+        type: Sequelize.STRING,
+      },
       role: {
+        type: Sequelize.STRING,
+      },
+      status: {
         type: Sequelize.STRING,
       },
       createdAt: {

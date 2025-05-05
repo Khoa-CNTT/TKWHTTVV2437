@@ -55,8 +55,8 @@ const ConfirmApprove = ({ handleCloseAppove }: IProps) => {
     }).then((result) => {
       if (result.isConfirmed) {
         Swal.fire({
-          title: "Deleted!",
-          text: "Your file has been deleted.",
+          title: "Đã xóa!",
+          text: "Bạn đã xóa thành công",
           icon: "success",
         });
 

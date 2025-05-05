@@ -8,6 +8,14 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
+      Payment.belongsTo(models.User, {
+        foreignKey: "idUser", // Khóa ngoại trỏ đến Category
+        as: "Users",
+      });
+      Payment.belongsTo(models.Reservation, {
+        foreignKey: "idReservation", 
+        as: "Reservations", // Tên alias PHẢI GIỮ NGUYÊN khi query
+      });
       // define association here
     }
   }
@@ -17,6 +25,9 @@ module.exports = (sequelize, DataTypes) => {
       paymentDate: DataTypes.STRING,
       paymentMethod: DataTypes.STRING,
       paymentStatus: DataTypes.STRING,
+      createdAt: DataTypes.DATE,
+      updatedAt: DataTypes.DATE,
+      idUser: DataTypes.STRING,
     },
     {
       sequelize,

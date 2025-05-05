@@ -13,7 +13,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "idProperty", // Khóa ngoại trong bảng imageRoom
         as: "rooms", // Alias để truy cập
       });
-
+      Property.belongsTo(models.Category, {
+        foreignKey: "idCategory", // Khóa ngoại trỏ đến Category
+        as: "category",
+      });
       Property.hasMany(models.ImageProperty, {
         foreignKey: "idProperty", // Khóa ngoại trong bảng imageRoom
         as: "images", // Alias để truy cập
@@ -24,11 +27,9 @@ module.exports = (sequelize, DataTypes) => {
         as: "reviews", // Alias để truy cập
       });
 
-      Property.belongsToMany(models.Amenity, {
-        through: "AmenityProperty", // Tên bảng trung gian
-        foreignKey: "idProperty", // Khóa ngoại trong bảng trung gian trỏ đến Room
-        otherKey: "idAmenity", // Khóa ngoại trong bảng trung gian trỏ đến Amenity
-        as: "amenities", // Alias để truy cập
+      Property.belongsTo(models.Address, {
+        foreignKey: "idAddress", // Khóa ngoại trong bảng Property
+        as: "address", // Alias để truy cập
       });
 
       Property.belongsToMany(models.Highlight, {

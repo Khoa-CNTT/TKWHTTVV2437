@@ -17,8 +17,13 @@ const createReservation = (data) => {
         roomId,
         imageBanking,
         total,
+        message = null,
+        nameAccount,
+        numberAccount,
+        nameBank,
       } = data;
       console.log("data", data);
+      const code = Math.floor(10000 + Math.random() * 90000).toString();
 
       const response = await db.Reservation.create({
         idUser: userId,
@@ -28,6 +33,12 @@ const createReservation = (data) => {
         email,
         phone,
         imageBanking,
+        message,
+        nameAccount,
+        numberAccount,
+        nameBank,
+        code,
+        statusUser: "created",
         checkIndate: startDay,
         checkOutdate: endDay,
         totalPrice: total,
@@ -72,7 +83,7 @@ const listReservationApprove = ({ filter }) => {
           {
             model: db.Room,
             as: "rooms",
-            attributes: ["name", "deposit", "price"],
+            attributes: ["name", "price"],
           },
         ],
         order,
@@ -99,7 +110,7 @@ const detailReservationApprove = (reid) => {
           {
             model: db.Room,
             as: "rooms",
-            attributes: ["name", "deposit", "price"],
+            attributes: ["name", "price"],
           },
         ],
       });

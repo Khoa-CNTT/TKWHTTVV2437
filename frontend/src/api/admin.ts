@@ -1,14 +1,22 @@
 import http from "@/libs/http";
+import { get } from "http";
+export interface StatisticsData {
+  date: string;
+  userCount: number;
+  ownerCount: number;
+  reservationCount: number;
+}
+type TimeFilter = "day" | "month" | "year";
 
 const apisAdmin = {
-  // Đăng nhập admin
+  // ========================= Quản lý tài khoản =========================
   loginAdmin: (data: { email: string; password: string }) =>
     http.post(`admin/login`, data),
 
-  // Quản lý chủ sở hữu
-  registerOwner: (data: any) => http.post(`admin/register-owner`, data),
+  // ========================= Quản lý chủ sở hữu =========================
+  // registerOwner: (data: any) => http.post(`admin/register-owner`, data),
 
-  // Quản lý người dùng
+  // ========================= Quản lý người dùng =========================
   listUsers: () =>
     http.get(`admin/list-users`, {
       headers: {
@@ -16,15 +24,18 @@ const apisAdmin = {
       },
     }),
 
-  // Tạo user mới
-  createUser: (data: any) =>
-    http.post(`admin/create-user`, data, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-      },
-    }),
+  createUser: async (data: any) => {
+    try {
+      return await http.post(`admin/create-user`, data, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      });
+    } catch (error) {
+      throw error; // Ném lỗi để frontend xử lý
+    }
+  },
 
-  // Cập nhật thông tin user
   updateUser: (id: string, data: any) =>
     http.put(`admin/update-user/${id}`, data, {
       headers: {
@@ -32,7 +43,6 @@ const apisAdmin = {
       },
     }),
 
-  // Xóa user
   deleteUser: (id: string) =>
     http.delete(`admin/delete-user/${id}`, {
       headers: {
@@ -41,58 +51,75 @@ const apisAdmin = {
     }),
 
   lockAccount: (id: string) => http.put(`admin/lock-account/${id}`, {}),
+  approveOwner: (id: string) => http.put(`admin/approve-owner/${id}`, {}),
 
-  // Quản lý danh mục
-  createCategory: (data: any) => http.post(`admin/create-category`, data),
+  // ========================= Quản lý danh mục (Category) =========================
+  // createCategory: (data: any) => http.post(`admin/create-category`, data),
 
-  updateCategory: (id: string, data: any) =>
-    http.put(`admin/update-category/${id}`, data),
+  // updateCategory: (id: string, data: any) =>
+  //   http.put(`admin/update-category/${id}`, data),
 
-  deleteCategory: (id: string) => http.delete(`admin/delete-category/${id}`),
+  // deleteCategory: (id: string) => http.delete(`admin/delete-category/${id}`),
 
   listCategories: () => http.get(`admin/list-categories`),
 
-  // Quản lý địa điểm
-  createLocation: (data: any) => http.post(`admin/create-location`, data),
+  // ========================= Quản lý địa điểm (Location) =========================
+  // createLocation: (data: any) => http.post(`admin/create-location`, data),
 
-  updateLocation: (id: string, data: any) =>
-    http.put(`admin/update-location/${id}`, data),
+  // updateLocation: (id: string, data: any) =>
+  //   http.put(`admin/update-location/${id}`, data),
 
-  deleteLocation: (id: string) => http.delete(`admin/delete-location/${id}`),
+  // deleteLocation: (id: string) => http.delete(`admin/delete-location/${id}`),
 
   listLocations: () => http.get(`admin/list-locations`),
 
-  // Quản lý tiện ích
-  createAmenity: (data: any) => http.post(`admin/create-amenity`, data),
+  // // ========================= Quản lý tiện ích (Amenity) =========================
+  // createAmenity: (data: any) => http.post(`admin/create-amenity`, data),
 
-  updateAmenity: (id: string, data: any) =>
-    http.put(`admin/update-amenity/${id}`, data),
+  // updateAmenity: (id: string, data: any) =>
+  //   http.put(`admin/update-amenity/${id}`, data),
 
-  deleteAmenity: (id: string) => http.delete(`admin/delete-amenity/${id}`),
+  // deleteAmenity: (id: string) => http.delete(`admin/delete-amenity/${id}`),
 
   listAmenities: () => http.get(`admin/list-amenities`),
 
-  // Quản lý homestay
-  approveHomestay: (id: string) => http.put(`admin/approve-homestay/${id}`, {}),
-
-  rejectHomestay: (id: string) => http.put(`admin/reject-homestay/${id}`, {}),
+  // ========================= Quản lý homestay =========================
 
   updateHomestay: (id: string, data: any) =>
     http.put(`admin/update-homestay/${id}`, data),
 
   listHomestays: () => http.get(`admin/list-homestays`),
 
-  // Quản lý thanh toán
+  deleteHomestay: (id: string) =>
+    http.delete(`admin/delete-homestay/${id}`, {}),
+  // ========================= Quản lý phòng (Room) =========================
+  listRooms: (propertyId: string) => http.get(`admin/list-room/${propertyId}`),
+  listProperties: (ownerId: string) =>
+    http.get(`admin/list-properties/${ownerId}`),
+  updateRoom: (id: string, data: any) =>
+    http.put(`admin/update-room/${id}`, data),
+
+  deleteRoom: (id: string) => http.delete(`admin/delete-room/${id}`),
+
+  // ========================= Quản lý thanh toán (Payment) =========================
   listPayments: () => http.get(`admin/list-payments`),
 
   refundPayment: (id: string) => http.put(`admin/refund-payment/${id}`, {}),
 
-  // Quản lý đặt phòng
+  // ========================= Quản lý đặt phòng (Booking) =========================
   listBookings: () => http.get(`admin/list-bookings`),
 
   confirmBooking: (id: string) => http.put(`admin/confirm-booking/${id}`, {}),
 
   cancelBooking: (id: string) => http.put(`admin/cancel-booking/${id}`, {}),
+
+  getStatistics: (filter: TimeFilter) =>
+    http.get<{ data: StatisticsData[] }>(`/admin/statistics`, {
+      params: { filter },
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+    }),
 };
 
 export default apisAdmin;

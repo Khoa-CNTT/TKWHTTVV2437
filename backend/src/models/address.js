@@ -8,11 +8,11 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
-      Address.belongsTo(models.Property, {
-        foreignKey: "idProperty",
-        as: "property",
+      Address.hasMany(models.Property, {
+        foreignKey: "idAddress", // Khóa ngoại trong bảng Property
+        as: "properties", // Alias để truy cập
       });
+
     }
   }
   Address.init(

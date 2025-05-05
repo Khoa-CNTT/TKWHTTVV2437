@@ -8,10 +8,17 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      Reservation.belongsTo(models.User, {
+        foreignKey: "idUser", // Khóa ngoại trỏ đến Category
+        as: "Users",
+      });
       Reservation.belongsTo(models.Room, {
-        foreignKey: "idRoom", // Khóa ngoại trong bảng imageRoom
-        as: "rooms", // Alias để truy cập
+        foreignKey: "idRoom", // Khóa ngoại trong bảng Property
+        as: "Rooms", // Alias để truy cập
+      });
+      Reservation.hasMany(models.Payment, {
+        foreignKey: "idReservation", // Khóa ngoại trong bảng imageRoom
+        as: "Payments", // Alias để truy cập
       });
     }
   }
@@ -23,11 +30,9 @@ module.exports = (sequelize, DataTypes) => {
       lastName: DataTypes.STRING,
       email: DataTypes.STRING,
       phone: DataTypes.STRING,
-      imageBanking: DataTypes.STRING,
       checkIndate: DataTypes.DATE,
       checkOutdate: DataTypes.DATE,
       numGuest: DataTypes.INTEGER,
-      deposit: DataTypes.DOUBLE,
       totalPrice: DataTypes.DOUBLE,
       status: DataTypes.STRING,
     },

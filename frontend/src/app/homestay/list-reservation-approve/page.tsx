@@ -31,7 +31,7 @@ const ListReservationApprovePage = () => {
   const getListResApprove = async (filter: string) => {
     const res = await apiReservation.listReservationApprove(filter);
 
-    setListResApprove(res.data.rows);
+    setListResApprove(res?.data?.rows);
   };
   useEffect(() => {
     getListResApprove(filter);

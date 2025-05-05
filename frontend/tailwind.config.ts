@@ -47,6 +47,7 @@ const config: Config = {
       borderRadius: {
         "[-50]": "50%",
       },
+      
     },
   },
   plugins: [],

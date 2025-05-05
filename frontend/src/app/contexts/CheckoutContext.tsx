@@ -24,7 +24,7 @@ const CheckoutContext = createContext<CheckoutType | undefined>(undefined);
 // Tạo provider component
 export function CheckoutProvider({ children }: { children: ReactNode }) {
   const [propertyId, setPropertyId] = useState<string | number | null>(
-    localStorage.getItem("propertyId") || ""
+    localStorage?.getItem("propertyId") || ""
   );
   const [startDate, setStartDate] = useState<Dayjs | null>(
     localStorage.getItem("startDate")
