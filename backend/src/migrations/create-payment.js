@@ -11,6 +11,9 @@ module.exports = {
       idReservation: {
         type: Sequelize.STRING,
       },
+      idUser: {
+        type: Sequelize.STRING,
+      },
       paymentDate: {
         type: Sequelize.STRING,
       },

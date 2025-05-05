@@ -1,9 +1,10 @@
-const dashboard = () => {
-    return (
-        <div className="flex flex-col items-center justify-center h-screen">
-        <h1 className="text-4xl font-bold">Admin Dashboard</h1>
-        <p className="mt-4 text-lg">Welcome to the admin dashboard!</p>
-        </div>
-    );
+import DashBoard from '@/components/container/DashboardContainer';
+
+export default function DashboardPage() {
+  return (
+    <div className="space-y-8">
+      <h1 className="text-3xl font-bold">Dashboard Analytics</h1>
+      <DashBoard />
+    </div>
+  )
 }
-export default dashboard;

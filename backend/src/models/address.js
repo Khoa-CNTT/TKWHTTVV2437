@@ -7,7 +7,13 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {}
+    static associate(models) {
+      Address.hasMany(models.Property, {
+        foreignKey: "idAddress", // Khóa ngoại trong bảng Property
+        as: "properties", // Alias để truy cập
+      });
+
+    }
   }
   Address.init(
     {
