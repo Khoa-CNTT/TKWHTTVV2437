@@ -32,21 +32,41 @@ module.exports = (sequelize, DataTypes) => {
         as: "address", // Alias để truy cập
       });
 
-    
+      Property.belongsToMany(models.Highlight, {
+        through: "HighlightProperty", // Tên bảng trung gian
+        foreignKey: "idProperty", // Khóa ngoại trong bảng trung gian trỏ đến Room
+        otherKey: "idHighlight", // Khóa ngoại trong bảng trung gian trỏ đến Amenity
+        as: "highlights", // Alias để truy cập
+      });
+
+      Property.hasOne(models.Address, {
+        foreignKey: "idProperty", // Khóa ngoại trong bảng imageRoom
+        as: "propertyAddress", // Alias để truy cập
+      });
+
+      Property.belongsTo(models.Advertising, {
+        foreignKey: "idAdvertising", // Khóa ngoại trong bảng imageRoom
+        as: "advertisingDetail", // Alias để truy cập
+      });
     }
   }
   Property.init(
     {
       idUser: DataTypes.STRING,
       idCategory: DataTypes.STRING,
-      idAddress: DataTypes.STRING,
       name: DataTypes.STRING,
       description: DataTypes.STRING,
-      status: DataTypes.STRING,
+      address: DataTypes.STRING,
+      slug: DataTypes.STRING,
+      advertising: DataTypes.INTEGER,
+      expiredAd: DataTypes.DATE,
+      idAdvertising: DataTypes.STRING,
+      payCommissionAt: DataTypes.DATE,
     },
     {
       sequelize,
       modelName: "Property",
+      tableName: "Properties",
     }
   );
   return Property;

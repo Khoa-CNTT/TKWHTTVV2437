@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Header from "@/components/header/Header";
 import SidebarHomestayOwner from "@/components/sidebar/SidebarHomestayOwner";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -21,7 +23,9 @@ export default function RootLayout({
             <SidebarHomestayOwner />
           </div>
 
-          <div className="w-[80%]">{children}</div>
+          <div className="w-[80%]">
+            {children} <ToastContainer position="top-right" autoClose={3000} />
+          </div>
         </div>
       </body>
     </html>

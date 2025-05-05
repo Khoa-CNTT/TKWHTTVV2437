@@ -12,6 +12,8 @@ router.get(
   reservationController.detailReservationApprove
 );
 
+router.get("/bar-chart/:id", reservationController.getDataBarChart);
+
 router.put("/approveReservation", reservationController.approveReservation);
 
 module.exports = router;

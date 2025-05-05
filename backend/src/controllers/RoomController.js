@@ -4,7 +4,8 @@ const roomService = require("../services/RoomService");
 const getListRoomByPropertyId = async (req, res) => {
   try {
     const response = await roomService.getListRoomByPropertyId(
-      req.params.propertyId
+      req.params.propertyId,
+      req.query
     );
     return res.status(200).json(response);
   } catch (error) {
@@ -60,10 +61,39 @@ const updateRoom = async (req, res) => {
   }
 };
 
+const updateStatusRoom = async (req, res) => {
+  try {
+    const response = await roomService.updateStatusRoom(
+      req.params.id,
+      req.body.status
+    );
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
+const getTopReventRoomByPropertyId = async (req, res) => {
+  try {
+    const response = await roomService.getTopReventRoomByPropertyId(
+      req.params.id
+    );
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
 module.exports = {
   getListRoomByPropertyId,
   getDetailById,
   createRoom,
   updateRoom,
   searchListRoomForBooking,
+  updateStatusRoom,
+  getTopReventRoomByPropertyId,
 };

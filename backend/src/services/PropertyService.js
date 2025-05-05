@@ -1,8 +1,11 @@
 const db = require("../models");
-const { fn, col } = require("sequelize");
+const { fn, col, Op, where } = require("sequelize");
 const { v4 } = require("uuid");
 const slugify = require("slugify");
 const hightlightProperty = require("../models/hightlightProperty");
+const { sequelize } = require("../models");
+const moment = require("moment");
+const reviewService = require("./ReviewService");
 
 const listTop10HomestayRating = () => {
   return new Promise(async (resolve, reject) => {
@@ -69,6 +72,215 @@ const listTop10HomestayRating = () => {
   });
 };
 
+const getListProperty = (filter, limit = 12, page = 1) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { minPrice, maxPrice, amenities, city, category } = filter;
+
+      // Tính toán offset cho phân trang
+      const offset = (page - 1) * limit;
+
+      // Xây dựng điều kiện lọc
+      const whereConditions = {};
+
+      if (minPrice) {
+        whereConditions["$rooms.price$"] = {
+          [Op.gte]: parseFloat(minPrice), // Giá lớn hơn hoặc bằng
+        };
+      }
+
+      if (maxPrice) {
+        whereConditions["$rooms.price$"] = {
+          ...whereConditions["$rooms.price$"],
+          [Op.lte]: parseFloat(maxPrice), // Giá nhỏ hơn hoặc bằng
+        };
+      }
+
+      // Điều kiện lọc theo city trong bảng Address
+      const addressConditions = {};
+      if (city) {
+        addressConditions["slug"] = slugify(city, {
+          lower: true, // chuyển thành chữ thường
+          strict: true, // bỏ các ký tự đặc biệt
+        }); // So sánh với cột city trong bảng Address
+      }
+
+      if (category) {
+        whereConditions["idCategory"] = category; // Lọc theo danh mục
+      }
+
+      // Điều kiện lọc theo amenities
+      // Điều kiện lọc theo amenities (chỉ lấy property có ít nhất tất cả amenities truyền vào)
+      if (amenities && amenities.length > 0) {
+        const amenityIds = amenities.split(",").map((id) => parseInt(id));
+
+        whereConditions[Op.and] = amenityIds.map((id) => ({
+          [Op.and]: [
+            sequelize.literal(`EXISTS (
+              SELECT 1 FROM \`AmenityProperties\` 
+              WHERE \`AmenityProperties\`.\`idProperty\` = \`Property\`.\`id\`
+              AND \`AmenityProperties\`.\`idAmenity\` = ${id}
+            )`),
+          ],
+        }));
+      }
+
+      // const currentTime = new Date();
+
+      const properties = await db.Property.findAndCountAll({
+        where: whereConditions,
+        attributes: {
+          include: [
+            [
+              fn(
+                "COALESCE",
+                fn("ROUND", fn("AVG", col("reviews.rating")), 1),
+                0
+              ),
+              "averageRating",
+            ],
+            [fn("COUNT", fn("DISTINCT", col("reviews.id"))), "reviewCount"],
+            [fn("MIN", col("rooms.price")), "price"],
+            // [
+            //   sequelize.literal(`CASE
+            //     WHEN expiredAd > '${currentTime.toISOString()}'
+            //     THEN 1 ELSE 0
+            //   END`),
+            //   "isActiveAd",
+            // ],
+          ],
+        },
+        include: [
+          {
+            model: db.ImageProperty,
+            as: "images",
+            attributes: ["id", "image"],
+            limit: 1,
+            order: [["createdAt", "ASC"]],
+          },
+          {
+            model: db.Address,
+            as: "propertyAddress",
+            attributes: ["id", "city", "slug"],
+            where: addressConditions,
+          },
+          {
+            model: db.Review,
+            as: "reviews",
+            attributes: [],
+          },
+          {
+            model: db.Room,
+            as: "rooms",
+            attributes: [],
+          },
+          {
+            model: db.Amenity,
+            as: "amenities", // Alias được định nghĩa trong model
+            attributes: ["id", "name"],
+            through: { attributes: [] }, // Không lấy dữ liệu từ bảng trung gian
+            // where: amenityConditions, // Áp dụng điều kiện lọc theo amenities
+          },
+        ],
+        group: ["Property.id"],
+        subQuery: false,
+        order: [
+          [
+            sequelize.literal(`CASE 
+              WHEN advertising > 0 AND expiredAd > NOW() THEN advertising 
+              ELSE 0 
+            END`),
+            "DESC",
+          ],
+        ],
+        limit,
+        offset,
+      });
+
+      // Trả về kết quả với phân trang
+      resolve({
+        status: properties.rows.length > 0 ? "OK" : "ERR",
+        data: properties.rows || [],
+        pagination: {
+          totalItems: properties.count.length,
+          totalPages: Math.ceil(properties.count.length / limit),
+          currentPage: page,
+          pageSize: limit,
+        },
+      });
+    } catch (error) {
+      reject({
+        status: "ERR",
+        message: `Error fetching properties: ${error.message || error}`,
+      });
+    }
+  });
+};
+
+const getPropertyIdByUserId = (userId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const property = await db.Property.findOne({
+        where: { idUser: userId },
+        attributes: ["id"],
+      });
+
+      resolve({
+        status: property ? "OK" : "ERR",
+        data: property || null,
+      });
+    } catch (error) {
+      reject({
+        status: "ERR",
+        message: `Error fetching properties: ${error.message || error}`,
+      });
+    }
+  });
+};
+
+const getListSearchText = (text) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!text || typeof text !== "string") {
+        return resolve({
+          status: "ERR",
+          data: [],
+        });
+      }
+
+      const properties = await db.Property.findAll({
+        where: {
+          [Op.or]: [
+            { name: { [Op.like]: `%${text}%` } },
+            { "$propertyAddress.city$": { [Op.like]: `%${text}%` } },
+            { "$propertyAddress.country$": { [Op.like]: `%${text}%` } },
+          ],
+        },
+        attributes: ["id", "name", "slug"],
+        include: [
+          {
+            model: db.Address,
+            as: "propertyAddress",
+            attributes: ["id", "city", "slug", "country"],
+            required: true, // Chỉ lấy properties có address
+          },
+        ],
+        limit: 10, // Giới hạn kết quả trả về
+      });
+
+      resolve({
+        status: properties.length > 0 ? "OK" : "ERR",
+        data: properties || [],
+      });
+    } catch (error) {
+      reject({
+        status: "ERR",
+        message: `Error fetching properties: ${error.message || error}`,
+      });
+    }
+  });
+};
+
 const createProperty = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -76,7 +288,7 @@ const createProperty = (data) => {
         id: v4(),
         name: data.name,
         description: data.description,
-        idUser: data.idUser,
+        idUser: data.userId,
         idCategory: data.categoryId,
         slug: slugify(data.name, {
           lower: true, // chuyển thành chữ thường
@@ -91,6 +303,10 @@ const createProperty = (data) => {
         district: data.district,
         city: data.city,
         country: data.country,
+        slug: slugify(data.city, {
+          lower: true, // chuyển thành chữ thường
+          strict: true, // bỏ các ký tự đặc biệt
+        }),
       });
 
       const images = await db.ImageProperty.bulkCreate(
@@ -162,6 +378,10 @@ const updateProperty = (propertyId, data) => {
           district: data.district,
           city: data.city,
           country: data.country,
+          slug: slugify(data.city, {
+            lower: true, // chuyển thành chữ thường
+            strict: true, // bỏ các ký tự đặc biệt
+          }),
         },
         { where: { idProperty: propertyId } }
       );
@@ -224,29 +444,49 @@ const getDetailBySlug = (slug) => {
         include: [
           {
             model: db.ImageProperty,
-            as: "images", // Alias được định nghĩa trong `Room.associate`
-            attributes: ["id", "image"], // Lấy tất cả các ảnh liên kết
+            as: "images",
+            attributes: ["id", "image"],
           },
           {
             model: db.Amenity,
-            as: "amenities", // Alias được định nghĩa trong Room.associate
+            as: "amenities",
             through: { attributes: [] },
           },
           {
             model: db.Highlight,
-            as: "highlights", // Alias được định nghĩa trong Room.associate
+            as: "highlights",
             through: { attributes: [] },
           },
           {
             model: db.Address,
             as: "propertyAddress",
           },
+<<<<<<< HEAD
+          {
+            model: db.Room,
+            as: "rooms",
+            attributes: ["price"], // Remove individual room attributes since we're aggregating
+          },
+=======
+>>>>>>> main
         ],
       });
 
+      let price = property?.rooms[0].price;
+
+      for (let i = 1; i < property?.rooms?.length; i++) {
+        price = Math.min(price, property?.rooms[i].price);
+      }
+
+      // Gộp kết quả
+      const result = {
+        ...property.toJSON(),
+        price,
+      };
+
       resolve({
-        status: property ? "OK" : "ERR",
-        data: property || null,
+        status: result ? "OK" : "ERR",
+        data: result || null,
       });
     } catch (error) {
       reject(error);
@@ -265,11 +505,14 @@ const getDetailProperyById = (propertyId) => {
             as: "images", // Alias được định nghĩa trong `property.associate`
             attributes: ["id", "image"], // Lấy tất cả các ảnh liên kết
           },
+<<<<<<< HEAD
+=======
           // {
           //   model: db.City,
           //   as: "city", // Alias được định nghĩa trong `Property.associate`
           //   attributes: ["name"], // Chỉ lấy cột "name" từ City
           // },
+>>>>>>> main
           {
             model: db.Address,
             as: "propertyAddress", // Alias được định nghĩa trong Room.associate
@@ -291,6 +534,56 @@ const getDetailProperyById = (propertyId) => {
             model: db.Address,
             as: "propertyAddress",
           },
+<<<<<<< HEAD
+        ],
+        // attributes: ["name"],
+      });
+
+      resolve({
+        status: property ? "OK" : "ERR",
+        data: property || null,
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const getDetailProperyByUserId = (userId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log({ userId });
+      const property = await db.Property.findOne({
+        where: { idUser: userId },
+        include: [
+          {
+            model: db.ImageProperty,
+            as: "images", // Alias được định nghĩa trong `property.associate`
+            attributes: ["id", "image"], // Lấy tất cả các ảnh liên kết
+          },
+          {
+            model: db.Address,
+            as: "propertyAddress", // Alias được định nghĩa trong Room.associate
+            attributes: ["street", "district", "ward", "country", "id", "city"],
+          },
+          {
+            model: db.Highlight,
+            as: "highlights", // Alias được định nghĩa trong Room.associate
+            attributes: ["name", "id", "icon", "description"],
+            through: { attributes: [] },
+          },
+          {
+            model: db.Amenity,
+            as: "amenities", // Alias được định nghĩa trong Room.associate
+            attributes: ["name", "id", "icon"],
+            through: { attributes: [] },
+          },
+          {
+            model: db.Address,
+            as: "propertyAddress",
+          },
+=======
+>>>>>>> main
         ],
         // attributes: ["name"],
       });
@@ -443,6 +736,122 @@ const getListHightlightByPropertyId = (id) => {
   });
 };
 
+const renewalAdByUserId = (userId, advertisingId, term, type) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const property = await db.Property.findOne({ where: { idUser: userId } });
+
+      if (property.expiredAd === null || property.expiredAd < moment()) {
+        await db.Property.update(
+          {
+            idAdvertising: advertisingId,
+            advertising: type,
+            expiredAd: moment().add(term, "months"),
+          },
+          {
+            where: { idUser: userId },
+          }
+        );
+      } else {
+        await db.Property.update(
+          {
+            idAdvertising: advertisingId,
+            advertising: type,
+            expiredAd: moment(property.expiredAd).add(term, "months"),
+          },
+          {
+            where: { idUser: userId },
+          }
+        );
+      }
+
+      resolve({
+        status: "OK",
+        data: property || null,
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const getAdvertisingByPropertyId = async (propertyId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const property = await db.Property.findOne({
+        where: { id: propertyId },
+        attributes: ["expiredAd", "advertising"],
+        include: [
+          {
+            model: db.Advertising,
+            as: "advertisingDetail",
+            attributes: [
+              "id",
+              "name",
+              "price",
+              "term",
+              "icon",
+              "description",
+              "type",
+            ],
+          },
+        ],
+      });
+
+      console.log({ property });
+
+      resolve({
+        status: property ? "OK" : "ERR",
+        data: property || null,
+      });
+    } catch (error) {
+      console.error("Error fetching advertising by property ID:", error);
+      reject(error);
+    }
+  });
+};
+
+const getTotalDashboard = async (propertyId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const totalBooking = await db.Reservation.count({
+        include: [
+          {
+            model: db.Room,
+            where: { idProperty: propertyId },
+            as: "rooms",
+            required: true,
+          },
+        ],
+      });
+
+      const totalRoomType = await db.Room.count({
+        where: { idProperty: propertyId },
+      });
+
+      // Thêm phần tính tổng số phòng từ bảng RoomType
+      const totalRoom = await db.Room.sum("quantity", {
+        where: { idProperty: propertyId },
+      });
+
+      const review = await reviewService.getRatingByPropertyId(propertyId);
+
+      const total = {};
+      total.totalBooking = totalBooking;
+      total.totalRoomType = totalRoomType;
+      total.totalRoom = totalRoom;
+      total.review = review.data;
+
+      resolve({
+        status: totalBooking ? "OK" : "ERR",
+        data: { ...total },
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   listTop10HomestayRating,
   getDetailBySlug,
@@ -452,4 +861,11 @@ module.exports = {
   getListAmenityByPropertyId,
   getListHightlightByPropertyId,
   updateProperty,
+  getListProperty,
+  getListSearchText,
+  getDetailProperyByUserId,
+  getPropertyIdByUserId,
+  renewalAdByUserId,
+  getAdvertisingByPropertyId,
+  getTotalDashboard,
 };

@@ -14,6 +14,21 @@ const getRatingByPropertyId = async (req, res) => {
   }
 };
 
+const getListReviewByProperyId = async (req, res) => {
+  try {
+    const response = await ReviewService.getListReviewByProperyId(
+      req.params.propertyId,
+      req.query
+    );
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
 module.exports = {
   getRatingByPropertyId,
+  getListReviewByProperyId,
 };
