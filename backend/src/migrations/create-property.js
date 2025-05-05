@@ -14,7 +14,7 @@ module.exports = {
       idCategory: {
         type: Sequelize.STRING,
       },
-      idCity: {
+      idAddress: {
         type: Sequelize.STRING,
       },
       name: {
@@ -22,12 +22,6 @@ module.exports = {
       },
       description: {
         type: Sequelize.TEXT,
-      },
-      address: {
-        type: Sequelize.STRING,
-      },
-      slug: {
-        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,
