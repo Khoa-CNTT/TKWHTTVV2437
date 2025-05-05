@@ -461,14 +461,11 @@ const getDetailBySlug = (slug) => {
             model: db.Address,
             as: "propertyAddress",
           },
-<<<<<<< HEAD
           {
             model: db.Room,
             as: "rooms",
             attributes: ["price"], // Remove individual room attributes since we're aggregating
           },
-=======
->>>>>>> main
         ],
       });
 
@@ -505,14 +502,11 @@ const getDetailProperyById = (propertyId) => {
             as: "images", // Alias được định nghĩa trong `property.associate`
             attributes: ["id", "image"], // Lấy tất cả các ảnh liên kết
           },
-<<<<<<< HEAD
-=======
           // {
           //   model: db.City,
           //   as: "city", // Alias được định nghĩa trong `Property.associate`
           //   attributes: ["name"], // Chỉ lấy cột "name" từ City
           // },
->>>>>>> main
           {
             model: db.Address,
             as: "propertyAddress", // Alias được định nghĩa trong Room.associate
@@ -534,7 +528,6 @@ const getDetailProperyById = (propertyId) => {
             model: db.Address,
             as: "propertyAddress",
           },
-<<<<<<< HEAD
         ],
         // attributes: ["name"],
       });
@@ -582,8 +575,6 @@ const getDetailProperyByUserId = (userId) => {
             model: db.Address,
             as: "propertyAddress",
           },
-=======
->>>>>>> main
         ],
         // attributes: ["name"],
       });
