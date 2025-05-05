@@ -12,6 +12,9 @@ import apisProperty from "@/apis/property";
 import TopRoomContainer from "@/components/container/TopRoomContainer";
 import { useAuth } from "@/app/contexts/AuthContext";
 import apisReservation from "@/apis/reservation";
+import { useSearchParams } from "next/navigation";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 interface ITotal {
   review: { averageRating: string };
@@ -32,11 +35,24 @@ interface IBarChar {
 }
 
 const chartData = {
-  labels: [],
+  labels: [
+    "06/2024",
+    "07/2024",
+    "08/2024",
+    "09/2024",
+    "10/2024",
+    "11/2024",
+    "12/2024",
+    "01/2025",
+    "02/2025",
+    "03/2025",
+    "04/2025",
+    "05/2025",
+  ],
   datasets: [
     {
       label: "Doanh thu",
-      data: [],
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       backgroundColor: "rgba(54, 162, 235, 0.6)", // Blue with 60% opacity
       borderColor: "rgba(54, 162, 235, 1)",
       borderWidth: 1,
@@ -58,6 +74,9 @@ const Dashboard = () => {
   const [propertyId, setPropertyId] = useState<string>("");
   const { user } = useAuth();
   const [total, setTotal] = useState<ITotal>();
+  const searchParams = useSearchParams(); // Lấy query từ URL
+  const router = useRouter();
+
   const [barChart, setBarChart] = useState<IBarChar>(chartData);
 
   useEffect(() => {
@@ -107,6 +126,17 @@ const Dashboard = () => {
     fetDataBarChart();
   }, [propertyId]);
 
+  useEffect(() => {
+    const status = searchParams.get("status");
+    if (status === "true") {
+      toast.success("Thanh toán thành công");
+      router.push("/homestay/dashboard");
+    } else if (status === "false") {
+      toast.error("Thanh toán thất bại");
+      router.push("/homestay/dashboard");
+    }
+  }, [searchParams]);
+
   return (
     <div className="w-full">
       <div className="p-10">
@@ -124,7 +154,7 @@ const Dashboard = () => {
                   <p className="text-gray-500 font-semibold">Tổng đặt</p>
 
                   <p className="text-2xl font-semibold">
-                    {total?.totalBooking}
+                    {total?.totalBooking || 0}
                   </p>
                 </div>
               </div>
@@ -136,7 +166,7 @@ const Dashboard = () => {
                   <p className="text-gray-500 font-semibold">Loại phòng</p>
 
                   <p className="text-2xl font-semibold">
-                    {total?.totalRoomType}
+                    {total?.totalRoomType || 0}
                   </p>
                 </div>
               </div>
@@ -148,7 +178,7 @@ const Dashboard = () => {
                   <p className="text-gray-500 font-semibold">Số lượng phòng</p>
 
                   <p className="text-2xl font-semibold">
-                    {total?.totalRoomType}
+                    {total?.totalRoomType || 0}
                   </p>
                 </div>
               </div>
@@ -160,7 +190,7 @@ const Dashboard = () => {
                   <p className="text-gray-500 font-semibold">Đánh giá</p>
 
                   <p className="text-2xl font-semibold">
-                    {total?.review.averageRating}/5
+                    {total?.review.averageRating || 0}/5
                   </p>
                 </div>
               </div>
@@ -176,7 +206,7 @@ const Dashboard = () => {
           </div>
 
           <div className="flex-2">
-            <PayCommissionContainer />
+            <PayCommissionContainer userId={user?.id || ""} />
           </div>
         </div>
       </div>

@@ -36,7 +36,8 @@ module.exports = {
       },
       status: {
         // trang thai payment
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING, // pending, done
+        defaultValue: "pending",
       },
       paymentDate: {
         // ngay payment thuc te
@@ -44,6 +45,10 @@ module.exports = {
       },
       methodPay: {
         type: Sequelize.STRING,
+      },
+      orderQuantity: {
+        // số lượng order booking
+        type: Sequelize.INTEGER,
       },
       createdAt: {
         allowNull: false,
