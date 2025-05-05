@@ -130,6 +130,30 @@ const getListProperty = async (req, res) => {
   }
 };
 
+const getAdvertisingByPropertyId = async (req, res) => {
+  try {
+    const response = await PropertyService.getAdvertisingByPropertyId(
+      req.params.id
+    );
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
+const getTotalDashboard = async (req, res) => {
+  try {
+    const response = await PropertyService.getTotalDashboard(req.params.id);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
 module.exports = {
   // fetchFullData,
   createProperty,
@@ -143,4 +167,6 @@ module.exports = {
   getListSearchText,
   getDetailProperyByUserId,
   getPropertyIdByUserId,
+  getAdvertisingByPropertyId,
+  getTotalDashboard,
 };

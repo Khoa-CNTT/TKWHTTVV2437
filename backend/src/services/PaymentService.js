@@ -1,5 +1,8 @@
 const moment = require("moment");
 const vnpay = require("../config/vnpay.json");
+const PropertyService = require("../services/PropertyService");
+const db = require("../models");
+const AdOrderService = require("../services/AdOderService");
 
 const createPaymentUrl = (req, res) => {
   try {
@@ -81,7 +84,7 @@ function sortObject(obj) {
   return sorted;
 }
 
-const vnpay_ipn = (req, res) => {
+const vnpay_ipn = async (req, res) => {
   try {
     let vnp_Params = req.query;
     let secureHash = vnp_Params["vnp_SecureHash"];
@@ -115,35 +118,50 @@ const vnpay_ipn = (req, res) => {
       );
     }
 
-    if (!checkOrderId) {
-      //   return res
-      //     .status(200)
-      //     .json({ RspCode: "01", Message: "Order not found" });
+    // Kiểm tra đơn hàng
+    const order = await db.AdOrder.findOne({ where: { id: orderId } });
+    if (!order) {
+      console.error("Order not found:", orderId);
       return res.redirect(
         `${process.env.URL_CLIENT}/homestay/advertising?status=false`
       );
     }
 
-    if (!checkAmount) {
-      // return res.status(200).json({ RspCode: "04", Message: "Amount invalid" });
-      return res.redirect(
-        `${process.env.URL_CLIENT}/homestay/advertising?status=false`
-      );
-    }
+    // if (!checkAmount) {
+    //   // return res.status(200).json({ RspCode: "04", Message: "Amount invalid" });
+    //   return res.redirect(
+    //     `${process.env.URL_CLIENT}/homestay/advertising?status=false`
+    //   );
+    // }
 
-    if (paymentStatus !== "0") {
-      return res.status(200).json({
-        RspCode: "02",
-        Message: "This order has been updated to the payment status",
-      });
-    }
+    // if (paymentStatus !== "0") {
+    //   return res.status(200).json({
+    //     RspCode: "02",
+    //     Message: "This order has been updated to the payment status",
+    //   });
+    // }
 
     if (rspCode === "00") {
-      return res.redirect(
-        `${process.env.URL_CLIENT}/homestay/advertising?status=true`
+      const advertising = await db.Advertising.findOne({
+        where: { id: order.idAdvertising },
+      });
+
+      if (!advertising) {
+        console.error("Advertising not found for order:", orderId);
+        return res.redirect(
+          `${process.env.URL_CLIENT}/homestay/advertising?status=false`
+        );
+      }
+
+      await PropertyService.renewalAdByUserId(
+        order.idUser,
+        advertising.id,
+        advertising.term,
+        advertising.type
       );
-    } else {
-      // return res.status(200).json({ RspCode: "00", Message: "Success" });
+
+      await AdOrderService.updateStatusAdOrder(orderId, "done");
+
       return res.redirect(
         `${process.env.URL_CLIENT}/homestay/advertising?status=true`
       );

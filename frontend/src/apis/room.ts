@@ -83,6 +83,18 @@ const apisRoom = {
 
     return response.json();
   },
+
+  getTopRevenueRoomByPropertyId: async (propertyId: string) => {
+    const response = await fetch(
+      `${process.env.URL_SERVER_API}/room/top-revenue-room/${propertyId}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
+
+    return response.json();
+  },
 };
 
 export default apisRoom;

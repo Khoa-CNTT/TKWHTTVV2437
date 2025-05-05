@@ -1,9 +1,11 @@
 const db = require("../models");
-const { fn, col, Op } = require("sequelize");
+const { fn, col, Op, where } = require("sequelize");
 const { v4 } = require("uuid");
 const slugify = require("slugify");
 const hightlightProperty = require("../models/hightlightProperty");
 const { sequelize } = require("../models");
+const moment = require("moment");
+const reviewService = require("./ReviewService");
 
 const listTop10HomestayRating = () => {
   return new Promise(async (resolve, reject) => {
@@ -75,8 +77,6 @@ const getListProperty = (filter, limit = 12, page = 1) => {
     try {
       const { minPrice, maxPrice, amenities, city, category } = filter;
 
-      console.log({ amenities });
-
       // Tính toán offset cho phân trang
       const offset = (page - 1) * limit;
 
@@ -125,6 +125,8 @@ const getListProperty = (filter, limit = 12, page = 1) => {
         }));
       }
 
+      // const currentTime = new Date();
+
       const properties = await db.Property.findAndCountAll({
         where: whereConditions,
         attributes: {
@@ -139,6 +141,13 @@ const getListProperty = (filter, limit = 12, page = 1) => {
             ],
             [fn("COUNT", fn("DISTINCT", col("reviews.id"))), "reviewCount"],
             [fn("MIN", col("rooms.price")), "price"],
+            // [
+            //   sequelize.literal(`CASE
+            //     WHEN expiredAd > '${currentTime.toISOString()}'
+            //     THEN 1 ELSE 0
+            //   END`),
+            //   "isActiveAd",
+            // ],
           ],
         },
         include: [
@@ -176,7 +185,13 @@ const getListProperty = (filter, limit = 12, page = 1) => {
         group: ["Property.id"],
         subQuery: false,
         order: [
-          ["advertising", "DESC"], // Sắp xếp theo cột advertising giảm dần
+          [
+            sequelize.literal(`CASE 
+              WHEN advertising > 0 AND expiredAd > NOW() THEN advertising 
+              ELSE 0 
+            END`),
+            "DESC",
+          ],
         ],
         limit,
         offset,
@@ -707,6 +722,122 @@ const getListHightlightByPropertyId = (id) => {
   });
 };
 
+const renewalAdByUserId = (userId, advertisingId, term, type) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const property = await db.Property.findOne({ where: { idUser: userId } });
+
+      if (property.expiredAd === null || property.expiredAd < moment()) {
+        await db.Property.update(
+          {
+            idAdvertising: advertisingId,
+            advertising: type,
+            expiredAd: moment().add(term, "months"),
+          },
+          {
+            where: { idUser: userId },
+          }
+        );
+      } else {
+        await db.Property.update(
+          {
+            idAdvertising: advertisingId,
+            advertising: type,
+            expiredAd: moment(property.expiredAd).add(term, "months"),
+          },
+          {
+            where: { idUser: userId },
+          }
+        );
+      }
+
+      resolve({
+        status: "OK",
+        data: property || null,
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const getAdvertisingByPropertyId = async (propertyId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const property = await db.Property.findOne({
+        where: { id: propertyId },
+        attributes: ["expiredAd", "advertising"],
+        include: [
+          {
+            model: db.Advertising,
+            as: "advertisingDetail",
+            attributes: [
+              "id",
+              "name",
+              "price",
+              "term",
+              "icon",
+              "description",
+              "type",
+            ],
+          },
+        ],
+      });
+
+      console.log({ property });
+
+      resolve({
+        status: property ? "OK" : "ERR",
+        data: property || null,
+      });
+    } catch (error) {
+      console.error("Error fetching advertising by property ID:", error);
+      reject(error);
+    }
+  });
+};
+
+const getTotalDashboard = async (propertyId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const totalBooking = await db.Reservation.count({
+        include: [
+          {
+            model: db.Room,
+            where: { idProperty: propertyId },
+            as: "rooms",
+            required: true,
+          },
+        ],
+      });
+
+      const totalRoomType = await db.Room.count({
+        where: { idProperty: propertyId },
+      });
+
+      // Thêm phần tính tổng số phòng từ bảng RoomType
+      const totalRoom = await db.Room.sum("quantity", {
+        where: { idProperty: propertyId },
+      });
+
+      const review = await reviewService.getRatingByPropertyId(propertyId);
+
+      const total = {};
+      total.totalBooking = totalBooking;
+      total.totalRoomType = totalRoomType;
+      total.totalRoom = totalRoom;
+      total.review = review.data;
+
+      resolve({
+        status: totalBooking ? "OK" : "ERR",
+        data: { ...total },
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   listTop10HomestayRating,
   getDetailBySlug,
@@ -720,4 +851,7 @@ module.exports = {
   getListSearchText,
   getDetailProperyByUserId,
   getPropertyIdByUserId,
+  renewalAdByUserId,
+  getAdvertisingByPropertyId,
+  getTotalDashboard,
 };

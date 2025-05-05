@@ -142,6 +142,30 @@ const apisProperty = {
 
     return response.json();
   },
+
+  getAdvertisingByPropertyId: async (propertyId: string) => {
+    const response = await fetch(
+      `${process.env.URL_SERVER_API}/property/advertising/${propertyId}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
+
+    return response.json();
+  },
+
+  getTotalDashboardByPropertyId: async (propertyId: string) => {
+    const response = await fetch(
+      `${process.env.URL_SERVER_API}/property/total-dashboard/${propertyId}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
+
+    return response.json();
+  },
 };
 
 export default apisProperty;

@@ -75,6 +75,19 @@ const updateStatusRoom = async (req, res) => {
   }
 };
 
+const getTopReventRoomByPropertyId = async (req, res) => {
+  try {
+    const response = await roomService.getTopReventRoomByPropertyId(
+      req.params.id
+    );
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
 module.exports = {
   getListRoomByPropertyId,
   getDetailById,
@@ -82,4 +95,5 @@ module.exports = {
   updateRoom,
   searchListRoomForBooking,
   updateStatusRoom,
+  getTopReventRoomByPropertyId,
 };

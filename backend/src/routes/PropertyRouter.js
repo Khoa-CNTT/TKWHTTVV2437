@@ -11,6 +11,8 @@ router.get(
   "/property-id-by-user-id/:id",
   propertyController.getPropertyIdByUserId
 );
+router.get("/total-dashboard/:id", propertyController.getTotalDashboard);
+router.get("/advertising/:id", propertyController.getAdvertisingByPropertyId);
 router.get("/search", propertyController.getListSearchText);
 router.get("/amenities/:id", propertyController.getListAmenityByPropertyId);
 router.get("/list-top-10-rating", propertyController.listTop10HomestayRating);

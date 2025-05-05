@@ -27,6 +27,7 @@ export interface IProperty {
   idCategory: string;
   propertyAddress: IAddress;
   advertising: string;
+  expiredAd: string;
 }
 
 export interface IPropertyCreate {

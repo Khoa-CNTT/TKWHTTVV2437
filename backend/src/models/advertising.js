@@ -9,6 +9,11 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+
+      Advertising.hasOne(models.Property, {
+        foreignKey: "idAdvertising", // Khóa ngoại trong bảng imageRoom
+        as: "property", // Alias để truy cập
+      });
     }
   }
   Advertising.init(

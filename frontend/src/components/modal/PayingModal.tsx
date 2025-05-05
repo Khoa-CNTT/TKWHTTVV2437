@@ -11,8 +11,8 @@ import iconVnpay from "../../assets/images/icon-vnpay.jpg";
 import Image from "next/image";
 import apisPayment from "@/apis/payment";
 import { toast } from "react-toastify";
-import { useSearchParams } from "next/navigation";
-import { MutableRefObject } from "react";
+import apisAdOrder from "@/apis/adOrder";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 interface IProps {
   name: string;
@@ -21,6 +21,8 @@ interface IProps {
   price: number;
   type: number;
   description: string;
+  id: string;
+  onShowModal: (value: boolean) => void;
 }
 
 const iconData: { [key: string]: JSX.Element } = {
@@ -32,37 +34,38 @@ const PayingModal: React.FC<IProps> = ({
   icon,
   term,
   price,
+  id,
   type,
   description,
+  onShowModal,
 }) => {
-  const searchParams = useSearchParams(); // Lấy query từ URL
-  const toastShown: MutableRefObject<boolean> = useRef(false);
-
-  useEffect(() => {
-    const status = searchParams.get("status");
-    if (status === "true" && !toastShown.current) {
-      toast.success("Thanh toán thành công");
-      toastShown.current = true;
-    } else if (status === "false" && !toastShown.current) {
-      toast.error("Thanh toán thất bại");
-      toastShown.current = true;
-    }
-  }, [searchParams]);
+  const { user } = useAuth();
 
   const handleSubmitPayment = async () => {
     try {
-      const response = await apisPayment.createUrlPayment({
+      // create order
+      const order = await apisAdOrder.createAdOrder({
         amount: price,
-        orderId: "xwwddsdd3ddddxxbd",
+        idAdvertising: id,
+        idUser: user?.id,
+        methodPay: "vnpay",
+        quantity: 1,
       });
 
-      if (response.success) {
-        console.log("response", response);
-        // Chuyển hướng người dùng đến URL thanh toán
-        window.location.href = response.data.vnpUrl;
-      } else {
-        toast.error("Thanh toán thất bại");
-        console.error("Thanh toán thất bại");
+      if (order.data) {
+        const response = await apisPayment.createUrlPayment({
+          amount: price,
+          orderId: order.data.id,
+        });
+
+        if (response.success) {
+          console.log("response", response);
+          // Chuyển hướng người dùng đến URL thanh toán
+          window.location.href = response.data.vnpUrl;
+        } else {
+          toast.error("Thanh toán thất bại");
+          console.error("Thanh toán thất bại");
+        }
       }
     } catch (error) {
       toast.error("Đã có lỗi trong quá trình thanh toán");
@@ -75,7 +78,7 @@ const PayingModal: React.FC<IProps> = ({
       <div className="bg-white w-[600px] h-[80vh] rounded-md shadow-lg p-4 flex flex-col">
         <div className="flex items-center gap-4">
           <IoMdClose
-            // onClick={() => onShowModalReview(false)}
+            onClick={() => onShowModal(false)}
             className="text-blue-800 hover:bg-blue-200 rounded-full cursor-pointer"
             size={27}
           />

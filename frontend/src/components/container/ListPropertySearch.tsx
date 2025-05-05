@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import apisProperty from "@/apis/property";
 import { IProperty } from "@/app/types/property";
 import InforRomItem from "../room/InforRomItem";
+import moment from "moment";
 
 const ListPropertySearch = () => {
   const searchParams = useSearchParams(); // Lấy query từ URL
@@ -38,7 +39,9 @@ const ListPropertySearch = () => {
           quantityReview={item.reviewCount}
           rating={item.averageRating || 0}
           slug={item.slug}
-          advertising={Number(item?.advertising)}
+          advertising={
+            moment(item.expiredAd) > moment() ? Number(item?.advertising) : 0
+          }
         />
       ))}
     </div>

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
-
+import moment from "moment";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -26,6 +26,7 @@ interface IData {
   city: string;
   price: string;
   slug: string;
+  expiredAd: string;
 }
 
 const ContainerRecomend = () => {
@@ -69,7 +70,11 @@ const ContainerRecomend = () => {
               quantityReview={item.reviewCount}
               rating={item?.avgRating}
               slug={item.slug}
-              advertising={Number(item?.advertising)}
+              advertising={
+                moment(item.expiredAd) > moment()
+                  ? Number(item?.advertising)
+                  : 0
+              }
             />
           </SwiperSlide>
         ))}

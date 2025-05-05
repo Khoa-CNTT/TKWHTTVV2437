@@ -42,6 +42,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "idProperty", // Khóa ngoại trong bảng imageRoom
         as: "propertyAddress", // Alias để truy cập
       });
+
+      Property.belongsTo(models.Advertising, {
+        foreignKey: "idAdvertising", // Khóa ngoại trong bảng imageRoom
+        as: "advertisingDetail", // Alias để truy cập
+      });
     }
   }
   Property.init(
@@ -53,6 +58,9 @@ module.exports = (sequelize, DataTypes) => {
       address: DataTypes.STRING,
       slug: DataTypes.STRING,
       advertising: DataTypes.INTEGER,
+      expiredAd: DataTypes.DATE,
+      idAdvertising: DataTypes.STRING,
+      payCommissionAt: DataTypes.DATE,
     },
     {
       sequelize,

@@ -292,6 +292,59 @@ const updateStatusRoom = (roomId, status) => {
   });
 };
 
+const getTopReventRoomByPropertyId = async (propertyId) => {
+  try {
+    // Bước 1: Lấy rooms với revenue
+    const rooms = await db.Room.findAll({
+      where: { idProperty: propertyId },
+      attributes: [
+        "id",
+        "name",
+        "price",
+        "code",
+        [
+          db.sequelize.fn("SUM", db.sequelize.col("reservations.totalPrice")),
+          "revenue",
+        ],
+        [
+          db.sequelize.fn("COUNT", db.sequelize.col("reservations.id")),
+          "reservationCount",
+        ],
+      ],
+      include: [
+        {
+          model: db.Reservation,
+          as: "reservations",
+          attributes: [],
+          required: false,
+        },
+      ],
+      group: ["Room.id"],
+      order: [[db.sequelize.literal("revenue"), "DESC"]],
+    });
+
+    // Bước 2: Lấy ảnh cho từng room
+    const roomIds = rooms.map((room) => room.id);
+    const images = await db.ImageRoom.findAll({
+      where: { idRoom: roomIds },
+      attributes: ["id", "image", "idRoom"],
+    });
+
+    // Gộp dữ liệu
+    const roomsWithImages = rooms.map((room) => ({
+      ...room.get({ plain: true }),
+      images: images.filter((img) => img.idRoom === room.id),
+    }));
+
+    return {
+      status: "OK",
+      data: roomsWithImages,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   getListRoomByPropertyId,
   getDetailById,
@@ -299,4 +352,5 @@ module.exports = {
   updateRoom,
   searchListRoomForBooking,
   updateStatusRoom,
+  getTopReventRoomByPropertyId,
 };
