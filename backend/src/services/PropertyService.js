@@ -3,6 +3,7 @@ const { fn, col } = require("sequelize");
 const { v4 } = require("uuid");
 const slugify = require("slugify");
 const hightlightProperty = require("../models/hightlightProperty");
+const { saveEmbedding } = require("./queryService");
 
 const listTop10HomestayRating = () => {
   return new Promise(async (resolve, reject) => {
@@ -68,10 +69,18 @@ const listTop10HomestayRating = () => {
     }
   });
 };
-
 const createProperty = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
+      // Kiểm tra dữ liệu đầu vào cơ bản
+      if (!data.name || !data.description || !data.idUser || !data.categoryId) {
+        return reject({
+          status: "ERR",
+          message: "Missing required property information",
+        });
+      }
+
+      // Tạo property
       const property = await db.Property.create({
         id: v4(),
         name: data.name,
@@ -79,11 +88,12 @@ const createProperty = (data) => {
         idUser: data.idUser,
         idCategory: data.categoryId,
         slug: slugify(data.name, {
-          lower: true, // chuyển thành chữ thường
-          strict: true, // bỏ các ký tự đặc biệt
+          lower: true,
+          strict: true,
         }),
       });
 
+      // Tạo address
       const address = await db.Address.create({
         id: v4(),
         idProperty: property.id,
@@ -93,39 +103,77 @@ const createProperty = (data) => {
         country: data.country,
       });
 
+      // Tạo images
       const images = await db.ImageProperty.bulkCreate(
         data.images.map((item) => ({
-          id: item.id,
+          id: item.id || v4(),
           idProperty: property.id,
           image: item.image,
         }))
       );
 
-        const amenities = await db.AmenityProperty.bulkCreate(
-          data.amenities.map((item) => ({
-            idProperty: property.id,
-            idAmenity: item,
-          }))
-        );
-     
+      // Tạo amenities
+      const amenities = await db.AmenityProperty.bulkCreate(
+        data.amenities.map((item) => ({
+          idProperty: property.id,
+          idAmenity: item,
+        }))
+      );
+
+      // Tạo highlights
       const highlights = await db.HighlightProperty.bulkCreate(
         data.highlights.map((item) => ({
           idProperty: property.id,
           idHighlight: item,
         }))
       );
-     
-      const newdata = [{property: property}, {address: address}, {amenities: amenities}, {highlights: highlights}, {images: images}];
 
+      // Chuẩn bị dữ liệu cho embedding - FIX: Tạo đúng định dạng cho saveEmbedding
+      const propertyData = {
+        id: property.id,
+        name: property.name,
+        description: property.description,
+        slug: property.slug,
+        address: {
+          street: address.street,
+          district: address.district,
+          city: address.city,
+          country: address.country,
+        },
+        images: images.map((img) => ({
+          id: img.id,
+          image: img.image,
+        })),
+        amenities: amenities.map((am) => am.idAmenity),
+        highlights: highlights.map((hl) => hl.idHighlight),
+      };
+
+      try {
+        // Thực hiện embedding sau khi đã tạo dữ liệu - FIX: truyền đúng định dạng
+        const embeddingResult = await saveEmbedding("hotel", propertyData);
+        console.log("Embedding result:", embeddingResult);
+      } catch (embeddingError) {
+        console.error("Failed to save embedding:", embeddingError);
+        // Vẫn tiếp tục để trả về dữ liệu đã tạo
+      }
+
+      console.log(
+        "🚀 ~ file: PropertyService.js:1 ~ createProperty ~ embedding completed:",
+        JSON.stringify(propertyData, null, 2)
+      );
+
+      // Trả về kết quả thành công
       resolve({
         status: "OK",
-        data: newdata,
+        data: propertyData,
       });
     } catch (error) {
-      // Ném lỗi có thông tin chi tiết về lỗi
+      console.error("Property creation error:", error);
+
       reject({
         status: "ERR",
-        message: `Error creating property: ${error.message || error}`, // Cung cấp thông tin lỗi chi tiết hơn
+        message: `Error creating property: ${error.message || error}`,
+        stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
       });
     }
   });
@@ -233,8 +281,8 @@ const getDetailBySlug = (slug) => {
           },
           {
             model: db.Address,
-            as: "propertyAddress"
-          }
+            as: "propertyAddress",
+          },
         ],
       });
 
@@ -283,8 +331,8 @@ const getDetailProperyById = (propertyId) => {
           },
           {
             model: db.Address,
-            as: "propertyAddress"
-          }
+            as: "propertyAddress",
+          },
         ],
         // attributes: ["name"],
       });
@@ -445,5 +493,5 @@ module.exports = {
   createProperty,
   getListAmenityByPropertyId,
   getListHightlightByPropertyId,
-  updateProperty
+  updateProperty,
 };
