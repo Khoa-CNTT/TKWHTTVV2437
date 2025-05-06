@@ -1,4 +1,6 @@
 const db = require("../models");
+const Op = require("sequelize").Op;
+const moment = require("moment");
 
 const getListCommissionPaymentByPropertyId = (propertyId) => {
   return new Promise(async (resolve, reject) => {
@@ -61,7 +63,96 @@ const updateCommissionPayment = (id, data) => {
   });
 };
 
+const getDataBarChartCommissionAdmin = async (filter) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { type } = filter;
+      const labels = [];
+      const data = [];
+
+      if (type === "month") {
+        for (let i = 11; i >= 0; i--) {
+          const month = moment().subtract(i, "months");
+          labels.push(month.format("MM/YYYY"));
+          const result = await db.CommissionPayment.findOne({
+            attributes: [
+              [
+                db.Sequelize.fn("SUM", db.Sequelize.col("commissionAmount")),
+                "total",
+              ],
+            ],
+            where: {
+              createdAt: {
+                [Op.between]: [
+                  month.startOf("month").toDate(),
+                  month.endOf("month").toDate(),
+                ],
+              },
+              status: "done",
+            },
+          });
+          data.push(result ? parseFloat(result.get("total")) || 0 : 0);
+        }
+      } else if (type === "quarter") {
+        for (let i = 11; i >= 0; i--) {
+          const quarter = moment().subtract(i, "quarters");
+          labels.push(`${quarter.quarter()}/${quarter.year()}`);
+          const result = await db.CommissionPayment.findOne({
+            attributes: [
+              [
+                db.Sequelize.fn("SUM", db.Sequelize.col("commissionAmount")),
+                "total",
+              ],
+            ],
+            where: {
+              createdAt: {
+                [Op.between]: [
+                  quarter.startOf("quarter").toDate(),
+                  quarter.endOf("quarter").toDate(),
+                ],
+              },
+              status: "done",
+            },
+          });
+          data.push(result ? parseFloat(result.get("total")) || 0 : 0);
+        }
+      } else if (type === "year") {
+        for (let i = 10; i >= 0; i--) {
+          const year = moment().subtract(i, "years");
+          labels.push(year.format("YYYY"));
+          const result = await db.CommissionPayment.findOne({
+            attributes: [
+              [
+                db.Sequelize.fn("SUM", db.Sequelize.col("commissionAmount")),
+                "total",
+              ],
+            ],
+            where: {
+              createdAt: {
+                [Op.between]: [
+                  year.startOf("year").toDate(),
+                  year.endOf("year").toDate(),
+                ],
+              },
+              status: "done",
+            },
+          });
+          data.push(result ? parseFloat(result.get("total")) || 0 : 0);
+        }
+      }
+
+      resolve({
+        status: "OK",
+        data: { labels, data },
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   getListCommissionPaymentByPropertyId,
   updateCommissionPayment,
+  getDataBarChartCommissionAdmin,
 };

@@ -28,13 +28,13 @@ const PayCommissionContainer: React.FC<IProps> = ({ userId }) => {
     fetchCommissionPayment();
   }, [propertyId]);
 
-  if (commissionPayment.length === 0) {
+  if (commissionPayment?.length === 0) {
     return "";
   }
 
   return (
     <div>
-      {commissionPayment.map((item) => (
+      {commissionPayment?.map((item) => (
         <div className="ralative border-gray-300 border rounded-md p-4 mt-4">
           <h4 className="text-center font-semibold">
             Thông tin thanh toán tiền hoa hồng tháng {item.month}/{item.year}

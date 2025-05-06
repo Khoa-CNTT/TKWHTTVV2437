@@ -1,6 +1,15 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { FaTachometerAlt, FaUsers, FaHome, FaCogs, FaBook, FaMoneyBill, FaCheckCircle, FaWpforms } from "react-icons/fa";
+import {
+  FaTachometerAlt,
+  FaUsers,
+  FaHome,
+  FaCogs,
+  FaBook,
+  FaMoneyBill,
+  FaCheckCircle,
+  FaWpforms,
+} from "react-icons/fa";
 
 const SidebarAdmin = () => {
   const router = useRouter();
@@ -9,7 +18,7 @@ const SidebarAdmin = () => {
     {
       title: "Dashboard",
       icon: <FaTachometerAlt />,
-      path: "/admin/Dashboard",
+      path: "/admin/dashboard",
     },
     {
       title: "Accounts",
@@ -43,10 +52,9 @@ const SidebarAdmin = () => {
     },
     {
       title: "Thanh toán",
-      icon: <FaMoneyBill /> ,
+      icon: <FaMoneyBill />,
       path: "/admin/Payment",
-
-    }
+    },
   ];
 
   return (

@@ -1,7 +1,16 @@
-'use client';
-import { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Select, SelectItem } from '@nextui-org/react';
+"use client";
+import { useState, useEffect } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+// import { Select, SelectItem } from '@nextui-org/react';
 import apisAdmin from "@/api/admin";
 interface StatisticsData {
   date: string;
@@ -9,11 +18,10 @@ interface StatisticsData {
   ownerCount: number;
   reservationCount: number;
 }
-type TimeFilter = 'day' | 'month' | 'year';
+type TimeFilter = "day" | "month" | "year";
 const StatisticsChart = () => {
-
   const [data, setData] = useState<StatisticsData[]>([]);
-  const [filter, setFilter] = useState<TimeFilter>('day'); // Xác định kiểu rõ ràng
+  const [filter, setFilter] = useState<TimeFilter>("day"); // Xác định kiểu rõ ràng
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,7 +33,7 @@ const StatisticsChart = () => {
       const response = await apisAdmin.getStatistics(filter);
       setData(response.data || []); // Đảm bảo luôn là mảng
     } catch (err) {
-      console.error('Error fetching statistics:', err);
+      console.error("Error fetching statistics:", err);
       setData([]); // Reset data khi có lỗi
     } finally {
       setLoading(false);
@@ -49,15 +57,21 @@ const StatisticsChart = () => {
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-semibold">Thống kê hệ thống</h3>
         <Select
-    label="Chọn khoảng thời gian"
-    className="w-48"
-    selectedKeys={[filter]}
-    onChange={(e) => setFilter(e.target.value as TimeFilter)} // Thêm type assertion
-  >
-    <SelectItem key="day" value="day">Theo ngày</SelectItem>
-    <SelectItem key="month" value="month">Theo tháng</SelectItem>
-    <SelectItem key="year" value="year">Theo năm</SelectItem>
-  </Select>
+          label="Chọn khoảng thời gian"
+          className="w-48"
+          selectedKeys={[filter]}
+          onChange={(e) => setFilter(e.target.value as TimeFilter)} // Thêm type assertion
+        >
+          <SelectItem key="day" value="day">
+            Theo ngày
+          </SelectItem>
+          <SelectItem key="month" value="month">
+            Theo tháng
+          </SelectItem>
+          <SelectItem key="year" value="year">
+            Theo năm
+          </SelectItem>
+        </Select>
       </div>
 
       <div className="h-80">
@@ -68,9 +82,11 @@ const StatisticsChart = () => {
               <XAxis
                 dataKey="date"
                 tickFormatter={(value) =>
-                  filter === 'month' ? value.slice(5) :
-                    filter === 'year' ? value :
-                      value.slice(0, 10)
+                  filter === "month"
+                    ? value.slice(5)
+                    : filter === "year"
+                      ? value
+                      : value.slice(0, 10)
                 }
               />
               <YAxis />
