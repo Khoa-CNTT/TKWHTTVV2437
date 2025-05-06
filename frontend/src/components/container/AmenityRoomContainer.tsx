@@ -30,7 +30,6 @@ const iconMap: { [key: string]: JSX.Element } = {
 };
 
 const AnmenityRoomContainer: React.FC<IProps> = ({ amenities }) => {
-  console.log({ amenities: amenities });
   return (
     <div>
       {amenities.map((item: Amenity, index: number) => (

@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
         otherKey: "idRoom", // Khóa ngoại trong bảng trung gian trỏ đến Room
         as: "rooms", // Alias để truy cập
       });
+ 
     }
   }
   Amenity.init(

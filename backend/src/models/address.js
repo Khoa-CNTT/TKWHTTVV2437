@@ -8,10 +8,9 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
       Address.belongsTo(models.Property, {
-        foreignKey: "idProperty",
-        as: "property",
+        foreignKey: "idProperty", // Khóa ngoại trong bảng Property
+        as: "property", // Alias để truy cập
       });
     }
   }
@@ -23,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
       ward: DataTypes.STRING,
       country: DataTypes.STRING,
       idProperty: DataTypes.STRING,
+      slug: DataTypes.STRING,
     },
     {
       sequelize,

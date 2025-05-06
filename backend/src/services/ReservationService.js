@@ -1,5 +1,8 @@
 const db = require("../models");
 import { v4 } from "uuid";
+import moment from "moment";
+import { Op } from "sequelize";
+
 const createReservation = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -286,6 +289,112 @@ const updateInfoReservation = (data) => {
     }
   });
 };
+const getDataBarChart = async (propertyId, filter) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { type } = filter;
+
+      const labels = [];
+      const data = [];
+      if (type === "month") {
+        for (let i = 11; i >= 0; i--) {
+          const month = moment().subtract(i, "months"); // Define month here
+
+          labels.push(month.format("MM/YYYY"));
+          const result = await db.Reservation.findOne({
+            attributes: [
+              [db.Sequelize.fn("SUM", db.Sequelize.col("totalPrice")), "total"],
+            ],
+            where: {
+              checkInDate: {
+                [Op.between]: [
+                  month.startOf("month").toDate(),
+                  month.endOf("month").toDate(),
+                ],
+              },
+            },
+            include: [
+              {
+                model: db.Room,
+                where: { idProperty: propertyId },
+                as: "rooms",
+                required: true,
+              },
+            ],
+          });
+
+          data.push(result ? parseFloat(result.get("total")) || 0 : 0);
+        }
+      } else if (type === "quarter") {
+        for (let i = 7; i >= 0; i--) {
+          const quarter = moment().subtract(i, "quarters"); // Define quarter here
+
+          labels.push(quarter.format("Q/YYYY"));
+          const result = await db.Reservation.findOne({
+            attributes: [
+              [db.Sequelize.fn("SUM", db.Sequelize.col("totalPrice")), "total"],
+            ],
+            where: {
+              checkInDate: {
+                [Op.between]: [
+                  quarter.startOf("quarter").toDate(),
+                  quarter.endOf("quarter").toDate(),
+                ],
+              },
+            },
+            include: [
+              {
+                model: db.Room,
+                where: { idProperty: propertyId },
+                as: "rooms",
+                required: true,
+              },
+            ],
+          });
+
+          data.push(result ? parseFloat(result.get("total")) || 0 : 0);
+        }
+      } else if (type === "year") {
+        for (let i = 9; i >= 0; i--) {
+          const year = moment().subtract(i, "years"); // Define year here
+
+          labels.push(year.format("YYYY"));
+          const result = await db.Reservation.findOne({
+            attributes: [
+              [db.Sequelize.fn("SUM", db.Sequelize.col("totalPrice")), "total"],
+            ],
+            where: {
+              checkInDate: {
+                [Op.between]: [
+                  year.startOf("year").toDate(),
+                  year.endOf("year").toDate(),
+                ],
+              },
+            },
+            include: [
+              {
+                model: db.Room,
+                where: { idProperty: propertyId },
+                as: "rooms",
+                required: true,
+              },
+            ],
+          });
+
+          data.push(result ? parseFloat(result.get("total")) || 0 : 0);
+        }
+      }
+
+      resolve({
+        status: data ? "OK" : "ERR",
+        data: { labels, data },
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   createReservation,
   listReservationApprove,
@@ -294,4 +403,5 @@ module.exports = {
   listReservationOfUser,
   detailReservationOfUser,
   updateInfoReservation,
+  getDataBarChart,
 };

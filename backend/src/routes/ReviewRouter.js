@@ -7,4 +7,9 @@ router.get(
   reviewController.getRatingByPropertyId
 );
 
+router.get(
+  "/list-review/:propertyId",
+  reviewController.getListReviewByProperyId
+);
+
 module.exports = router;

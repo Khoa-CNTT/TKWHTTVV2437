@@ -72,7 +72,14 @@ const lockAccount = async (req, res) => {
     return res.status(500).json({ msg: "Error: " + error.message });
   }
 };
-
+const approveOwner = async (req, res) => {
+  try {
+    const response = await AdminService.approveOwner(req.params.id);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
 const createCategory = async (req, res) => {
   try {
     const response = await AdminService.createCategory(req.body);
@@ -208,9 +215,75 @@ const updateHomestay = async (req, res) => {
   }
 };
 
+
+
+
+const createHomestay = async (req, res) => {
+  try {
+    const response = await AdminService.createHomestay(req.body);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
+
+const deleteHomestay = async (req, res) => {
+  try {
+    const response = await AdminService.deleteHomestay(req.params.id);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
+
+
 const listHomestays = async (req, res) => {
   try {
-    const response = await AdminService.listHomestays(req.query.keyword);
+    const response = await AdminService.listHomestays(req.query.propertyId);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
+const getListRoomByPropertyId = async (req, res) => {
+  try {
+    const response = await AdminService.getListRoomByPropertyId(req.params.propertyId);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
+
+const getListPropertiesByOwnerId = async (req, res) => {
+  try {
+    const response = await AdminService.getListPropertiesByOwnerId(req.params.ownerId);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Controller Error: " + error.message });
+  }
+};
+
+const createRoom = async (req, res) => {
+  try {
+    const response = await AdminService.createRoom(req.body);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
+
+const updateRoom = async (req, res) => {
+  try {
+    const response = await AdminService.updateRoom(req.params.id, req.body);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ msg: "Error: " + error.message });
+  }
+};
+
+const deleteRoom = async (req, res) => {
+  try {
+    const response = await AdminService.deleteRoom(req.params.id);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({ msg: "Error: " + error.message });
@@ -262,6 +335,17 @@ const cancelBooking = async (req, res) => {
   }
 };
 
+const getStatistics = async (req, res) => {
+  try {
+    const filter = req.query.filter || 'day';
+    const stats = await AdminService.getStatistics(filter);
+    res.status(200).json(stats);
+  } catch (error) {
+    console.error('Error getting statistics:', error);
+    res.status(500).json({ error: 'Server Error' });
+  }
+};
+
 module.exports = {
   loginAdmin,
   registerOwner,
@@ -270,6 +354,7 @@ module.exports = {
   deleteUser,
   listUsers,
   lockAccount,
+  approveOwner,
   createCategory,
   updateCategory,
   deleteCategory,
@@ -285,10 +370,18 @@ module.exports = {
   approveHomestay,
   rejectHomestay,
   updateHomestay,
+  createHomestay,
+  deleteHomestay,
+  getListRoomByPropertyId,
+  getListPropertiesByOwnerId,
+  createRoom,
+  updateRoom,
+  deleteRoom,
   listHomestays,
   listPayments,
   refundPayment,
   listBookings,
   confirmBooking,
   cancelBooking,
+  getStatistics
 };

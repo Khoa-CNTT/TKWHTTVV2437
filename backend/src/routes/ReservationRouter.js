@@ -21,6 +21,7 @@ router.get(
   "/detailReservationOfUser",
   reservationController.detailReservationOfUser
 );
+router.get("/bar-chart/:id", reservationController.getDataBarChart);
 
 router.put("/approveReservation", reservationController.approveReservation);
 router.put(

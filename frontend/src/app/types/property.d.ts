@@ -8,6 +8,7 @@ export interface IImage {
 }
 
 export interface IProperty {
+  id: string;
   title: string;
   price: number;
   images: { id: string; image: string }[]; // Cập nhật kiểu dữ liệu của images
@@ -25,10 +26,13 @@ export interface IProperty {
   amenities: IAmenity[];
   idCategory: string;
   propertyAddress: IAddress;
+  advertising: string;
+  expiredAd: string;
 }
 
 export interface IPropertyCreate {
   categoryId?: string;
+  userId?: string;
   city?: string;
   country?: string;
   description?: string;
@@ -37,5 +41,5 @@ export interface IPropertyCreate {
   name?: string;
   amenities?: string[];
   highlights?: string[];
-  images?: {id?: string, image?: string}[];
-} 
+  images?: { id?: string; image?: string }[];
+}

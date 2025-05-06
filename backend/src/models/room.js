@@ -13,16 +13,16 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "idRoom", // Khóa ngoại trong bảng imageRoom
         as: "images", // Alias để truy cập
       });
-
+      Room.belongsTo(models.Property, {
+        foreignKey: "idProperty", // Khóa ngoại trỏ đến Property
+        as: "property",
+      });
       Room.hasMany(models.Review, {
         foreignKey: "idRoom", // Khóa ngoại trong bảng imageRoom
         as: "reviews", // Alias để truy cập
       });
 
-      Room.belongsTo(models.Property, {
-        foreignKey: "idProperty", // Khóa ngoại trong bảng imageRoom
-        as: "property", // Alias để truy cập
-      });
+    
       Room.hasMany(models.Reservation, {
         foreignKey: "idRoom", // hoặc tên khóa ngoại tương ứng
         as: "reservations", // Alias này phải đúng như trong phần include
@@ -45,7 +45,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Room.init(
     {
-      idProperty: DataTypes.STRING,
+      idProperty: DataTypes.UUID,
       name: DataTypes.STRING,
       description: DataTypes.STRING,
       maxPerson: DataTypes.INTEGER,
@@ -58,6 +58,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "Room",
+      tableName: "Rooms",
     }
   );
   return Room;

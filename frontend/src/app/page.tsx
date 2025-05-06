@@ -19,9 +19,7 @@ export default async function Home() {
       <Banner />
 
       <div className="w-[1260px] mx-auto">
-        <div className="mt-8">
-          <ContainerRecomend properties={properties.data} />
-        </div>
+        <ContainerRecomend />
 
         <Container cities={cities.data} />
 
