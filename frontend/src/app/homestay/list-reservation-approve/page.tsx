@@ -9,11 +9,41 @@ import { useReservationContext } from "@/app/contexts/ReservationContext";
 import dayjs from "dayjs";
 import { FaFilter } from "react-icons/fa";
 import { useRouter, useSearchParams } from "next/navigation";
+
+interface IReservationApprove {
+  id: string;
+  idUser: string;
+  idRoom: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  imageBanking: string | null;
+  message: string | null;
+  numberAccount: string;
+  nameAccount: string;
+  nameBank: string;
+  statusUser: string;
+  code: string;
+  returnImgBanking: string | null;
+  checkIndate: string; // ISO format from backend
+  checkOutdate: string;
+  numGuest: number | null;
+  totalPrice: number;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  rooms: {
+    name: string;
+    price: number;
+  };
+}
+
 const ListReservationApprovePage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isOpenApprove, setIsOpenAppove] = useState(false);
-  const [listResApprove, setListResApprove] = useState<any[]>();
+  const [listResApprove, setListResApprove] = useState<IReservationApprove[]>();
   const { reservation, setReservation } = useReservationContext();
   const [filter, setFilter] = useState<string>("oldest");
 
@@ -105,17 +135,17 @@ const ListReservationApprovePage = () => {
           <table className="min-w-full text-black ">
             <thead className="bg-gray-200 text-[-14] text-gray-500 font-bold ">
               <tr>
-                <th className="px-4 py-3 text-left">
+                {/* <th className="px-4 py-3 text-left">
                   <input type="checkbox" />
-                </th>
+                </th> */}
                 <th className="px-4 py-3 text-left">Mã đơn</th>
                 <th className="px-4 py-3 text-left ">Loại phòng</th>
                 <th className="px-4 py-3 text-left ">Tên khách hàng</th>
-                <th className="px-4 py-3 text-left ">Yêu cầu</th>
+
                 <th className="px-4 py-3 text-left ">Check In</th>
                 <th className="px-4 py-3 text-left ">Check Out</th>
                 <th className="px-4 py-3 text-left ">Tổng tiền</th>
-                <th className="px-4 py-3 text-left ">Trạng thái</th>
+                <th className="px-4 py-3 text-left ">Yêu cầu</th>
                 <th className="px-4 py-3 text-left ">Ngày đặt</th>
                 <th className="px-4 py-3 text-left ">...</th>
               </tr>
@@ -125,10 +155,10 @@ const ListReservationApprovePage = () => {
                 listResApprove?.map((item, index: number) => {
                   return (
                     <tr key={index} className="border-b border-gray-200">
-                      <td className="px-4 py-5">
+                      {/* <td className="px-4 py-5">
                         <input type="checkbox" />
-                      </td>
-                      <td className="px-4 py-5">{index + 1}</td>
+                      </td> */}
+                      <td className="px-4 py-5">{item?.code}</td>
                       <td className="px-4 py-5 w-1/5">{item?.rooms?.name}</td>
                       <td className="px-4 py-5">
                         <div className="w-fit flex items-center gap-2 border border-b-[3px] border-gray-400 rounded-3xl py-1 px-3">
@@ -140,9 +170,7 @@ const ListReservationApprovePage = () => {
                           <p>{`${item?.firstName} ${item?.lastName}`}</p>
                         </div>
                       </td>
-                      <td className="px-4 py-5">
-                        {item?.deposit != 0 ? "Có cọc" : "Không cọc"}
-                      </td>
+
                       <td className="px-4 py-5">
                         {dayjs(item?.checkIndate)?.format("DD/MM/YYYY HH:mm")}
                       </td>
@@ -156,34 +184,44 @@ const ListReservationApprovePage = () => {
                         })}
                       </td>
 
-                      <td className="px-4 py-5">{item?.status}</td>
+                      <td
+                        className={`px-4 py-5  ${item?.statusUser === "created" ? "text-green-500" : "text-red-600"}`}
+                      >
+                        {item?.statusUser === "created" ? "Đặt" : "Hủy"}
+                      </td>
                       <td className="px-4 py-5">
                         {dayjs(item?.createdAt)?.format("DD/MM/YYYY")}
                       </td>
                       <td className="px-4 py-5 ">
                         <button
-                          className="w-fit py-2 px-4 bg-green-700 rounded-3xl text-white font-semibold cursor-pointer min-w-32"
+                          className={`w-fit py-2 px-4 rounded-3xl text-white font-semibold cursor-pointer min-w-32 ${item?.statusUser === "created" ? "bg-green-700" : "bg-red-600"}`}
                           onClick={() => {
                             setReservation({
                               id: item?.id,
-                              loaiphong: item?.rooms?.name,
+                              nameRoom: item?.rooms?.name,
                               firstName: item?.firstName,
                               lastName: item?.lastName,
+                              message: item?.message,
                               checkIn: dayjs(item?.checkIndate),
                               checkOut: dayjs(item?.checkOutdate),
                               totalPrice: item?.totalPrice,
                               status: item?.status,
-                              ngayDat: dayjs(item?.createdAt),
                               email: item?.email,
                               phone: item?.phone,
-                              deposit: item?.deposit,
                               imageBanking: item?.imageBanking,
                               createdAt: dayjs(item?.createdAt),
+                              numberAccount: item?.numberAccount,
+                              nameAccount: item?.nameAccount,
+                              nameBank: item?.nameBank,
+                              statusUser: item?.statusUser,
+                              code: item?.code,
                             });
                             handleOpenAppove();
                           }}
                         >
-                          Phê duyệt
+                          {item?.statusUser === "created"
+                            ? "Phê duyệt"
+                            : "Hoàn tiền"}
                         </button>
                       </td>
                     </tr>

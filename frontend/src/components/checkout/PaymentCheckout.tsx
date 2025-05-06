@@ -1,8 +1,11 @@
+import apiPayment from "@/api/payment";
 import apiReservation from "@/api/reservation";
+import validate from "@/utils/validateInput";
 import { useRouter } from "next/navigation";
 import PreviousMap_ from "postcss/lib/previous-map";
 import { useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
+import { FaRegTrashCan } from "react-icons/fa6";
 import { TiArrowBack } from "react-icons/ti";
 interface IDataEnter {
   firstName: string;
@@ -26,6 +29,11 @@ interface IProps {
   startDay?: string;
   endDay?: string;
   roomId: string;
+  code: string;
+}
+interface IInvalidField {
+  name: string;
+  mes: string;
 }
 
 const PaymentCheckout = ({
@@ -36,6 +44,7 @@ const PaymentCheckout = ({
   startDay,
   endDay,
   roomId,
+  code,
 }: IProps) => {
   const router = useRouter();
   const [infoPayment, setInfoPayment] = useState<object>({
@@ -44,29 +53,55 @@ const PaymentCheckout = ({
     startDay: startDay || null,
     endDay: endDay || null,
     roomId,
+    code,
   });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [invalidFields, setInvalidFields] = useState<IInvalidField[]>([]);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "uploadVideo");
+      const res = await apiPayment.uploadImageToCloud(formData);
       onChangeDataEnter((prev) => ({
         ...prev,
-        imageBanking: URL.createObjectURL(file),
+        imageBanking: res?.data?.secure_url,
       }));
       setInfoPayment((prev: object) => ({
         ...prev,
-        imageBanking: URL.createObjectURL(file),
+        imageBanking: res?.data?.secure_url,
       }));
     }
   };
 
-  const handleCreateResservaiton = async (data: object) => {
-    const respon = await apiReservation.createReservation(data);
+  const handleFileRemove = () => {
+    onChangeDataEnter((prev) => ({
+      ...prev,
+      imageBanking: "",
+    }));
+    setInfoPayment((prev: object) => ({
+      ...prev,
+      imageBanking: "",
+    }));
+  };
 
-    if (respon?.status === "OK") {
-      router.push(`/checkout?status=success`);
-    } else {
-      router.push(`/checkout?status=failed`);
+  const handleCreateResservaiton = async (data: object) => {
+    const valid = validate(
+      {
+        imageBanking: dataEnter?.imageBanking || "",
+      },
+      setInvalidFields
+    );
+    if (valid === 0) {
+      const respon = await apiReservation.createReservation(data);
+
+      if (respon?.status === "OK") {
+        router.push(`/checkout?status=success&id=${respon?.data?.id}`);
+      } else {
+        router.push(`/checkout?status=failed`);
+      }
     }
   };
 
@@ -119,6 +154,28 @@ const PaymentCheckout = ({
                   </span>
                 </p>
               </div>
+              <div className="flex items-center gap-2 ">
+                <span>
+                  <FaCheckCircle />
+                </span>
+                <div className="flex flex-col gap-1">
+                  <p className="flex ">
+                    Tin nhắn:{" "}
+                    <span className="font-semibold">
+                      Tên của bạn - thanh toán đơn đặt phòng - mã xác nhận
+                    </span>
+                  </p>
+
+                  <p className="flex ">
+                    Ví dụ:{" "}
+                    <span className="font-semibold">
+                      Nguyễn Văn A - thanh toán đơn đặt phòng - mã xác nhận
+                      12345
+                    </span>
+                  </p>
+                </div>
+              </div>
+
               <div className="flex flex-col items-center justify-center ">
                 <img
                   src="https://khangnguyenco.vn/pub/media/magefan_blog/ma-qr-code.jpg"
@@ -140,6 +197,11 @@ const PaymentCheckout = ({
           >
             📁 Chọn ảnh
           </label>
+          {invalidFields?.some((el) => el.name === "imageBanking") && (
+            <p className="mt-0.5 text-[-12] text-red-600 italic">
+              {invalidFields.find((el) => el.name === "imageBanking")?.mes}
+            </p>
+          )}
 
           <input
             id="file-upload"
@@ -151,11 +213,19 @@ const PaymentCheckout = ({
             }}
           />
           {dataEnter.imageBanking && (
-            <img
-              src={dataEnter.imageBanking}
-              alt="Xem trước"
-              className="w-[200px] object-cover rounded-lg border shadow"
-            />
+            <div className="relative w-fit">
+              <img
+                src={dataEnter.imageBanking}
+                alt="Xem trước"
+                className="w-[200px] object-cover rounded-lg border shadow"
+              />
+              <div
+                className="absolute top-2 right-2 px-2 py-2 rounded-[-50] bg-gray-300 hover:opacity-25 cursor-pointer"
+                onClick={handleFileRemove}
+              >
+                <FaRegTrashCan />
+              </div>
+            </div>
           )}
         </div>
       </div>

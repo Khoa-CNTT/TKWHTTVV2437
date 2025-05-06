@@ -18,9 +18,9 @@ const createReservation = (data) => {
         nameAccount,
         numberAccount,
         nameBank,
+        code,
       } = data;
       console.log("data", data);
-      const code = Math.floor(10000 + Math.random() * 90000).toString();
 
       const response = await db.Reservation.create({
         idUser: userId,
@@ -46,6 +46,7 @@ const createReservation = (data) => {
       resolve({
         status: "OK",
         message: "Create success",
+        data: response,
       });
     } catch (error) {
       reject("error " + error);
@@ -122,12 +123,13 @@ const detailReservationApprove = (reid) => {
   });
 };
 
-const approveReservation = ({ reid, status }) => {
+const approveReservation = ({ reid, status, returnImgBanking }) => {
   return new Promise(async (resolve, reject) => {
     try {
       const response = await db.Reservation.update(
         {
           status: status,
+          returnImgBanking: returnImgBanking,
         },
         {
           where: {
@@ -145,9 +147,151 @@ const approveReservation = ({ reid, status }) => {
     }
   });
 };
+
+const listReservationOfUser = (idUser) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let order = [["createdAt", "DESC"]];
+
+      const response = await db.Reservation.findAndCountAll({
+        where: { idUser: idUser },
+        include: [
+          {
+            model: db.Room,
+            as: "rooms",
+            attributes: ["name", "price"],
+            include: [
+              {
+                model: db.Property,
+                as: "property",
+
+                attributes: ["id", "address", "name"],
+                include: [
+                  {
+                    model: db.Address,
+                    as: "propertyAddress",
+
+                    attributes: {
+                      exclude: ["id", "idProperty", "createdAt", "updatedAt"],
+                    },
+                  },
+                  {
+                    model: db.ImageProperty,
+                    as: "images", // alias này cần đúng với định nghĩa trong model
+                    attributes: ["id", "image", "idProperty"],
+                  },
+                ],
+              },
+              // {
+              //   model: db.ImageRoom,
+
+              //   as: "images", // alias này cần đúng với định nghĩa trong model
+              //   attributes: ["id", "image", "idRoom"],
+              // },
+            ],
+          },
+        ],
+        order,
+        distinct: true,
+      });
+
+      resolve({
+        status: response ? "OK" : "ERR",
+        data: response,
+      });
+    } catch (error) {
+      reject("error " + error);
+    }
+  });
+};
+
+const detailReservationOfUser = (idRes) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let order = [["createdAt", "DESC"]];
+
+      const response = await db.Reservation.findOne({
+        where: { id: idRes },
+        include: [
+          {
+            model: db.Room,
+            as: "rooms",
+            attributes: ["name", "price"],
+            include: [
+              {
+                model: db.Property,
+                as: "property",
+
+                attributes: ["id", "address", "name"],
+                include: [
+                  {
+                    model: db.Address,
+                    as: "propertyAddress",
+
+                    attributes: {
+                      exclude: ["id", "idProperty", "createdAt", "updatedAt"],
+                    },
+                  },
+                  {
+                    model: db.ImageProperty,
+                    as: "images", // alias này cần đúng với định nghĩa trong model
+                    attributes: ["id", "image", "idProperty"],
+                  },
+                ],
+              },
+              {
+                model: db.ImageRoom,
+
+                as: "images", // alias này cần đúng với định nghĩa trong model
+                attributes: ["id", "image", "idRoom"],
+              },
+            ],
+          },
+        ],
+        order,
+        distinct: true,
+      });
+
+      resolve({
+        status: response ? "OK" : "ERR",
+        data: response,
+      });
+    } catch (error) {
+      reject("error " + error);
+    }
+  });
+};
+
+const updateInfoReservation = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { id, ...payload } = data;
+      const response = await db.Reservation.update(
+        {
+          ...payload,
+        },
+        {
+          where: {
+            id: id,
+          },
+        }
+      );
+
+      resolve({
+        status: "OK",
+        msg: "Update reservation success!",
+      });
+    } catch (error) {
+      reject("error " + error);
+    }
+  });
+};
 module.exports = {
   createReservation,
   listReservationApprove,
   detailReservationApprove,
   approveReservation,
+  listReservationOfUser,
+  detailReservationOfUser,
+  updateInfoReservation,
 };

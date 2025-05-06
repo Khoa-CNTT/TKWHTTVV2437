@@ -47,6 +47,9 @@ const CheckoutPage = () => {
   const [property, setProperty] = useState<IProperty | null>(null);
   const [room, setRoom] = useState<IRoom | null>(null);
   const [invalidFields, setInvalidFields] = useState<IInvalidField[]>([]);
+  const [code, setCode] = useState<string>(
+    Math.floor(10000 + Math.random() * 90000).toString()
+  );
   const [dataEnter, setDataEnter] = useState<IDataEnter>({
     firstName: user?.firstName || "",
     lastName: user?.lastName || "",
@@ -126,8 +129,14 @@ const CheckoutPage = () => {
     fetchDataRoom();
   }, [roomId, propertyId]);
 
-  const handleToISOString = (value: dayjs.Dayjs | null) => {
-    const isoString = startDate?.format("DD/MM/YYYY") + "14:00";
+  const handleToISOString = (value: dayjs.Dayjs | null, status: string) => {
+    let isoString;
+    if (status === "startDay") {
+      isoString = value?.format("DD/MM/YYYY") + "14:00";
+    } else {
+      isoString = value?.format("DD/MM/YYYY") + "12:00";
+    }
+
     const dateObj = moment(isoString, "DD/MM/YYYY HH:mm").toDate();
     return dateObj.toISOString();
   };
@@ -164,15 +173,16 @@ const CheckoutPage = () => {
                   dataEnter={dataEnter}
                   onChangeDataEnter={setDataEnter}
                   userId={user?.id}
-                  startDay={handleToISOString(startDate)}
-                  endDay={handleToISOString(endDate)}
+                  startDay={handleToISOString(startDate, "startDay")}
+                  endDay={handleToISOString(endDate, "endDay")}
                   roomId={roomId}
+                  code={code}
                 />
               </div>
             )}
 
             <div className="w-[40%]">
-              <InforRoomCheckout property={property} room={room} />
+              <InforRoomCheckout property={property} room={room} code={code} />
             </div>
           </div>
         </div>

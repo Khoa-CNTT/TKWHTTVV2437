@@ -11,6 +11,12 @@ const apiReservation = {
     http.get(`reservation/detailReservationApprove?reid=${reid}`),
   approveReservation: (data: object) =>
     http.put(`reservation/approveReservation`, data),
+  listReservationOfUser: (idUser: string) =>
+    http.get(`reservation/listReservationOfUser?idUser=${idUser}`),
+  detailReservationOfUser: (idRes: string) =>
+    http.get(`reservation/detailReservationOfUser?idRes=${idRes}`),
+  updateInfoReservation: (data: object) =>
+    http.put(`reservation/updateInfoReservation`, data),
 };
 
 export default apiReservation;
