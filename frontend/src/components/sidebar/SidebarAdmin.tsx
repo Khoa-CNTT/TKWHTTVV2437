@@ -10,13 +10,10 @@ import {
   FaCheckCircle,
   FaWpforms,
 } from "react-icons/fa";
-<<<<<<< HEAD
 import { RiAdvertisementFill } from "react-icons/ri";
 import { FaPersonBreastfeeding } from "react-icons/fa6";
 import clsx from "clsx";
 import { usePathname } from "next/navigation";
-=======
->>>>>>> da0995d0fff9c3c377293326424c4fdd71e76309
 
 const SidebarAdmin = () => {
   const router = useRouter();
