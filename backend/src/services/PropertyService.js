@@ -8,7 +8,6 @@ const { sequelize } = require("../models");
 const moment = require("moment");
 const reviewService = require("./ReviewService");
 
-
 const listTop10HomestayRating = () => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -339,14 +338,12 @@ const createProperty = (data) => {
         }))
       );
 
-
       const amenities = await db.AmenityProperty.bulkCreate(
         data.amenities.map((item) => ({
           idProperty: property.id,
           idAmenity: item,
         }))
       );
-
 
       const highlights = await db.HighlightProperty.bulkCreate(
         data.highlights.map((item) => ({
@@ -363,10 +360,6 @@ const createProperty = (data) => {
         { images: images },
       ];
 
-<<<<<<< HEAD
-=======
-
->>>>>>> main
       // Chuẩn bị dữ liệu cho embedding - FIX: Tạo đúng định dạng cho saveEmbedding
       const propertyData = {
         id: property.id,
@@ -531,7 +524,6 @@ const getDetailBySlug = (slug) => {
             as: "rooms",
             attributes: ["price"], // Remove individual room attributes since we're aggregating
           },
-
         ],
       });
 
@@ -925,5 +917,4 @@ module.exports = {
   renewalAdByUserId,
   getAdvertisingByPropertyId,
   getTotalDashboard,
-
 };
