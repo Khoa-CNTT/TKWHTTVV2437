@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       });
       Reservation.belongsTo(models.Room, {
         foreignKey: "idRoom", // Khóa ngoại trong bảng Property
-        as: "Rooms", // Alias để truy cập
+        as: "rooms", // Alias để truy cập
       });
       Reservation.hasMany(models.Payment, {
         foreignKey: "idReservation", // Khóa ngoại trong bảng imageRoom
