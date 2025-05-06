@@ -4,7 +4,7 @@ const listTop10City = () => {
   return new Promise(async (resolve, reject) => {
     try {
       const citys = await db.City.findAll({
-        limit: 10,
+        limit: 9,
       });
 
       resolve({

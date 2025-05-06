@@ -26,9 +26,7 @@ module.exports = {
       phone: {
         type: Sequelize.STRING,
       },
-      imageBanking: {
-        type: Sequelize.STRING,
-      },
+     
       checkIndate: {
         type: Sequelize.DATE,
       },

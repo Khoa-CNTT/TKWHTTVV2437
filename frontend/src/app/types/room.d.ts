@@ -5,6 +5,7 @@ export interface IRoom {
   id: string;
   name: string;
   price: number;
+  deposit?: number;
   maxPerson: number;
   status: string;
   description: string;

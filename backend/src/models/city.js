@@ -9,22 +9,18 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-
-      City.hasMany(models.Property, {
-        foreignKey: "idCity", // Khóa ngoại trong bảng imageRoom
-        as: "properties", // Alias để truy cập
-      });
     }
   }
   City.init(
     {
       name: DataTypes.STRING,
       image: DataTypes.STRING,
+      slug: DataTypes.STRING,
     },
     {
       sequelize,
       modelName: "City",
-      tableName: "RoomAvailabilities",
+      tableName: "Cities",
     }
   );
   return City;

@@ -4,12 +4,27 @@ import { useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import InputText from "../input/InputText";
 import ButtonLogin from "../button/ButtonLogin";
+import { useAuth } from "@/app/contexts/AuthContext";
+import { IUser } from "@/app/types/user";
+import * as React from "react";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { Box } from "@mui/material";
+import dayjs, { Dayjs } from "dayjs";
+import apiUser from "@/api/user";
+import Swal from "sweetalert2";
+
 const EditBasicInfo = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
   const isOpen = searchParams.get("edit") === "basic-info";
   const [show, setShow] = useState(false);
+  const { user, setUser } = useAuth();
+  const [editUser, setEditUser] = useState<IUser | null>();
+
   const genders = [
     { label: "Nữ", value: "Female" },
     { label: "Nam", value: "Male" },
@@ -21,12 +36,41 @@ const EditBasicInfo = () => {
     setShow(isOpen);
   }, [isOpen]);
 
+  useEffect(() => {
+    if (user) setEditUser(user);
+  }, [user]);
+
   const closeModal = () => {
     // Xoá query khi đóng modal
     router.push(pathname);
   };
 
+  const handleEditInfo = async () => {
+    const token = localStorage.getItem("access_token");
+
+    if (editUser?.id && token) {
+      const res = await apiUser.updateUser(editUser?.id, token, {
+        firstName: editUser?.firstName,
+        lastName: editUser?.lastName,
+        bio: editUser?.bio,
+        gender: editUser?.gender,
+        dateOfBirth: editUser.dateOfBirth
+          ? dayjs(editUser.dateOfBirth).toISOString()
+          : null,
+      });
+      if (res?.status === "OK" && res?.msg === "Update") {
+        Swal.fire({
+          title: "Update thành công!",
+          icon: "success",
+          draggable: true,
+        });
+        setUser({ ...editUser });
+        closeModal();
+      }
+    }
+  };
   if (!show) return null;
+
   return (
     <div>
       <div className="fixed top-0 left-0 bottom-0 right-0 bg-white">
@@ -57,20 +101,40 @@ const EditBasicInfo = () => {
                 id="firstName"
                 label="First Name"
                 type="text"
-                value=""
+                value={editUser?.firstName || ""}
+                onChange={(value) => {
+                  setEditUser((prev) =>
+                    prev ? { ...prev, firstName: value } : null
+                  );
+                }}
               />
+
               <InputText
-                id="middleName"
-                label="Middle Name"
+                id="lastName"
+                label="Last Name"
                 type="text"
-                value=""
+                value={editUser?.lastName || ""}
+                onChange={(value) => {
+                  setEditUser((prev) =>
+                    prev ? { ...prev, lastName: value } : null
+                  );
+                }}
               />
-              <InputText id="lastName" label="Last Name" type="text" value="" />
             </div>
             <div className="flex flex-col gap-3">
               <p className="text-[-14] font-semibold text-gray-700">Về bạn</p>
               <div>
-                <InputText id="bio" label="Tiểu sử" type="text" value="" />
+                <InputText
+                  id="bio"
+                  label="Tiểu sử"
+                  type="text"
+                  value={editUser?.bio || ""}
+                  onChange={(value) => {
+                    setEditUser((prev) =>
+                      prev ? { ...prev, bio: value } : null
+                    );
+                  }}
+                />
                 {/* <div className="text-[-12] italic mx-2">
                   Giúp những người chủ nhà tương lai hiểu rõ hơn về bạn. Bạn có
                   thể chia sẻ phong cách du lịch, sở thích, mối quan tâm và
@@ -82,11 +146,24 @@ const EditBasicInfo = () => {
               <p className="text-[-14] font-semibold text-gray-700">
                 Ngày sinh
               </p>
-              <div className="flex gap-3">
-                <InputText id="day" label="Ngày" type="text" value="" />
-                <InputText id="month" label="Tháng" type="text" value="" />
-                <InputText id="year" label="Năm" type="text" value="" />
-              </div>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <Box sx={{ width: "100%" }}>
+                  <DatePicker
+                    label="Ngày sinh"
+                    sx={{ width: "100%" }} // 👈 Đây là điểm chính
+                    value={
+                      editUser?.dateOfBirth
+                        ? dayjs(editUser?.dateOfBirth)
+                        : null
+                    }
+                    onChange={(newValue: Dayjs | null) => {
+                      setEditUser((prev) =>
+                        prev ? { ...prev, dateOfBirth: newValue } : null
+                      );
+                    }}
+                  />
+                </Box>
+              </LocalizationProvider>
             </div>
             <div className="flex flex-col gap-3">
               <h3 className="text-[-14] font-semibold text-gray-700 ">
@@ -101,8 +178,16 @@ const EditBasicInfo = () => {
                     type="radio"
                     name="gender"
                     value={gender.value}
-                    checked={selectedGender === gender.value}
-                    onChange={() => setSelectedGender(gender.value)}
+                    checked={
+                      selectedGender === gender.value ||
+                      editUser?.gender === gender.label
+                    }
+                    onChange={() => {
+                      setSelectedGender(gender.value);
+                      setEditUser((prev) =>
+                        prev ? { ...prev, gender: gender.label } : null
+                      );
+                    }}
                     className="form-radio text-blue-600 focus:ring-blue-500 w-[20px] h-[20px]"
                   />
                   <span className="">{gender.label}</span>
@@ -110,7 +195,7 @@ const EditBasicInfo = () => {
               ))}
             </div>
             <div className="mt-3">
-              <ButtonLogin text="Lưu thông tin" />
+              <ButtonLogin text="Lưu thông tin" onClick={handleEditInfo} />
             </div>
           </div>
         </div>

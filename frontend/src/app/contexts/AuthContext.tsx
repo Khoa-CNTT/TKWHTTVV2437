@@ -9,11 +9,12 @@ import {
 } from "react";
 import { jwtDecode } from "jwt-decode";
 import apiUser from "@/api/user";
+import { IUser } from "../types/user";
 
 // Định nghĩa kiểu dữ liệu cho AuthContext
 interface AuthContextType {
-  user: any; // Bạn có thể thay thế `any` bằng kiểu dữ liệu cụ thể của user
-  setUser: React.Dispatch<React.SetStateAction<any>>;
+  user: IUser | null; // Bạn có thể thay thế `any` bằng kiểu dữ liệu cụ thể của user
+  setUser: React.Dispatch<React.SetStateAction<IUser | null>>;
 }
 
 // Tạo context với kiểu dữ liệu mặc định
@@ -24,13 +25,26 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<IUser | null>(null);
 
   const handleGetDetailUser = async (id: string, token: string) => {
     try {
       const response = await apiUser.getDetailUser(id, token);
       if (response?.status === "OK") {
-        setUser(response.data); // Lưu thông tin user vào state
+        setUser({
+          id: response.data.id,
+          email: response.data.email,
+          phone: response.data.phone,
+          avatar: response.data.avatar,
+          firstName: response.data.firstName,
+          lastName: response.data.lastName,
+          role: response.data.role,
+          bio: response.data.bio,
+          gender: response.data.gender,
+          dateOfBirth: response.data.dateOfBirth,
+          emergencyPhone: response.data.emergencyPhone,
+          address: response.data.address,
+        }); // Lưu thông tin user vào state
       } else {
         console.error("Failed to fetch user details:", response?.msg);
       }

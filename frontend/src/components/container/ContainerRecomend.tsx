@@ -1,8 +1,9 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
-
+import moment from "moment";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -11,13 +12,39 @@ import TitleContainer from "./TitleContainer";
 import RoomItemRecomend from "../room/RoomItemRecomend";
 import { IProperty } from "@/app/types/property";
 
-interface IProps {
-  properties: [];
+// interface IProps {
+//   properties: [];
+// }
+
+interface IData {
+  propertyId: string;
+  avgRating: string;
+  reviewCount: number;
+  image: string;
+  name: string;
+  advertising: number;
+  city: string;
+  price: string;
+  slug: string;
+  expiredAd: string;
 }
 
-const ContainerRecomend: React.FC<IProps> = ({ properties }) => {
+const ContainerRecomend = () => {
+  const [properties, setProperties] = useState<IData[]>([]);
+
+  useEffect(() => {
+    const storedData = localStorage.getItem("dataRecommend");
+    if (storedData) {
+      setProperties(JSON.parse(storedData));
+    }
+  }, []);
+
+  if (properties.length === 0) {
+    return <div></div>;
+  }
+
   return (
-    <div>
+    <div className="mt-8">
       <TitleContainer title="Đề xuất cho bạn" />
 
       <Swiper
@@ -32,17 +59,22 @@ const ContainerRecomend: React.FC<IProps> = ({ properties }) => {
         }}
         modules={[Navigation, Autoplay]}
       >
-        {properties?.map((item: IProperty, index: number) => (
+        {properties?.map((item: IData, index: number) => (
           <SwiperSlide key={index}>
             <RoomItemRecomend
               key={index}
-              images={item.images}
-              title={item.name}
-              price={item.price}
-              city={item?.propertyAddress?.city}
+              image={item?.image}
+              title={item?.name}
+              price={Number(item?.price)}
+              city={item?.city}
               quantityReview={item.reviewCount}
-              rating={item.averageRating || 0}
+              rating={item?.avgRating}
               slug={item.slug}
+              advertising={
+                moment(item.expiredAd) > moment()
+                  ? Number(item?.advertising)
+                  : 0
+              }
             />
           </SwiperSlide>
         ))}

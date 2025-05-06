@@ -11,6 +11,17 @@ const listTop10HomestayRating = async (req, res) => {
   }
 };
 
+const getPropertyIdByUserId = async (req, res) => {
+  try {
+    const response = await PropertyService.getPropertyIdByUserId(req.params.id);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
 const getDetailBySlug = async (req, res) => {
   try {
     const response = await PropertyService.getDetailBySlug(req.params.slug);
@@ -33,6 +44,30 @@ const getDetailProperyById = async (req, res) => {
   }
 };
 
+const getDetailProperyByUserId = async (req, res) => {
+  try {
+    const response = await PropertyService.getDetailProperyByUserId(
+      req.params.id
+    );
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
+const getListSearchText = async (req, res) => {
+  try {
+    const response = await PropertyService.getListSearchText(req.query.text);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
 const createProperty = async (req, res) => {
   try {
     const response = await PropertyService.createProperty(req.body);
@@ -46,7 +81,10 @@ const createProperty = async (req, res) => {
 
 const updateProperty = async (req, res) => {
   try {
-    const response = await PropertyService.updateProperty(req.params.id, req.body);
+    const response = await PropertyService.updateProperty(
+      req.params.id,
+      req.body
+    );
     return res.status(200).json(response);
   } catch (error) {
     return res.status(404).json({
@@ -54,7 +92,6 @@ const updateProperty = async (req, res) => {
     });
   }
 };
-
 
 const getListAmenityByPropertyId = async (req, res) => {
   try {
@@ -82,6 +119,41 @@ const getListHightlightByPropertyId = async (req, res) => {
   }
 };
 
+const getListProperty = async (req, res) => {
+  try {
+    const response = await PropertyService.getListProperty(req.query);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({
+      msg: `Error in controller: ${error.message || JSON.stringify(error)}`,
+    });
+  }
+};
+
+const getAdvertisingByPropertyId = async (req, res) => {
+  try {
+    const response = await PropertyService.getAdvertisingByPropertyId(
+      req.params.id
+    );
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
+const getTotalDashboard = async (req, res) => {
+  try {
+    const response = await PropertyService.getTotalDashboard(req.params.id);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
 module.exports = {
   // fetchFullData,
   createProperty,
@@ -91,4 +163,10 @@ module.exports = {
   getListAmenityByPropertyId,
   getListHightlightByPropertyId,
   updateProperty,
+  getListProperty,
+  getListSearchText,
+  getDetailProperyByUserId,
+  getPropertyIdByUserId,
+  getAdvertisingByPropertyId,
+  getTotalDashboard,
 };

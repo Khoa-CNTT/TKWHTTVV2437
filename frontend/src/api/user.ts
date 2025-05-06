@@ -1,7 +1,7 @@
 import http from "@/libs/http";
 
 const apiUser = {
-  sendOtpToEmail: (data: { email: string }) =>
+  sendOtpToEmail: (data: { email: string; status?: string }) =>
     http.post(`user/sendMailOTP`, data),
 
   verifyPassword: (data: { email: string; password: string }) =>
@@ -18,6 +18,10 @@ const apiUser = {
       headers: { token: `Bearer ${token}` },
     }),
 
+  updateUser: (id: string, token: string, data: object) =>
+    http.put(`user/updateUser?id=${id}`, data, {
+      headers: { token: `Bearer ${token}` },
+    }),
   resgister: (data: {
     email: string;
     firstName: string;

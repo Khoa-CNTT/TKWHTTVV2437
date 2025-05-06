@@ -141,19 +141,38 @@ const InforRoomCheckout: React.FC<IProps> = ({ property, room }) => {
           </div>
         </div>
 
-        <div className="mt-3 border-t-[1px] border-gray-300 pt-4 flex justify-between items-center">
-          <p className="font-semibold">Tổng</p>
-          <p className="text-lg font-semibold">
-            {startDate &&
-              endDate &&
-              room?.price &&
-              Number(
-                room?.price * Math.abs(startDate?.diff(endDate, "day"))
-              ).toLocaleString("it-IT", {
-                style: "currency",
-                currency: "VND",
-              })}
-          </p>
+        <div>
+          <div className="mt-3 border-t-[1px] border-gray-300 pt-4 flex justify-between items-center">
+            <p className="font-semibold">Tổng</p>
+            <p className="text-lg font-semibold">
+              {startDate &&
+                endDate &&
+                room?.price &&
+                Number(
+                  room?.price * Math.abs(startDate?.diff(endDate, "day"))
+                ).toLocaleString("it-IT", {
+                  style: "currency",
+                  currency: "VND",
+                })}
+            </p>
+          </div>
+
+          {/* <div className="mt-3 border-t-[1px] border-gray-300 pt-4 flex justify-between items-center">
+            <p className="font-semibold">Còn lại</p>
+            <p className="text-lg font-semibold">
+              {startDate &&
+                endDate &&
+                room?.price &&
+                room?.deposit !== null &&
+                Number(
+                  room?.price * Math.abs(startDate?.diff(endDate, "day")) -
+                    Number(room?.deposit)
+                ).toLocaleString("it-IT", {
+                  style: "currency",
+                  currency: "VND",
+                })}
+            </p>
+          </div> */}
         </div>
       </div>
     </div>

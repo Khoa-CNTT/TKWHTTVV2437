@@ -1,6 +1,7 @@
 const db = require("../models");
 const bcrypt = require("bcrypt");
 const { Op } = require("sequelize");
+import moment from "moment";
 import { v4 } from "uuid";
 const { generalAccessToken, generalRefreshToken } = require("./JwtService");
 const generateOTP = require("../utils/generateOTP");
@@ -125,12 +126,23 @@ const detailUser = (id) => {
 const updateUser = (id, payload) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const respone = await db.User.update(
-        { ...payload },
-        {
-          where: { id: id },
-        }
-      );
+      const { password } = payload;
+      let respone;
+      if (password) {
+        respone = await db.User.update(
+          { password: hashPassword(password) },
+          {
+            where: { id: id },
+          }
+        );
+      } else {
+        respone = await db.User.update(
+          { ...payload },
+          {
+            where: { id: id },
+          }
+        );
+      }
 
       resolve({
         status: respone[0] > 0 ? "OK" : "ERR",
@@ -142,7 +154,7 @@ const updateUser = (id, payload) => {
   });
 };
 
-const sendMailOTP = (email) => {
+const sendMailOTP = (email, status) => {
   return new Promise(async (resolve, reject) => {
     try {
       const OTP = generateOTP();
@@ -227,6 +239,13 @@ const sendMailOTP = (email) => {
         html: html,
       });
 
+      if (status) {
+        resolve({
+          status: "OK",
+          msg: "Account is exist",
+          isExist: true,
+        });
+      }
       const checkUser = await db.User.findOne({
         where: { email },
         raw: true,
@@ -253,7 +272,10 @@ const sendMailOTP = (email) => {
 const verifyOTP = (email, OTP) => {
   return new Promise(async (resolve, reject) => {
     try {
-      console.log("oooopp");
+      console.log(email);
+      console.log(OTP);
+      console.log("oooopp123123123");
+
       console.log(otpStore);
       if (
         otpStore[email] &&
@@ -315,6 +337,148 @@ const verifyOTPLogin = (email, OTP) => {
     }
   });
 };
+
+const getTotalUserForAdminDashboard = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const totalUser = await db.User.count({
+        where: { role: "3" },
+      });
+
+      const totalProperty = await db.User.count({
+        where: { role: "7" },
+      });
+
+      resolve({
+        status: "OK",
+        data: { totalUser, totalProperty },
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const getDataLineChartUserAdmin = (filter) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { type } = filter;
+      const labels = [];
+      const dataUser = [];
+      const dataProperty = [];
+
+      if (type === "day") {
+        // Tạo mảng các ngày cần truy vấn trước
+        const dateRanges = [];
+        for (let i = 14; i >= 0; i--) {
+          const date = new Date();
+          date.setDate(date.getDate() - i);
+          const startDate = new Date(date.setHours(0, 0, 0, 0));
+          const endDate = new Date(date.setHours(23, 59, 59, 999));
+          labels.push(moment(date).format("DD/MM"));
+          dateRanges.push({ startDate, endDate });
+        }
+
+        // Sử dụng Promise.all để chạy song song các truy vấn
+        const queries = dateRanges.map(async ({ startDate, endDate }) => {
+          const [totalUser, totalProperty] = await Promise.all([
+            db.User.count({
+              where: {
+                role: "3",
+                createdAt: {
+                  [Op.between]: [startDate, endDate],
+                },
+              },
+            }),
+            db.User.count({
+              where: {
+                role: "7",
+                createdAt: {
+                  [Op.between]: [startDate, endDate],
+                },
+              },
+            }),
+          ]);
+          return { totalUser, totalProperty };
+        });
+
+        const results = await Promise.all(queries);
+        results.forEach(({ totalUser, totalProperty }) => {
+          dataUser.push(totalUser);
+          dataProperty.push(totalProperty);
+        });
+      } else if (type === "month") {
+        for (let i = 11; i >= 0; i--) {
+          const date = new Date();
+          date.setMonth(date.getMonth() - i);
+          const startDate = new Date(date.getFullYear(), date.getMonth(), 1);
+          const endDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+          labels.push(moment(date).format("MM/YYYY"));
+          const [totalUser, totalProperty] = await Promise.all([
+            db.User.count({
+              where: {
+                role: "3",
+                createdAt: {
+                  [Op.between]: [startDate, endDate],
+                },
+              },
+            }),
+            db.User.count({
+              where: {
+                role: "7",
+                createdAt: {
+                  [Op.between]: [startDate, endDate],
+                },
+              },
+            }),
+          ]);
+          dataUser.push(totalUser);
+          dataProperty.push(totalProperty);
+        }
+      } else if (type === "year") {
+        for (let i = 9; i >= 0; i--) {
+          const date = new Date();
+          date.setFullYear(date.getFullYear() - i);
+          const startDate = new Date(date.getFullYear(), 0, 1);
+          const endDate = new Date(date.getFullYear(), 11, 31);
+          labels.push(moment(date).format("YYYY"));
+          const [totalUser, totalProperty] = await Promise.all([
+            db.User.count({
+              where: {
+                role: "3",
+                createdAt: {
+                  [Op.between]: [startDate, endDate],
+                },
+              },
+            }),
+            db.User.count({
+              where: {
+                role: "7",
+                createdAt: {
+                  [Op.between]: [startDate, endDate],
+                },
+              },
+            }),
+          ]);
+          dataUser.push(totalUser);
+          dataProperty.push(totalProperty);
+        }
+      }
+
+      resolve({
+        status: "OK",
+        data: {
+          labels: labels, // Đảo ngược để hiển thị từ cũ đến mới
+          dataUser: dataUser,
+          dataProperty: dataProperty,
+        },
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   registerUser,
   signInUser,
@@ -323,4 +487,6 @@ module.exports = {
   sendMailOTP,
   verifyOTP,
   verifyOTPLogin,
+  getTotalUserForAdminDashboard,
+  getDataLineChartUserAdmin,
 };

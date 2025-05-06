@@ -15,7 +15,7 @@ const validate = (
   const formatPayload = Object.entries(payload);
 
   for (const arr of formatPayload) {
-    if (arr[1].trim() === "") {
+    if (arr[1].trim() === "" || arr[1].trim() === null) {
       invalids++;
       setInvalidFields((prev) => [
         ...prev,
@@ -25,6 +25,7 @@ const validate = (
   }
 
   let pass: string | undefined;
+  let email: string | undefined;
   for (const arr of formatPayload) {
     switch (arr[0]) {
       case "email":
@@ -35,8 +36,20 @@ const validate = (
             ...prev,
             { name: arr[0], mes: "Email không đúng định dạng" },
           ]);
+        } else {
+          email = arr[1];
         }
         break;
+      case "confirmEmail":
+        if (arr[1] !== email) {
+          invalids++;
+          setInvalidFields((prev) => [
+            ...prev,
+            { name: arr[0], mes: "Không giống email" },
+          ]);
+        }
+        break;
+
       case "phone":
         const regex = /(()|0)(3|5|7|8|9)+([0-9]{8})\b/;
         if (!regex.test(arr[1])) {

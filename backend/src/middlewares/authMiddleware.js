@@ -28,7 +28,7 @@ const authAdminMiddleware = (req, res, next) => {
         });
       }
 
-      if (user?.role === "1") {
+      if (user?.role === "Admin") {
         req.user = user; 
         next(); 
       } else {

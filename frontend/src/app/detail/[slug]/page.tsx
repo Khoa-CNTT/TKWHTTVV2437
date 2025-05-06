@@ -1,11 +1,8 @@
-
 import { IoLocationSharp } from "react-icons/io5";
-import { FaChevronRight } from "react-icons/fa";
 import { CiLogin } from "react-icons/ci";
 import { CiLogout } from "react-icons/ci";
 import { MdPets } from "react-icons/md";
 import { RiErrorWarningLine } from "react-icons/ri";
-import ContainerRecomend from "@/components/container/ContainerRecomend";
 import { FaPerson } from "react-icons/fa6";
 import HighlightProperty from "@/components/container/HighlightProperty";
 import ReviewContainer from "@/components/container/ReviewContainer";
@@ -14,10 +11,11 @@ import apisReview from "@/apis/review";
 import { ratingText } from "@/helper/ratingText";
 import AnmenityContainer from "@/components/container/AmenityContainer";
 import ListRoomContainer from "@/components/container/ListRoomContainer";
-import apisRoom from "@/apis/room";
 import ChooseDateContainer from "@/components/container/ChooseDateContainer";
 import ShowDescriptionEditext from "@/components/content/ShowDescriptionEditText";
-import { IRoom } from "@/app/types/room";
+import ContainerRecomendCity from "@/components/container/ContainerRecomendCity";
+import { IProperty } from "@/app/types/property";
+import ViewReviewButton from "@/components/button/ViewReviewButton";
 
 interface IProps {
   params: { slug: string };
@@ -33,7 +31,10 @@ const DetailPage = async (props: IProps) => {
 
   const property = await apisProperty.getPropertyBySlug(params.slug);
   const rating = await apisReview.getReviewByProperty(property.data.id);
-  const properties = await apisProperty.getListTop10Rating();
+  const reviews = await apisReview.getListReviewByPropertyId(property.data.id);
+  const properties = await apisProperty.getListProperty({
+    city: property.data.propertyAddress.city,
+  });
 
   return (
     <div className="pt-4 w-[1260px] mx-auto">
@@ -78,16 +79,23 @@ const DetailPage = async (props: IProps) => {
               </span>
             </div>
 
-            <div className="flex items-center gap-2 mt-2 text-blue-600 text-sm cursor-pointer">
-              <span>Xem tất cả đánh giá</span>
-              <FaChevronRight />
-            </div>
+            <ViewReviewButton
+              propertyId={property.data.id}
+              avgRating={rating.data.averageRating || 0.0}
+              reviewCount={rating.data.reviewCount}
+              image={property.data.images[0].image}
+              name={property.data.name}
+              advertising={property.data.advertising}
+              city={property.data.propertyAddress.city}
+              price={property.data.price}
+              slug={property.data.slug}
+            />
           </div>
 
           <div className="mt-4">
             <ShowDescriptionEditext description={property.data.description} />
           </div>
-          
+
           <div>
             <h5 className="mt-4 font-semibold text-lg">
               Các tiện nghi được ưa chuộng nhất
@@ -98,9 +106,7 @@ const DetailPage = async (props: IProps) => {
           <div>
             <h5 className="mt-8 font-semibold text-lg">Thông tin phòng</h5>
             <ChooseDateContainer />
-              <ListRoomContainer
-                propertyId={property.data.id}
-              />
+            <ListRoomContainer propertyId={property.data.id} />
           </div>
 
           <div className="mt-8">
@@ -161,43 +167,52 @@ const DetailPage = async (props: IProps) => {
         </div>
         <div className="flex-3 ralative">
           <div className="sticky top-0">
-            <HighlightProperty highlights={property.data.highlights}/>
+            <HighlightProperty highlights={property.data.highlights} />
           </div>
         </div>
       </div>
 
-      <div className="mt-4 p-4">
-        <h4 className="font-semibold text-xl">Đánh giá</h4>
+      {reviews?.data?.length > 0 && (
+        <div className="mt-4 p-4">
+          <h4 className="font-semibold text-xl">Đánh giá</h4>
 
-        <div>
-          <div className="mt-4">
-            <p className="text-4xl text-green-700 font-semibold">
-              {rating.data.averageRating || 0}/10
-            </p>
-            <p className="font-semibold">
-              {ratingText(rating.data.averageRating)}
-            </p>
-            <div className="flex items-center gap-2 mt-2 text-sm font-medium text-gray-600">
-              <p>{rating.data.reviewCount} Reviews</p>
-              <RiErrorWarningLine />
+          <div>
+            <div className="mt-4">
+              <p className="text-4xl text-green-700 font-semibold">
+                {rating.data.averageRating || 0}/5
+              </p>
+              <p className="font-semibold">
+                {ratingText(rating.data.averageRating)}
+              </p>
+              <div className="flex items-center gap-2 mt-2 text-sm font-medium text-gray-600">
+                <p>{rating.data.reviewCount} Reviews</p>
+                <RiErrorWarningLine />
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <ReviewContainer
+                reviews={reviews.data}
+                propertyId={property.data.id}
+                avgRating={rating.data.averageRating}
+                reviewCount={rating.data.reviewCount}
+              />
             </div>
           </div>
-
-          <div className="mt-4">
-            <ReviewContainer />
-          </div>
-
-          <div className="flex justify-center mt-4">
-            <button className="border-[1px] border-gray-400 rounded-3xl py-2 px-5 text-blue-600 font-semibold">
-              See more reviews
-            </button>
-          </div>
         </div>
-      </div>
+      )}
 
-      <div className="mt-8">
-        <ContainerRecomend properties={properties.data} />
-      </div>
+      {properties?.data?.filter(
+        (item: IProperty) => item.id !== property?.data?.id
+      ).length > 0 && (
+        <div className="mt-8">
+          <ContainerRecomendCity
+            properties={properties?.data?.filter(
+              (item: IProperty) => item?.id !== property?.data?.id
+            )}
+          />
+        </div>
+      )}
     </div>
   );
 };

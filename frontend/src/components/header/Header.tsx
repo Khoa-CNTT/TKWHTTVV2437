@@ -9,14 +9,13 @@ import {
   CiPen,
   CiLogout,
 } from "react-icons/ci";
-
+import { GiAirplaneDeparture } from "react-icons/gi";
 const Header = () => {
   const router = useRouter();
   const { user } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -60,11 +59,20 @@ const Header = () => {
   const handleNavagateAccount = () => {
     router.push("/account");
   };
+
+  const handleMytrip = () => {
+    router.push("/mytrip");
+  };
   const menu = [
     {
       title: "Thông tin cá nhân",
       icon: <CiUser />,
       handle: handleNavagateAccount,
+    },
+    {
+      title: "Chuyến đi của tôi",
+      icon: <GiAirplaneDeparture />,
+      handle: handleMytrip,
     },
     {
       title: "Đặt chuyến đi",

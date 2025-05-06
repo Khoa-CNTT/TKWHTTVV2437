@@ -10,6 +10,7 @@ import { IProperty } from "@/app/types/property";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import moment from "moment";
 
 interface IProps {
   properties: [];
@@ -47,6 +48,11 @@ const ContainerRoom: React.FC<IProps> = ({ properties }) => {
                 quantityReview={item.reviewCount}
                 rating={item.averageRating || 0}
                 slug={item.slug}
+                advertising={
+                  moment(item.expiredAd) > moment()
+                    ? Number(item?.advertising)
+                    : 0
+                }
               />
             </SwiperSlide>
           ))}

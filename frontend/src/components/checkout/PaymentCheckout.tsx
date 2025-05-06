@@ -11,6 +11,10 @@ interface IDataEnter {
   phone: string;
   message: string;
   imageBanking: string | null;
+  total?: number | null;
+  nameAccount: string;
+  numberAccount: string;
+  nameBank: string;
 }
 interface IProps {
   handleStep1: () => void;
@@ -58,7 +62,7 @@ const PaymentCheckout = ({
 
   const handleCreateResservaiton = async (data: object) => {
     const respon = await apiReservation.createReservation(data);
-    console.log("res ", respon);
+
     if (respon?.status === "OK") {
       router.push(`/checkout?status=success`);
     } else {
@@ -171,7 +175,7 @@ const PaymentCheckout = ({
             <p className="text-[-14]">Trở lại</p>
           </button>
           <button
-            className="text-white font-semibold bg-blue-600 px-20 py-3 rounded-3xl mt-8 hover:bg-blue-700 transition duration-300 ease-in-out"
+            className="text-white font-semibold bg-blue-600 px-20 py-3 rounded-3xl mt-8 hover:bg-blue-700 transition duration-300 ease-in-out "
             onClick={() => {
               handleCreateResservaiton(infoPayment);
             }}

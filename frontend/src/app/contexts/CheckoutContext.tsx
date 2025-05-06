@@ -21,29 +21,36 @@ interface CheckoutType {
 // Tạo context với giá trị mặc định
 const CheckoutContext = createContext<CheckoutType | undefined>(undefined);
 
-// Tạo provider component
 export function CheckoutProvider({ children }: { children: ReactNode }) {
-  const [propertyId, setPropertyId] = useState<string | number | null>(
-    localStorage.getItem("propertyId") || ""
-  );
-  const [startDate, setStartDate] = useState<Dayjs | null>(
-    localStorage.getItem("startDate")
-      ? dayjs(localStorage.getItem("startDate"))
-      : dayjs(new Date())
-  );
+  // Initialize state with null or default values
+  const [propertyId, setPropertyId] = useState<string | number | null>(null);
+  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs(new Date()));
   const [endDate, setEndDate] = useState<Dayjs | null>(
-    localStorage.getItem("endDate")
-      ? dayjs(localStorage.getItem("endDate"))
-      : dayjs(new Date().setDate(new Date().getDate() + 2))
+    dayjs(new Date().setDate(new Date().getDate() + 2))
   );
+  const [roomId, setRoomId] = useState<string>("");
 
-  const [roomId, setRoomId] = useState<string>(
-    localStorage.getItem("roomId") || ""
-  );
-
-  // Lưu giá trị vào localStorage khi thay đổi
+  // Use useEffect to read from localStorage after component mounts (client-side)
   useEffect(() => {
-    localStorage.setItem("propertyId", propertyId as string);
+    setPropertyId(localStorage.getItem("propertyId") || "");
+    setRoomId(localStorage.getItem("roomId") || "");
+
+    const storedStartDate = localStorage.getItem("startDate");
+    if (storedStartDate) {
+      setStartDate(dayjs(storedStartDate));
+    }
+
+    const storedEndDate = localStorage.getItem("endDate");
+    if (storedEndDate) {
+      setEndDate(dayjs(storedEndDate));
+    }
+  }, []);
+
+  // Save to localStorage when values change
+  useEffect(() => {
+    if (propertyId !== null) {
+      localStorage.setItem("propertyId", propertyId as string);
+    }
   }, [propertyId]);
 
   useEffect(() => {
@@ -61,6 +68,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
       localStorage.setItem("endDate", endDate.toISOString());
     }
   }, [endDate]);
+
   return (
     <CheckoutContext.Provider
       value={{
@@ -78,7 +86,6 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
     </CheckoutContext.Provider>
   );
 }
-
 // Hook tùy chỉnh để sử dụng context
 export function useCheckoutContext() {
   const context = useContext(CheckoutContext);

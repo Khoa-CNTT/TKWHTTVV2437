@@ -13,7 +13,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "idProperty", // Khóa ngoại trong bảng imageRoom
         as: "rooms", // Alias để truy cập
       });
-
+      Property.belongsTo(models.Category, {
+        foreignKey: "idCategory", // Khóa ngoại trỏ đến Category
+        as: "category",
+      });
       Property.hasMany(models.ImageProperty, {
         foreignKey: "idProperty", // Khóa ngoại trong bảng imageRoom
         as: "images", // Alias để truy cập
@@ -24,9 +27,16 @@ module.exports = (sequelize, DataTypes) => {
         as: "reviews", // Alias để truy cập
       });
 
-      Property.belongsTo(models.City, {
-        foreignKey: "idCity", // Khóa ngoại trong bảng imageRoom
-        as: "city", // Alias để truy cập
+      // Property.belongsTo(models.Address, {
+      //   foreignKey: "idAddress", // Khóa ngoại trong bảng Property
+      //   as: "address", // Alias để truy cập
+      // });
+
+      Property.belongsToMany(models.Highlight, {
+        through: "HighlightProperty", // Tên bảng trung gian
+        foreignKey: "idProperty", // Khóa ngoại trong bảng trung gian trỏ đến Room
+        otherKey: "idHighlight", // Khóa ngoại trong bảng trung gian trỏ đến Amenity
+        as: "highlights", // Alias để truy cập
       });
 
       Property.belongsToMany(models.Amenity, {
@@ -36,16 +46,14 @@ module.exports = (sequelize, DataTypes) => {
         as: "amenities", // Alias để truy cập
       });
 
-      Property.belongsToMany(models.Highlight, {
-        through: "HighlightProperty", // Tên bảng trung gian
-        foreignKey: "idProperty", // Khóa ngoại trong bảng trung gian trỏ đến Room
-        otherKey: "idHighlight", // Khóa ngoại trong bảng trung gian trỏ đến Amenity
-        as: "highlights", // Alias để truy cập
-      });
-
       Property.hasOne(models.Address, {
         foreignKey: "idProperty", // Khóa ngoại trong bảng imageRoom
         as: "propertyAddress", // Alias để truy cập
+      });
+
+      Property.belongsTo(models.Advertising, {
+        foreignKey: "idAdvertising", // Khóa ngoại trong bảng imageRoom
+        as: "advertisingDetail", // Alias để truy cập
       });
     }
   }
@@ -53,15 +61,19 @@ module.exports = (sequelize, DataTypes) => {
     {
       idUser: DataTypes.STRING,
       idCategory: DataTypes.STRING,
-      idCity: DataTypes.STRING,
       name: DataTypes.STRING,
       description: DataTypes.STRING,
-      address: DataTypes.STRING,
+      // address: DataTypes.STRING,
       slug: DataTypes.STRING,
+      advertising: DataTypes.INTEGER,
+      expiredAd: DataTypes.DATE,
+      idAdvertising: DataTypes.STRING,
+      payCommissionAt: DataTypes.DATE,
     },
     {
       sequelize,
       modelName: "Property",
+      tableName: "Properties",
     }
   );
   return Property;
