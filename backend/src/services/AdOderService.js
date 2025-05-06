@@ -7,9 +7,13 @@ const moment = require("moment");
 const createAdOrder = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
+<<<<<<< HEAD
       const { amount, idAdvertising, idUser, methodPay, quantity, idProperty } =
         data;
       console.log({ idProperty });
+=======
+      const { amount, idAdvertising, idUser, methodPay, quantity } = data;
+>>>>>>> da0995d0fff9c3c377293326424c4fdd71e76309
       const adOrder = await db.AdOrder.create({
         id: v4(),
         amount: amount,
