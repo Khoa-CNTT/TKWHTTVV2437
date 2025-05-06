@@ -10,9 +10,14 @@ import {
   FaCheckCircle,
   FaWpforms,
 } from "react-icons/fa";
+import { RiAdvertisementFill } from "react-icons/ri";
+import { FaPersonBreastfeeding } from "react-icons/fa6";
+import clsx from "clsx";
+import { usePathname } from "next/navigation";
 
 const SidebarAdmin = () => {
   const router = useRouter();
+  const pathname = usePathname();
 
   const menuItems = [
     {
@@ -55,6 +60,16 @@ const SidebarAdmin = () => {
       icon: <FaMoneyBill />,
       path: "/admin/Payment",
     },
+    {
+      title: "Thanh toán hoa hồng",
+      icon: <FaPersonBreastfeeding />,
+      path: "/admin/commission",
+    },
+    {
+      title: "Đăng ký quảng cáo",
+      icon: <RiAdvertisementFill />,
+      path: "/admin/advertising",
+    },
   ];
 
   return (
@@ -66,7 +81,12 @@ const SidebarAdmin = () => {
         {menuItems.map((item, index) => (
           <li
             key={index}
-            className="flex items-center gap-3 font-medium px-4 py-3 rounded-md cursor-pointer hover:bg-gray-200"
+            className={clsx(
+              "mt-1 text-sm font-medium px-4 py-3 rounded-md cursor-pointer flex gap-3",
+              pathname === item.path
+                ? "bg-blue-700 text-white" // Active link styles
+                : "hover:bg-gray-200"
+            )}
             onClick={() => router.push(item.path)}
           >
             <span className="text-lg">{item.icon}</span>

@@ -119,6 +119,7 @@ const MyAdvertisingItem: React.FC<IProps> = ({ advertisings }) => {
               type: advertising?.advertisingDetail?.type,
               id: advertising?.advertisingDetail?.id,
             }}
+            propertyId={propertyId}
           />
         ))}
       </div>

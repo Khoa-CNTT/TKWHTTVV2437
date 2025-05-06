@@ -9,6 +9,20 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      AdOrder.belongsTo(models.Property, {
+        foreignKey: "idProperty",
+        as: "property",
+      });
+
+      AdOrder.belongsTo(models.Advertising, {
+        foreignKey: "idAdvertising",
+        as: "advertising",
+      });
+
+      AdOrder.belongsTo(models.User, {
+        foreignKey: "idUser",
+        as: "user",
+      });
     }
   }
   AdOrder.init(
@@ -19,6 +33,7 @@ module.exports = (sequelize, DataTypes) => {
       methodPay: DataTypes.STRING,
       quantity: DataTypes.INTEGER,
       status: DataTypes.STRING,
+      idProperty: DataTypes.STRING,
     },
     {
       sequelize,

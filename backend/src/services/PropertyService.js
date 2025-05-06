@@ -56,6 +56,7 @@ const listTop10HomestayRating = () => {
             model: db.Room,
             as: "rooms", // Alias được định nghĩa trong `Room.associate`
             attributes: [], // Không lấy các cột từ bảng Review
+            required: true,
           },
         ],
         group: ["Property.id"], // Nhóm theo Room và các bảng liên kết
@@ -74,11 +75,17 @@ const listTop10HomestayRating = () => {
   });
 };
 
-
-const getListProperty = (filter, limit = 12, page = 1) => {
+const getListProperty = (filter, limit = 12) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { minPrice, maxPrice, amenities, city, category } = filter;
+      const {
+        minPrice,
+        maxPrice,
+        amenities,
+        city,
+        category,
+        page = 1,
+      } = filter;
 
       // Tính toán offset cho phân trang
       const offset = (page - 1) * limit;
@@ -176,6 +183,7 @@ const getListProperty = (filter, limit = 12, page = 1) => {
             model: db.Room,
             as: "rooms",
             attributes: [],
+            required: true,
           },
           {
             model: db.Amenity,
@@ -355,7 +363,10 @@ const createProperty = (data) => {
         { images: images },
       ];
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> main
       // Chuẩn bị dữ liệu cho embedding - FIX: Tạo đúng định dạng cho saveEmbedding
       const propertyData = {
         id: property.id,

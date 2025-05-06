@@ -29,6 +29,20 @@ const apisAdOrder = {
 
     return response.json();
   },
+  getListAdOrderByAdmin: async (query: Record<string, string | number>) => {
+    const queryString = new URLSearchParams(
+      query as Record<string, string>
+    ).toString();
+    const response = await fetch(
+      `${process.env.URL_SERVER_API}/ad-order/get-list-ad-order-by-admin?${queryString}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
+
+    return response.json();
+  },
 };
 
 export default apisAdOrder;

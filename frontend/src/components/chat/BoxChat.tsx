@@ -1,8 +1,14 @@
+"use client";
+
 import { IoClose } from "react-icons/io5";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AiOutlineSend } from "react-icons/ai";
 import clsx from "clsx";
 import { RiRobot2Line } from "react-icons/ri";
+import apisChatBot from "@/apis/chatbot";
+import { v4 as uuidv4 } from "uuid";
+
+// uuidv4()
 
 interface IProps {
   onSetBox: (value: boolean) => void;
@@ -23,15 +29,51 @@ const BoxChat: React.FC<IProps> = ({ onSetBox }) => {
     },
   ]);
   const [inputValue, setInputValue] = useState<string>("");
-
-  const handleSendMessage = () => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null); // Thêm ref
+  const handleSendMessage = async () => {
     if (inputValue.trim()) {
       setMessages((prev) => [
         ...prev,
         { id: prev.length + 1, text: inputValue, sender: "user" },
       ]);
       setInputValue("");
+
+      setMessages((prev) => [
+        ...prev,
+        { id: prev.length + 1, text: "", sender: "bot" },
+      ]);
+
+      let response;
+      try {
+        setLoading(true);
+
+        response = await apisChatBot.getMessage(inputValue.trim(), uuidv4());
+        setLoading(false);
+      } catch (e) {
+        console.log("error", e);
+        setLoading(false);
+      }
+
+      if (response?.answer) {
+        setMessages((prev) =>
+          prev.map((message) =>
+            message.id === prev.length
+              ? { ...message, text: response.answer } // Cập nhật thuộc tính text (giữ nguyên các thuộc tính khác)
+              : message
+          )
+        );
+      }
     }
+  };
+
+  // Thêm useEffect để scroll xuống dưới cùng khi messages thay đổi
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -48,29 +90,44 @@ const BoxChat: React.FC<IProps> = ({ onSetBox }) => {
           className="hover:opacity-80"
         />
       </div>
-      <div className="flex-1 overflow-y-auto px-4">
+
+      <div className="flex-1 overflow-y-auto px-4 pb-4">
         {/* Chat messages will go here */}
         <ul>
           {messages.map((message, index) => (
             <li key={index} className="mt-2 flex items-center gap-2">
               {message.sender === "bot" && (
-                <RiRobot2Line className="text-black" size={25} />
+                <div className="flex items-center gap-2">
+                  <RiRobot2Line className="text-black" size={25} />
+                  {loading && message.text.length === 0 && (
+                    <div className="flex gap-2">
+                      <div className="w-2 h-2 rounded-full animate-pulse bg-blue-600"></div>
+                      <div className="w-2 h-2 rounded-full animate-pulse bg-blue-600"></div>
+                      <div className="w-2 h-2 rounded-full animate-pulse bg-blue-600"></div>
+                    </div>
+                  )}
+                </div>
               )}
-              <span
-                className={clsx(
-                  "bg-blue-700 max-w-[70%] block px-4 py-2 rounded-md break-words",
-                  {
-                    "bg-gray-200 text-black": message.sender === "bot", // Tin nhắn từ bot
-                    "bg-blue-700 text-white ml-auto": message.sender === "user", // Tin nhắn từ user
-                  }
-                )}
-              >
-                {message.text}
-              </span>
+              {message.text.length > 0 && (
+                <span
+                  className={clsx(
+                    "bg-blue-700 max-w-[70%] block px-4 py-2 rounded-md break-words",
+                    {
+                      "bg-gray-200 text-black": message.sender === "bot", // Tin nhắn từ bot
+                      "bg-blue-700 text-white ml-auto":
+                        message.sender === "user", // Tin nhắn từ user
+                    }
+                  )}
+                >
+                  {message.text}
+                </span>
+              )}
             </li>
           ))}
         </ul>
+        <div ref={messagesEndRef} />
       </div>
+
       <div className="p-4 border-t relative">
         <input
           type="text"
