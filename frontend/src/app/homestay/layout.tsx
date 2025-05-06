@@ -16,8 +16,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`font-roboto antialiased `}>
-        <Header />
+      <div className={`font-roboto antialiased `}>
+        {/* <Header /> */}
         <div className="flex w-full">
           <div className="w-[20%] min-h-screen bg-gray-100 shadow-md py-4 px-2">
             <SidebarHomestayOwner />
@@ -27,7 +27,8 @@ export default function RootLayout({
             {children} <ToastContainer position="top-right" autoClose={3000} />
           </div>
         </div>
-      </body>
+      </div>
+      //{" "}
     </html>
   );
 }

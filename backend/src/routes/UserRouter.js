@@ -15,5 +15,10 @@ router.post("/log-out", userController.logOutUser);
 router.post("/refresh-token", userController.refreshToken);
 router.get("/detail-user/:id", authUserMiddleWare, userController.detailUser);
 router.put("/updateUser", authUserMiddleWare, userController.updateUser);
+router.get(
+  "/total-dashboard-admin",
+  userController.getTotalUserForAdminDashboard
+);
+router.get("/data-line-chart-admin", userController.getDataLineChartUserAdmin);
 
 module.exports = router;

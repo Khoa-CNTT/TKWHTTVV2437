@@ -15,6 +15,8 @@ import apisReservation from "@/apis/reservation";
 import { useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import clsx from "clsx";
 
 interface ITotal {
   review: { averageRating: string };
@@ -65,7 +67,7 @@ const chartOptions = {
   plugins: {
     title: {
       display: true,
-      text: "Báo cáo doanh thu theo tháng",
+      text: "Báo cáo doanh thu",
     },
   },
 };
@@ -76,6 +78,7 @@ const Dashboard = () => {
   const [total, setTotal] = useState<ITotal>();
   const searchParams = useSearchParams(); // Lấy query từ URL
   const router = useRouter();
+  const [type, setType] = useState<string>("month");
 
   const [barChart, setBarChart] = useState<IBarChar>(chartData);
 
@@ -106,7 +109,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetDataBarChart = async () => {
       const response = await apisReservation.getDataBarChart(propertyId, {
-        type: "month",
+        type: type,
       });
 
       setBarChart({
@@ -124,7 +127,7 @@ const Dashboard = () => {
     };
 
     fetDataBarChart();
-  }, [propertyId]);
+  }, [propertyId, type]);
 
   useEffect(() => {
     const status = searchParams.get("status");
@@ -197,6 +200,37 @@ const Dashboard = () => {
             </div>
 
             <div className="mt-8 w-full">
+              <div className="flex justify-end">
+                <ul className="flex items-center gap-4 font-semibold">
+                  <li
+                    className={clsx(
+                      "cursor-pointer",
+                      type === "month" ? "text-blue-600" : "text-gray-500"
+                    )}
+                    onClick={() => setType("month")}
+                  >
+                    Tháng
+                  </li>
+                  <li
+                    className={clsx(
+                      "cursor-pointer",
+                      type === "quarter" ? "text-blue-600" : "text-gray-500"
+                    )}
+                    onClick={() => setType("quarter")}
+                  >
+                    Quý
+                  </li>
+                  <li
+                    className={clsx(
+                      "cursor-pointer",
+                      type === "year" ? "text-blue-600" : "text-gray-500"
+                    )}
+                    onClick={() => setType("year")}
+                  >
+                    Năm
+                  </li>
+                </ul>
+              </div>
               <BarChartContainer data={barChart} options={chartOptions} />
             </div>
 

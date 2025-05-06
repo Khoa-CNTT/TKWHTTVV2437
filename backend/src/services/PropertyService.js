@@ -3,6 +3,7 @@ const { fn, col, Op, where } = require("sequelize");
 const { v4 } = require("uuid");
 const slugify = require("slugify");
 const hightlightProperty = require("../models/hightlightProperty");
+const { saveEmbedding } = require("./queryService");
 const { sequelize } = require("../models");
 const moment = require("moment");
 const reviewService = require("./ReviewService");
@@ -54,6 +55,7 @@ const listTop10HomestayRating = () => {
             model: db.Room,
             as: "rooms", // Alias được định nghĩa trong `Room.associate`
             attributes: [], // Không lấy các cột từ bảng Review
+            required: true,
           },
         ],
         group: ["Property.id"], // Nhóm theo Room và các bảng liên kết
@@ -72,10 +74,17 @@ const listTop10HomestayRating = () => {
   });
 };
 
-const getListProperty = (filter, limit = 12, page = 1) => {
+const getListProperty = (filter, limit = 12) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { minPrice, maxPrice, amenities, city, category } = filter;
+      const {
+        minPrice,
+        maxPrice,
+        amenities,
+        city,
+        category,
+        page = 1,
+      } = filter;
 
       // Tính toán offset cho phân trang
       const offset = (page - 1) * limit;
@@ -173,6 +182,7 @@ const getListProperty = (filter, limit = 12, page = 1) => {
             model: db.Room,
             as: "rooms",
             attributes: [],
+            required: true,
           },
           {
             model: db.Amenity,
@@ -284,6 +294,15 @@ const getListSearchText = (text) => {
 const createProperty = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
+      // Kiểm tra dữ liệu đầu vào cơ bản
+      if (!data.name || !data.description || !data.idUser || !data.categoryId) {
+        return reject({
+          status: "ERR",
+          message: "Missing required property information",
+        });
+      }
+
+      // Tạo property
       const property = await db.Property.create({
         id: v4(),
         name: data.name,
@@ -291,11 +310,12 @@ const createProperty = (data) => {
         idUser: data.userId,
         idCategory: data.categoryId,
         slug: slugify(data.name, {
-          lower: true, // chuyển thành chữ thường
-          strict: true, // bỏ các ký tự đặc biệt
+          lower: true,
+          strict: true,
         }),
       });
 
+      // Tạo address
       const address = await db.Address.create({
         id: v4(),
         idProperty: property.id,
@@ -309,9 +329,10 @@ const createProperty = (data) => {
         }),
       });
 
+      // Tạo images
       const images = await db.ImageProperty.bulkCreate(
         data.images.map((item) => ({
-          id: item.id,
+          id: item.id || v4(),
           idProperty: property.id,
           image: item.image,
         }))
@@ -339,15 +360,52 @@ const createProperty = (data) => {
         { images: images },
       ];
 
+      // Chuẩn bị dữ liệu cho embedding - FIX: Tạo đúng định dạng cho saveEmbedding
+      const propertyData = {
+        id: property.id,
+        name: property.name,
+        description: property.description,
+        slug: property.slug,
+        address: {
+          street: address.street,
+          district: address.district,
+          city: address.city,
+          country: address.country,
+        },
+        images: images.map((img) => ({
+          id: img.id,
+          image: img.image,
+        })),
+        amenities: amenities.map((am) => am.idAmenity),
+        highlights: highlights.map((hl) => hl.idHighlight),
+      };
+
+      try {
+        // Thực hiện embedding sau khi đã tạo dữ liệu - FIX: truyền đúng định dạng
+        const embeddingResult = await saveEmbedding("hotel", propertyData);
+        console.log("Embedding result:", embeddingResult);
+      } catch (embeddingError) {
+        console.error("Failed to save embedding:", embeddingError);
+        // Vẫn tiếp tục để trả về dữ liệu đã tạo
+      }
+
+      console.log(
+        "🚀 ~ file: PropertyService.js:1 ~ createProperty ~ embedding completed:",
+        JSON.stringify(propertyData, null, 2)
+      );
+
+      // Trả về kết quả thành công
       resolve({
         status: "OK",
-        data: newdata,
+        data: propertyData,
       });
     } catch (error) {
-      // Ném lỗi có thông tin chi tiết về lỗi
+      console.error("Property creation error:", error);
+
       reject({
         status: "ERR",
-        message: `Error creating property: ${error.message || error}`, // Cung cấp thông tin lỗi chi tiết hơn
+        message: `Error creating property: ${error.message || error}`,
+        stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
       });
     }
   });
