@@ -55,11 +55,11 @@ const SidebarAdmin = () => {
       icon: <FaCheckCircle />,
       path: "/admin/Verification",
     },
-    {
-      title: "Thanh toán",
-      icon: <FaMoneyBill />,
-      path: "/admin/Payment",
-    },
+    // {
+    //   title: "Thanh toán",
+    //   icon: <FaMoneyBill />,
+    //   path: "/admin/Payment",
+    // },
     {
       title: "Thanh toán hoa hồng",
       icon: <FaPersonBreastfeeding />,

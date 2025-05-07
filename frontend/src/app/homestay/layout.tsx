@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <div lang="en">
       <div className={`font-roboto antialiased `}>
         {/* <Header /> */}
         <div className="flex w-full">
@@ -28,7 +28,6 @@ export default function RootLayout({
           </div>
         </div>
       </div>
-      //{" "}
-    </html>
+    </div>
   );
 }

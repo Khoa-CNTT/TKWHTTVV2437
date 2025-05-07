@@ -35,7 +35,10 @@ const PayCommissionContainer: React.FC<IProps> = ({ userId }) => {
   return (
     <div>
       {commissionPayment?.map((item) => (
-        <div className="ralative border-gray-300 border rounded-md p-4 mt-4">
+        <div
+          key={item.id}
+          className="ralative border-gray-300 border rounded-md p-4 mt-4"
+        >
           <h4 className="text-center font-semibold">
             Thông tin thanh toán tiền hoa hồng tháng {item.month}/{item.year}
           </h4>

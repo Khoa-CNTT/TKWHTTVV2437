@@ -3,7 +3,11 @@ import React, { useState, useEffect } from "react";
 import apisAdmin from "@/api/admin";
 import dayjs from "dayjs";
 import "font-awesome/css/font-awesome.min.css"; // Import Font Awesome CSS
-import { showConfirmAlert,showSuccessAlert,showErrorAlert } from "@/helper/Alert";
+import {
+  showConfirmAlert,
+  showSuccessAlert,
+  showErrorAlert,
+} from "@/helper/Alert";
 
 // Interface cho Property
 interface IProperty {
@@ -36,10 +40,11 @@ const ManagePropertiesContainer: React.FC = () => {
 
   // Lọc và sắp xếp dữ liệu
   const filteredProperties = properties
-    .filter((property) =>
-      property.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      property.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      property.description.toLowerCase().includes(searchTerm.toLowerCase())
+    .filter(
+      (property) =>
+        property.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.description.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .sort((a, b) => {
       if (!sortField) return 0;
@@ -67,7 +72,9 @@ const ManagePropertiesContainer: React.FC = () => {
       const response = await apisAdmin.listHomestays();
       const mappedProperties = response.data.map((property: any) => {
         const prices = Array.isArray(property.rooms)
-          ? property.rooms.map((room: any) => room.price).filter((price: number) => price > 0)
+          ? property.rooms
+              .map((room: any) => room.price)
+              .filter((price: number) => price > 0)
           : [];
         const minPrice = Math.min(...prices);
         const maxPrice = Math.max(...prices);
@@ -97,7 +104,9 @@ const ManagePropertiesContainer: React.FC = () => {
     }
   };
   const handleDelete = async (id: string) => {
-          const confirm = await showConfirmAlert("Bạn chắc chắn muốn hủy đặt phòng này?");
+    const confirm = await showConfirmAlert(
+      "Bạn chắc chắn muốn hủy đặt phòng này?"
+    );
     if (confirm) {
       try {
         await apisAdmin.deleteHomestay(id);
@@ -143,7 +152,9 @@ const ManagePropertiesContainer: React.FC = () => {
         />
       </div>
 
-      {loading && <p className="text-center text-blue-500">Đang tải dữ liệu...</p>}
+      {loading && (
+        <p className="text-center text-blue-500">Đang tải dữ liệu...</p>
+      )}
       {error && <p className="text-center text-red-500">{error}</p>}
 
       {!loading && !error && (
@@ -155,62 +166,81 @@ const ManagePropertiesContainer: React.FC = () => {
                   className="px-4 py-3 text-left cursor-pointer"
                   onClick={() => handleSort("name")}
                 >
-                  Tên {sortField === "name" && (sortOrder === "asc" ? "▲" : "▼")}
+                  Tên{" "}
+                  {sortField === "name" && (sortOrder === "asc" ? "▲" : "▼")}
                 </th>
                 <th
                   className="px-4 py-3 text-left cursor-pointer"
                   onClick={() => handleSort("city")}
                 >
-                  Thành phố {sortField === "city" && (sortOrder === "asc" ? "▲" : "▼")}
+                  Thành phố{" "}
+                  {sortField === "city" && (sortOrder === "asc" ? "▲" : "▼")}
                 </th>
                 <th
                   className="px-4 py-3 text-left cursor-pointer"
                   onClick={() => handleSort("description")}
                 >
-                  Mô tả {sortField === "description" && (sortOrder === "asc" ? "▲" : "▼")}
+                  Mô tả{" "}
+                  {sortField === "description" &&
+                    (sortOrder === "asc" ? "▲" : "▼")}
                 </th>
                 <th
                   className="px-4 py-3 text-left cursor-pointer"
                   onClick={() => handleSort("type")}
                 >
-                  Loại {sortField === "type" && (sortOrder === "asc" ? "▲" : "▼")}
+                  Loại{" "}
+                  {sortField === "type" && (sortOrder === "asc" ? "▲" : "▼")}
                 </th>
                 <th
                   className="px-4 py-3 text-left cursor-pointer"
                   onClick={() => handleSort("status")}
                 >
-                  Trạng thái {sortField === "status" && (sortOrder === "asc" ? "▲" : "▼")}
+                  Trạng thái{" "}
+                  {sortField === "status" && (sortOrder === "asc" ? "▲" : "▼")}
                 </th>
                 <th
                   className="px-4 py-3 text-left cursor-pointer"
                   onClick={() => handleSort("priceRange")}
                 >
-                  Giá cả {sortField === "priceRange" && (sortOrder === "asc" ? "▲" : "▼")}
+                  Giá cả{" "}
+                  {sortField === "priceRange" &&
+                    (sortOrder === "asc" ? "▲" : "▼")}
                 </th>
                 <th
                   className="px-4 py-3 text-left cursor-pointer"
                   onClick={() => handleSort("createdAt")}
                 >
-                  Ngày tạo {sortField === "createdAt" && (sortOrder === "asc" ? "▲" : "▼")}
+                  Ngày tạo{" "}
+                  {sortField === "createdAt" &&
+                    (sortOrder === "asc" ? "▲" : "▼")}
                 </th>
                 <th className="px-4 py-3 text-left">Hành động</th>
               </tr>
             </thead>
             <tbody className="text-sm font-semibold">
               {currentRows.map((property) => (
-                <tr key={property.id} className="border-b border-gray-200 hover:bg-gray-100">
+                <tr
+                  key={property.id}
+                  className="border-b border-gray-200 hover:bg-gray-100"
+                >
                   <td className="px-4 py-5">{property.name}</td>
                   <td className="px-4 py-5">{property.city}</td>
                   <td className="px-4 py-5">{property.description}</td>
                   <td className="px-4 py-5">{property.type}</td>
                   <td className="px-4 py-5">{property.status}</td>
                   <td className="px-4 py-5">{property.priceRange}</td>
-                  <td className="px-4 py-5">{dayjs(property.createdAt).format("DD/MM/YYYY")}</td>
+                  <td className="px-4 py-5">
+                    {dayjs(property.createdAt).format("DD/MM/YYYY")}
+                  </td>
                   <td className="px-4 py-5 ">
                     <div className="flex items-center gap-3">
                       <i
                         className="fa fa-eye text-grey-500 text-lg cursor-pointer hover:text-blue-700"
-                        onClick={() => router.push(`/admin/Properties/Room?propertyId=${property.id}`)}
+                        onClick={() =>
+                          router.push(
+                            `/admin/Properties/Room?propertyId=${property.id}`
+                          )
+                        }
                       ></i>
                       <button
                         className="flex items-center px-3 py-1 text-sm text-red-700 hover:bg-gray-100 rounded"
@@ -220,7 +250,6 @@ const ManagePropertiesContainer: React.FC = () => {
                       </button>
                     </div>
                   </td>
-
                 </tr>
               ))}
             </tbody>
@@ -238,10 +267,11 @@ const ManagePropertiesContainer: React.FC = () => {
             {Array.from({ length: totalPages }, (_, index) => (
               <button
                 key={index + 1}
-                className={`px-3 py-1 rounded ${currentPage === index + 1
-                  ? "bg-orange-500 text-white"
-                  : "bg-gray-300 hover:bg-gray-400"
-                  }`}
+                className={`px-3 py-1 rounded ${
+                  currentPage === index + 1
+                    ? "bg-orange-500 text-white"
+                    : "bg-gray-300 hover:bg-gray-400"
+                }`}
                 onClick={() => handlePageChange(index + 1)}
               >
                 {index + 1}

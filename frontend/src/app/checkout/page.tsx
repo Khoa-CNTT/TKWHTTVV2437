@@ -76,7 +76,7 @@ const CheckoutPage = () => {
       numberAccount: "",
       nameBank: "",
     });
-  }, [user, room]);
+  }, [user, room, startDate, endDate]);
   useEffect(() => {
     setShow(isOpen);
   }, [isOpen]);

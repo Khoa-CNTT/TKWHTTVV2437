@@ -38,6 +38,24 @@ const apisCommissionPayment = {
 
     return response.json();
   },
+
+  getListCommissionPaymentByAdmin: async (
+    query: Record<string, string | number>
+  ) => {
+    const queryString = new URLSearchParams(
+      query as Record<string, string>
+    ).toString();
+
+    const response = await fetch(
+      `${process.env.URL_SERVER_API}/commission/list-commission-admin?${queryString}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
+
+    return response.json();
+  },
 };
 
 export default apisCommissionPayment;

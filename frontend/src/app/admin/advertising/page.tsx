@@ -11,6 +11,7 @@ import Stack from "@mui/material/Stack";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import { useDebounce } from "use-debounce";
+import MessageNotFound from "@/components/Item/MessageNotFound";
 
 interface IPagination {
   totalItems: number;
@@ -77,8 +78,12 @@ const Advertising = () => {
     fetchDataAdOrder();
   }, [currentPage, text, status, type]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [text, status, type]);
+
   return (
-    <div className="w-full">
+    <div className="w-full relative">
       <div className="p-2">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Danh sách đã mua gói quảng cáo</h1>
@@ -89,7 +94,9 @@ const Advertising = () => {
             <OutlinedInput
               placeholder="Please enter text"
               value={valueSearch}
-              onChange={(e) => setValueSearch(e.target.value)}
+              onChange={(e) => {
+                setValueSearch(e.target.value);
+              }}
               sx={{
                 width: "100%", // Tùy chỉnh chiều rộng
                 borderRadius: "10px", // Bo góc
@@ -108,7 +115,9 @@ const Advertising = () => {
 
             {showDeleteText && (
               <IoMdClose
-                onClick={() => setValueSearch((prev) => "")}
+                onClick={() => {
+                  setValueSearch((prev) => "");
+                }}
                 size={22}
                 className="absolute top-[50%] translate-y-[-50%] text-gray-600 right-[10px] cursor-pointer z-10"
               />
@@ -122,7 +131,9 @@ const Advertising = () => {
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
                 value={type}
-                onChange={(e) => setType(Number(e.target.value))}
+                onChange={(e) => {
+                  setType(Number(e.target.value));
+                }}
                 sx={{
                   "& .MuiSelect-select": {
                     padding: "10px", // Tùy chỉnh padding
@@ -141,7 +152,9 @@ const Advertising = () => {
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
                 value={status}
-                onChange={(e) => setStatus(e.target.value)}
+                onChange={(e) => {
+                  setStatus(e.target.value);
+                }}
                 sx={{
                   "& .MuiSelect-select": {
                     padding: "10px", // Tùy chỉnh padding
@@ -170,37 +183,41 @@ const Advertising = () => {
                 <th className="px-4 py-3 text-left">Trạng thái</th>
               </tr>
             </thead>
-            <tbody className=" text-[-14] font-semibold">
-              {dataAdOrder.map((item, index) => (
-                <tr
-                  key={item?.id}
-                  className="border-b border-gray-200 cursor-pointer hover:bg-gray-100"
-                >
-                  <td className="px-4 py-5">{`${pagination?.pageSize * (pagination?.currentPage - 1) + index + 1}`}</td>
-                  <td className="px-4 py-5">{item?.advertising?.name}</td>
-                  <td className="pl-4 py-5">{item?.property?.name}</td>
-                  <td className="pl-4 py-5">{`${item?.user?.firstName} ${item.user.lastName}`}</td>
-                  <td className="pl-4 text-red-600">
-                    {item?.advertising?.price.toLocaleString("it-IT", {
-                      style: "currency",
-                      currency: "VND",
-                    })}
-                  </td>
-                  <td className="px-4 py-5 flex items-center gap-2">
-                    {item?.methodPay?.toLocaleUpperCase()}
-                  </td>
-                  <td className="px-4 py-5">
-                    {item?.status === "pending"
-                      ? "Chờ xác nhận"
-                      : item?.status === "done"
-                        ? "Thành công"
-                        : item?.status === "failed"
-                          ? "Đã hủy"
-                          : item?.status}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+            {dataAdOrder?.length === 0 ? (
+              <MessageNotFound />
+            ) : (
+              <tbody className=" text-[-14] font-semibold">
+                {dataAdOrder.map((item, index) => (
+                  <tr
+                    key={item?.id}
+                    className="border-b border-gray-200 cursor-pointer hover:bg-gray-100"
+                  >
+                    <td className="px-4 py-5">{`${pagination?.pageSize * (pagination?.currentPage - 1) + index + 1}`}</td>
+                    <td className="px-4 py-5">{item?.advertising?.name}</td>
+                    <td className="pl-4 py-5">{item?.property?.name}</td>
+                    <td className="pl-4 py-5">{`${item?.user?.firstName} ${item.user.lastName}`}</td>
+                    <td className="pl-4 text-red-600">
+                      {item?.advertising?.price.toLocaleString("it-IT", {
+                        style: "currency",
+                        currency: "VND",
+                      })}
+                    </td>
+                    <td className="px-4 py-5 flex items-center gap-2">
+                      {item?.methodPay?.toLocaleUpperCase()}
+                    </td>
+                    <td className="px-4 py-5">
+                      {item?.status === "pending"
+                        ? "Chờ xác nhận"
+                        : item?.status === "done"
+                          ? "Thành công"
+                          : item?.status === "failed"
+                            ? "Đã hủy"
+                            : item?.status}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            )}
           </table>
         </div>
       </div>
@@ -209,7 +226,7 @@ const Advertising = () => {
         <div className="mt-8 flex justify-center">
           <Stack spacing={2}>
             <Pagination
-              page={currentPage}
+              page={currentPage ?? 1}
               onChange={(event: React.ChangeEvent<unknown>, page: number) =>
                 setCurrentPage(page)
               }
