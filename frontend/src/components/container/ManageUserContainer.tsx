@@ -12,13 +12,14 @@ interface IUser {
     firstName: string;
     lastName: string;
     email: string;
+    password: string;
     phone: string;
-    avatar?: string;
-    bio?: string;
-    gender?: string;
-    dateOfBirth?: string;
-    emergencyPhone?: string;
-    address?: string;
+    avatar: string;
+    bio: string;
+    gender: string;
+    dateOfBirth: Date;
+    emergencyPhone: string;
+    address: string;
     status: string;
     role: string;
     createdAt: string;
@@ -27,6 +28,25 @@ interface IUser {
 interface IInvalidField {
     name: string; // Tên trường không hợp lệ
     mes: string;  // Thông báo lỗi
+}
+interface UserFormState {
+
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  phone: string;
+  avatar: string;
+  bio: string;
+  gender: string;
+  dateOfBirth: Date;
+  emergencyPhone: string;
+  address: string;
+  status: string;
+  role: string;
+  createdAt: string;
+  updatedAt: string;
 }
 const ManageUserContainer: React.FC = () => {
     const [invalidFields, setInvalidFields] = useState<IInvalidField[]>([]);
@@ -87,10 +107,11 @@ const ManageUserContainer: React.FC = () => {
         try {
             const response = await apisAdmin.listUsers();
             setUsers(response.data);
-        } catch (err) {
-            console.error("Lỗi khi tải danh sách người dùng:", err);
-            setError("Không thể tải danh sách người dùng. Vui lòng thử lại sau.");
-        } finally {
+          } catch (error) {
+            const errorMessage = (error as { msg?: string })?.msg 
+              ?? "Đã xảy ra lỗi khi tải danh sách người dùng.";
+            showErrorAlert(errorMessage);
+          } finally {
             setLoading(false);
         }
     };
@@ -107,10 +128,11 @@ const ManageUserContainer: React.FC = () => {
                 showSuccessAlert("Tài khoản đã được khóa thành công!");
                 fetchUsers(); // Tải lại danh sách người dùng
             }
-        } catch (error) {
-            console.error("Lỗi khi khóa tài khoản:", error);
-            showErrorAlert("Đã xảy ra lỗi khi khóa tài khoản. Vui lòng thử lại.");
-        }
+          } catch (error) {
+            const errorMessage = (error as { msg?: string })?.msg 
+              ?? "Đã xảy ra lỗi khi khoá người dùng.";
+            showErrorAlert(errorMessage);
+          }
     };
   
     const handleDeleteUser = async (userId: string) => {
@@ -123,10 +145,11 @@ const ManageUserContainer: React.FC = () => {
                 await apisAdmin.deleteUser(userId); // Gọi API xóa người dùng
                 showSuccessAlert("Người dùng đã được xóa thành công!");
                 fetchUsers(); // Tải lại danh sách người dùng
-            } catch (error) {
-                console.error("Lỗi khi xóa người dùng:", error);
-                showErrorAlert("Đã xảy ra lỗi khi xóa người dùng. Vui lòng thử lại.");
-            } finally {
+              } catch (error) {
+                const errorMessage = (error as { msg?: string })?.msg 
+                  ?? "Đã xảy ra lỗi khi xoá người dùng.";
+                showErrorAlert(errorMessage);
+              } finally {
                 setDeletingUserId(null); // Xóa trạng thái xóa
             }
         }
@@ -254,7 +277,6 @@ const ManageUserContainer: React.FC = () => {
                         onClick={(e) => {
                           e.stopPropagation();
                           onSelectUser(user);
-                          (user);
                         }}
                       ></i>
                       <button
@@ -286,7 +308,7 @@ const ManageUserContainer: React.FC = () => {
           avatar: "",
           bio: "",
           gender: "",
-          dateOfBirth: "",
+          dateOfBirth: "", 
           emergencyPhone: "",
           address: "",
           role: "User",
@@ -300,21 +322,23 @@ const ManageUserContainer: React.FC = () => {
       
         const handleAddUser = async () => {
           // Kiểm tra tính hợp lệ
+          const payload = {
+            ...newUser,
+            dateOfBirth: new Date(newUser.dateOfBirth) // Chuyển string -> Date
+          };
           const invalidCount = validate(newUser, setInvalidFields);
-      
           if (invalidCount > 0) {
             showErrorAlert("Vui lòng kiểm tra lại các trường nhập liệu.");
             return;
           }
-      
           try {
-            await apisAdmin.createUser(newUser);
+            await apisAdmin.createUser(payload);
             showSuccessAlert("Người dùng đã được thêm thành công!");
             onUserAdded();
             onClose();
-          } catch (error: any) {
-            console.error("Lỗi khi thêm người dùng:", error);
-            const errorMessage = error.msg || "Đã xảy ra lỗi khi thêm người dùng.";
+          }  catch (error) {
+            const errorMessage = (error as { msg?: string })?.msg 
+              ?? "Đã xảy ra lỗi khi thêm mới người dùng.";
             showErrorAlert(errorMessage);
           }
         };
@@ -381,7 +405,12 @@ const ManageUserContainer: React.FC = () => {
                     type="date"
                     name="dateOfBirth"
                     value={newUser.dateOfBirth}
-                    onChange={handleInputChange}
+                    onChange={(e) => {
+                      setNewUser(prev => ({
+                        ...prev,
+                        dateOfBirth: e.target.value ? dayjs(e.target.value).format("YYYY-MM-DD") : ""
+                      }));
+                    }}
                     className="border rounded px-2 py-1 w-full"
                   />
                 </div>
@@ -551,9 +580,8 @@ const ManageUserContainer: React.FC = () => {
             setIsEditing(false);
             onClose();
             onUpdate();
-          } catch (error: any) {
-            const errorMessage = error.msg || "Đã xảy ra lỗi khi cập nhật người dùng.";
-            showErrorAlert(errorMessage);
+          } catch (error) {
+            showErrorAlert("Đã xảy ra lỗi khi cập nhật người dùng.");
           }
         }
       };
@@ -652,7 +680,7 @@ const ManageUserContainer: React.FC = () => {
                   <input
                     type="date"
                     name="dateOfBirth"
-                    value={editingUser ? editingUser.dateOfBirth || '' : user.dateOfBirth ? dayjs(user.dateOfBirth).format('YYYY-MM-DD') : ''}
+                    value={editingUser ? dayjs(user.dateOfBirth).format('YYYY-MM-DD') : ''}
                     onChange={handleEditChange}
                     disabled={!isEditing}
                     className="border rounded px-2 py-1 w-full text-sm"

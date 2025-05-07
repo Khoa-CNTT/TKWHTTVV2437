@@ -6,18 +6,41 @@ import "font-awesome/css/font-awesome.min.css"; // Import Font Awesome CSS
 import { showConfirmAlert,showSuccessAlert,showErrorAlert } from "@/helper/Alert";
 
 // Interface cho Property
+interface IRoom {
+  id: string;
+  name: string;
+  price: number;
+  maxPerson: number;
+  status: string;
+  images: string[];
+  amenities: { name: string }[];
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface IProperty {
   id: string;
   name: string;
-  city: string;
+  address?: {
+    city?: string;
+  };
   description: string;
-  type: string; // Loại property
-  status: string; // Trạng thái property
-  image: string; // Image từ ImageProperties
-  amenities: { name: string }[]; // Danh sách amenities
+  category?: {
+    name?: string;
+  };
+  status: string;
+  image: string;
+  amenities: { name: string }[];
   createdAt: string;
   updatedAt: string;
-  priceRange: string; // Giá cả (thấp nhất ~ cao nhất)
+  rooms?: IRoom[];
+  priceRange: string;
+}
+
+interface IRoomResponse {
+  price: number;
+
 }
 
 const ManagePropertiesContainer: React.FC = () => {
@@ -38,7 +61,7 @@ const ManagePropertiesContainer: React.FC = () => {
   const filteredProperties = properties
     .filter((property) =>
       property.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      property.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      property.address?.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       property.description.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .sort((a, b) => {
@@ -65,10 +88,13 @@ const ManagePropertiesContainer: React.FC = () => {
     setError(null);
     try {
       const response = await apisAdmin.listHomestays();
-      const mappedProperties = response.data.map((property: any) => {
-        const prices = Array.isArray(property.rooms)
-          ? property.rooms.map((room: any) => room.price).filter((price: number) => price > 0)
-          : [];
+      const mappedProperties: IProperty[] = response.data.map((property: IProperty) => {
+        // Xử lý rooms với kiểu dữ liệu cụ thể
+        const rooms = property.rooms || [];
+        const prices = rooms
+          .map((room: IRoomResponse) => room.price)
+          .filter((price: number) => price > 0);
+
         const minPrice = Math.min(...prices);
         const maxPrice = Math.max(...prices);
         return {
@@ -76,16 +102,15 @@ const ManagePropertiesContainer: React.FC = () => {
           name: property.name,
           city: property.address?.city || "Không xác định",
           description: property.description || "Không có mô tả",
-          type: property.category?.name || "Không xác định", // Loại property
-          status: property.status || "Không xác định", // Trạng thái property
-          image: property.image || "", // Image từ ImageProperties
-          amenities: property.amenities || [], // Danh sách amenities
+          type: property.category?.name || "Không xác định",
+          status: property.status,
+          image: property.image,
+          amenities: property.amenities,
           createdAt: property.createdAt,
           updatedAt: property.updatedAt,
-          priceRange:
-            prices.length > 0
-              ? `${minPrice.toLocaleString()} ~ ${maxPrice.toLocaleString()}`
-              : "Không có giá", // Giá cả
+          priceRange: prices.length > 0 
+            ? `${minPrice.toLocaleString()} ~ ${maxPrice.toLocaleString()}`
+            : "Không có giá",
         };
       });
       setProperties(mappedProperties);
@@ -200,9 +225,9 @@ const ManagePropertiesContainer: React.FC = () => {
               {currentRows.map((property) => (
                 <tr key={property.id} className="border-b border-gray-200 hover:bg-gray-100">
                   <td className="px-4 py-5">{property.name}</td>
-                  <td className="px-4 py-5">{property.city}</td>
+                  <td className="px-4 py-5">{property.address?.city}</td>
                   <td className="px-4 py-5">{property.description}</td>
-                  <td className="px-4 py-5">{property.type}</td>
+                  <td className="px-4 py-5">{property.category?.name}</td>
                   <td className="px-4 py-5">{property.status}</td>
                   <td className="px-4 py-5">{property.priceRange}</td>
                   <td className="px-4 py-5">{dayjs(property.createdAt).format("DD/MM/YYYY")}</td>

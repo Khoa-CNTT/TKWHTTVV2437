@@ -12,7 +12,7 @@ import apiUser from "@/api/user";
 
 // Định nghĩa kiểu dữ liệu cho AuthContext
 interface AuthContextType {
-  user: any; // Bạn có thể thay thế `any` bằng kiểu dữ liệu cụ thể của user
+  user: Object | null;
   setUser: React.Dispatch<React.SetStateAction<any>>;
 }
 

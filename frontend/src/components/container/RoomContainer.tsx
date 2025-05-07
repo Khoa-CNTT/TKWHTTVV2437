@@ -8,6 +8,7 @@ import { showErrorAlert ,showConfirmAlert,showSuccessAlert} from "@/helper/Alert
 
 interface IRoom {
   id: string;
+  idProperty: string;
   name: string;
   price: number;
   maxPerson: number;
@@ -15,6 +16,7 @@ interface IRoom {
   image: string;
   description: string;
   type: string;
+  images: string[];
   amenities: { name: string }[];
   createdAt: string;
   updatedAt: string;
@@ -70,7 +72,7 @@ const RoomContainer: React.FC = () => {
     setError(null);
     try {
       const response = await apisAdmin.listRooms(propertyId);
-      const mappedRooms = response.data.map((room: any) => ({
+      const mappedRooms : IRoom[] = response.data.map((room: IRoom) => ({
         id: room.id,
         name: room.name,
         price: room.price,
