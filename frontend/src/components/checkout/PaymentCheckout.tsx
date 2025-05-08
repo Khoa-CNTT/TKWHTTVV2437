@@ -1,5 +1,6 @@
 import apiPayment from "@/api/payment";
 import apiReservation from "@/api/reservation";
+import { IInfoPayment } from "@/app/types/accountPayment";
 import validate from "@/utils/validateInput";
 import { useRouter } from "next/navigation";
 import PreviousMap_ from "postcss/lib/previous-map";
@@ -30,6 +31,8 @@ interface IProps {
   endDay?: string;
   roomId: string;
   code: string;
+  propertyId: string | null | number;
+  AccountPayment: IInfoPayment | null;
 }
 interface IInvalidField {
   name: string;
@@ -45,6 +48,8 @@ const PaymentCheckout = ({
   endDay,
   roomId,
   code,
+  propertyId,
+  AccountPayment,
 }: IProps) => {
   const router = useRouter();
   const [infoPayment, setInfoPayment] = useState<object>({
@@ -54,6 +59,7 @@ const PaymentCheckout = ({
     endDay: endDay || null,
     roomId,
     code,
+    propertyId,
   });
 
   const [invalidFields, setInvalidFields] = useState<IInvalidField[]>([]);
@@ -131,7 +137,9 @@ const PaymentCheckout = ({
                 </span>
                 <p>
                   Đơn vị thụ hưởng:{" "}
-                  <span className="font-semibold">Trần Văn Thịnh</span>
+                  <span className="font-semibold">
+                    {AccountPayment?.nameAccount}
+                  </span>
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -140,7 +148,9 @@ const PaymentCheckout = ({
                 </span>
                 <p>
                   Số tài khoản:{" "}
-                  <span className="font-semibold">868686868686</span>
+                  <span className="font-semibold">
+                    {AccountPayment?.numberAccount}
+                  </span>
                 </p>
               </div>
               <div className="flex items-center gap-2 ">
@@ -150,7 +160,7 @@ const PaymentCheckout = ({
                 <p>
                   Tại:{" "}
                   <span className="font-semibold">
-                    Techcombank(Ngân hàng kỹ thương)
+                    {AccountPayment?.nameBank}
                   </span>
                 </p>
               </div>
@@ -178,8 +188,8 @@ const PaymentCheckout = ({
 
               <div className="flex flex-col items-center justify-center ">
                 <img
-                  src="https://khangnguyenco.vn/pub/media/magefan_blog/ma-qr-code.jpg"
-                  className="w-40 h-40"
+                  src={AccountPayment?.qrCode || ""}
+                  className="w-40 h-40 object-contain"
                   alt=""
                 />
                 <p className="mt-1 font-semibold">Mã QR tài khoản: </p>

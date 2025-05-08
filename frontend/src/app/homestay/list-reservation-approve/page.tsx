@@ -9,6 +9,7 @@ import { useReservationContext } from "@/app/contexts/ReservationContext";
 import dayjs from "dayjs";
 import { FaFilter } from "react-icons/fa";
 import { useRouter, useSearchParams } from "next/navigation";
+import { IoReloadCircle } from "react-icons/io5";
 
 interface IReservationApprove {
   id: string;
@@ -80,13 +81,32 @@ const ListReservationApprovePage = () => {
     <div className="w-full">
       <div className="p-10">
         <h1 className="text-2xl font-bold ">Danh sách cần phê duyệt</h1>
-        <div className="flex justify-end items-center mt-10">
+        <div className="flex justify-between items-center mt-10">
+          <div>
+            <button
+              className={`flex items-center gap-1 px-4 py-2 border 
+         border-primary text-primary
+        font-semibold rounded-xl bg-white text-sm shadow-sm 
+        transition-transform active:scale-95
+      `}
+              onClick={() => getListResApprove(filter)}
+            >
+              Tải lại
+              <span>
+                <IoReloadCircle />
+              </span>
+            </button>
+          </div>
           <div className="flex items-center gap-4">
             <span className="px-4 py-2 border border-gray-500 font-semibold rounded-xl">
               <FaFilter />
             </span>
             <button
-              className={`flex items-center gap-1 px-4 py-2 border ${filter === "oldest" ? "border-primary text-primary" : "border-gray-500 hover:bg-gray-100 text-gray-700"} font-semibold rounded-xl bg-white text-sm  shadow-sm  `}
+              className={`flex items-center gap-1 px-4 py-2 border 
+                            ${filter === "oldest" ? "border-primary text-primary" : "border-gray-500 hover:bg-gray-100 text-gray-700"} 
+                            font-semibold rounded-xl bg-white text-sm shadow-sm 
+                            transition-transform active:scale-95
+                          `}
               onClick={() => handleFilter("oldest")}
             >
               Ngày đặt: cũ nhất
@@ -95,7 +115,7 @@ const ListReservationApprovePage = () => {
               </span>
             </button>
             <button
-              className={`flex items-center gap-1 px-4 py-2 border ${filter === "latest" ? "border-primary text-primary" : "border-gray-500 hover:bg-gray-100 text-gray-700"} font-semibold rounded-xl bg-white text-sm  shadow-sm  `}
+              className={`flex items-center gap-1 px-4 py-2 border active:scale-95 transition-transform ${filter === "latest" ? "border-primary text-primary" : "border-gray-500 hover:bg-gray-100 text-gray-700"} font-semibold rounded-xl bg-white text-sm  shadow-sm  `}
               onClick={() => handleFilter("latest")}
             >
               Ngày đặt: mới nhất
@@ -104,7 +124,7 @@ const ListReservationApprovePage = () => {
               </span>
             </button>
             <button
-              className={`flex items-center gap-1 px-4 py-2 border ${filter === "price-asc" ? "border-primary text-primary" : "border-gray-500 hover:bg-gray-100 text-gray-700"} font-semibold rounded-xl bg-white text-sm  shadow-sm  `}
+              className={`flex items-center gap-1 px-4 py-2 border active:scale-95 transition-transform ${filter === "price-asc" ? "border-primary text-primary" : "border-gray-500 hover:bg-gray-100 text-gray-700"} font-semibold rounded-xl bg-white text-sm  shadow-sm  `}
               onClick={() => handleFilter("price-asc")}
             >
               Tổng tiền: tăng dần
@@ -113,7 +133,7 @@ const ListReservationApprovePage = () => {
               </span>
             </button>
             <button
-              className={`flex items-center gap-1 px-4 py-2 border ${filter === "price-desc" ? "border-primary text-primary" : "border-gray-500 hover:bg-gray-100 text-gray-700"} font-semibold rounded-xl bg-white text-sm  shadow-sm  `}
+              className={`flex items-center gap-1 px-4 py-2 border active:scale-95 transition-transform ${filter === "price-desc" ? "border-primary text-primary" : "border-gray-500 hover:bg-gray-100 text-gray-700"} font-semibold rounded-xl bg-white text-sm  shadow-sm  `}
               onClick={() => handleFilter("price-desc")}
             >
               Tổng tiền: giảm dần
@@ -122,14 +142,6 @@ const ListReservationApprovePage = () => {
               </span>
             </button>
           </div>
-          {/* <div>
-            <button className="flex items-center gap-1 px-4 py-2 border border-gray-500 font-semibold rounded-xl bg-white text-sm text-gray-700 shadow-sm hover:bg-gray-100">
-              All Booking
-              <span>
-                <FaCaretDown />
-              </span>
-            </button>
-          </div> */}
         </div>
         <div className="overflow-hidden mt-8 rounded-xl">
           <table className="min-w-full text-black ">

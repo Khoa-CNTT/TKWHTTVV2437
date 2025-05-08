@@ -10,9 +10,19 @@ interface IProps {
   id: string;
   statusUser: string;
   status: string;
+  startDay: string;
+  endDay: string;
+  idRoom: string;
 }
 
-const ActionMyTrip = ({ id, statusUser, status }: IProps) => {
+const ActionMyTrip = ({
+  id,
+  statusUser,
+  status,
+  startDay,
+  endDay,
+  idRoom,
+}: IProps) => {
   const router = useRouter();
 
   const handleCancel = async () => {
@@ -29,7 +39,10 @@ const ActionMyTrip = ({ id, statusUser, status }: IProps) => {
 
     if (result.isConfirmed) {
       if (statusUser === "created") {
-        const res = await apiReservation.updateInfoReservation({
+        const res = await apiReservation.updateStatusUserReservation({
+          startDay: startDay,
+          endDay: endDay,
+          idRoom: idRoom,
           id: id,
           statusUser: "canceled",
         });
@@ -43,7 +56,10 @@ const ActionMyTrip = ({ id, statusUser, status }: IProps) => {
           router.refresh(); // Refresh lại dữ liệu mới
         }
       } else if (statusUser === "canceled") {
-        const res = await apiReservation.updateInfoReservation({
+        const res = await apiReservation.updateStatusUserReservation({
+          startDay: startDay,
+          endDay: endDay,
+          idRoom: idRoom,
           id: id,
           statusUser: "created",
         });

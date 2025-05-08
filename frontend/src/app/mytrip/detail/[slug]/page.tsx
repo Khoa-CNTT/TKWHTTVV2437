@@ -75,6 +75,20 @@ const DetailPage = async (props: IProps) => {
                 {getStatusText(reservation?.data?.status)}
               </p>
             </div>
+
+            {reservation?.data?.reason && (
+              <div className="p-4 border border-red-600 mb-4 rounded-xl text-red-500 flex flex-col gap-2">
+                <p className="font-semibold">
+                  Lí do: {reservation?.data?.reason}
+                </p>
+                {reservation?.data?.returnImgBanking && (
+                  <p className="text-[12px] italic">
+                    Thông tin hoàn tiền ở dưới{" "}
+                  </p>
+                )}
+              </div>
+            )}
+
             <h1 className="text-2xl font-bold mb-4">
               Đặt phòng của bạn ở {property?.data.propertyAddress.city} đã được
               xác nhận.
@@ -170,7 +184,7 @@ const DetailPage = async (props: IProps) => {
                     {/* Thông tin phòng */}
                     <div className="flex items-start gap-4 mb-8">
                       <img
-                        src="https://vcdn1-dulich.vnecdn.net/2022/06/01/Hoi-An-VnExpress-5851-16488048-4863-2250-1654057244.jpg?w=0&h=0&q=100&dpr=1&fit=crop&s=Z2ea_f0O7kgGZllKmJF92g"
+                        src={room?.data?.images[0]?.image}
                         alt="Phòng Có Giường Cỡ King"
                         className="w-32 h-24 object-cover rounded"
                       />
@@ -247,7 +261,7 @@ const DetailPage = async (props: IProps) => {
                 </div>
               </div>
               <img
-                src="https://vcdn1-dulich.vnecdn.net/2022/06/01/Hoi-An-VnExpress-5851-16488048-4863-2250-1654057244.jpg?w=0&h=0&q=100&dpr=1&fit=crop&s=Z2ea_f0O7kgGZllKmJF92g"
+                src={property?.data?.images[0]?.image}
                 alt="Hotel room"
                 className="w-32 h-24 rounded object-cover"
               />
@@ -345,7 +359,7 @@ const DetailPage = async (props: IProps) => {
                     Hãy email cho chỗ nghĩ và họ sẽ trả lời sớm nhất có thể
                   </p>
                   <a
-                    href="mailto:badagor999@gmail.com"
+                    href={`mailto:${property?.data?.users.mail}`}
                     className="font-semibold text-primary hover:opacity-70 cursor-pointer"
                   >
                     Gởi email
@@ -361,10 +375,10 @@ const DetailPage = async (props: IProps) => {
                   <h3 className="font-semibold">Gọi điện cho chỗ nghỉ</h3>
 
                   <a
-                    href="tel:0707560285"
+                    href={`tel:${property?.data?.users.phone}`}
                     className="font-semibold text-primary hover:opacity-70 cursor-pointer"
                   >
-                    0123456789
+                    {property?.data?.users.phone}
                   </a>
                 </div>
               </div>
@@ -391,23 +405,26 @@ const DetailPage = async (props: IProps) => {
             id={reservation.data.id}
             statusUser={reservation.data.statusUser}
             status={reservation.data.status}
+            startDay={reservation.data.checkIndate}
+            endDay={reservation.data.checkOutdate}
+            idRoom={reservation.data.idRoom}
           />
 
           {/* Liên hệ chỗ nghỉ */}
           <div className="border rounded-lg shadow p-6 flex flex-col gap-4 text-sm">
             <p className="font-semibold">Liên hệ chỗ nghỉ</p>
-            <p>Điện thoại: +84 961 932 532</p>
+            <p>Điện thoại: {property?.data?.users.phone}</p>
             <a
-              href="mailto:badagor999@gmail.com"
+              href={`mailto:${property?.data?.users.email}`}
               className="text-blue-600 underline text-left hover:text-blue-800"
             >
-              Nhắn tin
+              Gởi email: {property?.data?.users.email}
             </a>
             <a
-              href="tel:0707560285"
+              href={`tel:${property?.data?.users.phone}`}
               className="text-blue-600 underline text-left hover:text-blue-800"
             >
-              Gửi email
+              Gọi điện: {property?.data?.users.phone}
             </a>
           </div>
         </div>

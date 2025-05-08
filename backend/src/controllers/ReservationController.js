@@ -39,11 +39,14 @@ const detailReservationApprove = async (req, res) => {
 
 const approveReservation = async (req, res) => {
   try {
-    const { reid, status, returnImgBanking } = req.body;
+    const { reid, status, returnImgBanking, reason, ...payload } = req.body;
+
     const response = await ReservationService.approveReservation({
       reid,
       status,
       returnImgBanking,
+      payload,
+      reason,
     });
     return res.status(200).json(response);
   } catch (error) {
@@ -100,6 +103,19 @@ const updateInfoReservation = async (req, res) => {
     });
   }
 };
+
+const updateStatusUserReservation = async (req, res) => {
+  try {
+    const response = await ReservationService.updateStatusUserReservation(
+      req.body
+    );
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
 module.exports = {
   createReservation,
   listReservationApprove,
@@ -109,4 +125,5 @@ module.exports = {
   detailReservationOfUser,
   updateInfoReservation,
   getDataBarChart,
+  updateStatusUserReservation,
 };

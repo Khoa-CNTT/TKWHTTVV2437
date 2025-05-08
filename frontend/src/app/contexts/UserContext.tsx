@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 import apisAdmin from "@/api/admin";
 
 interface IUser {
@@ -13,10 +19,8 @@ interface IUser {
   status: string;
   createdAt: string;
   updatedAt: string;
-  role: string; 
-
+  role: string;
 }
-
 
 interface UserContextType {
   users: IUser[];

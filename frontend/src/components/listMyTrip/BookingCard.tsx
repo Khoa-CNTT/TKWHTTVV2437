@@ -89,6 +89,9 @@ const BookingCard = ({ data }: IProps) => {
                   currency: "VND",
                 })}
               </div>
+              {/* <p className="text-[-16] font-semibold">
+                Mã xác nhận: <span>{data?.code}</span>
+              </p> */}
               <p className="text-[-16] font-semibold">
                 Thời gian đặt:{" "}
                 <span>

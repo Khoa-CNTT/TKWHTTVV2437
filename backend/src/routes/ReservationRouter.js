@@ -28,5 +28,8 @@ router.put(
   "/updateInfoReservation",
   reservationController.updateInfoReservation
 );
-
+router.put(
+  "/updateStatusUserReservation",
+  reservationController.updateStatusUserReservation
+);
 module.exports = router;

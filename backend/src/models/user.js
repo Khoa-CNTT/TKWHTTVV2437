@@ -8,6 +8,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "idUser",
         as: "reviews",
       });
+
+      models.User.hasMany(models.Property, {
+        foreignKey: "idUser",
+        as: "properties",
+      });
     }
   }
   User.init(
@@ -15,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       id: {
         type: DataTypes.STRING,
         primaryKey: true,
-        allowNull: false
+        allowNull: false,
       },
       email: DataTypes.STRING,
       password: DataTypes.STRING,

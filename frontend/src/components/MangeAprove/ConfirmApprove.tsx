@@ -16,13 +16,32 @@ interface IProps {
 
 const ConfirmApprove = ({ handleCloseAppove }: IProps) => {
   const { reservation, setReservation } = useReservationContext();
-  console.log("resv ", reservation);
+  // console.log("resv ", reservation);
   const [isOpenImage, setIsOpenImage] = useState(false);
   const [returnImgBanking, setReturnImgBanking] = useState<string | null>(null);
   const [isChecked, setIsChecked] = useState(false);
+  const [detailRes, setDetailRes] = useState<object | null>(null);
+  const [reason, setReason] = useState("");
+  const [reasonNoInvalid, setReasonNoInvalid] = useState("");
 
+  const reasons = [
+    "Không còn phòng trống",
+    "Thông tin người đặt không hợp lệ",
+    "Yêu cầu không phù hợp với chính sách",
+    "Khách đã hủy trước",
+  ];
+
+  useEffect(() => {
+    const handleDetailRes = async () => {
+      const res = await apiReservation.detailReservationOfUser(reservation?.id);
+      setDetailRes({ ...res?.data });
+    };
+
+    handleDetailRes();
+  }, [reservation]);
   const handleAppove = async () => {
     const res = await apiReservation.approveReservation({
+      ...detailRes,
       reid: reservation?.id,
       status: "confirmed",
     });
@@ -44,16 +63,36 @@ const ConfirmApprove = ({ handleCloseAppove }: IProps) => {
   };
   const rejectReservation = async () => {
     const res = await apiReservation.approveReservation({
+      ...detailRes,
       reid: reservation?.id,
       status: "reject",
       returnImgBanking: returnImgBanking,
+      reason: returnImgBanking ? reason : reasonNoInvalid,
     });
-    setReservation({ ...reservation, status: "reject" });
-    handleCloseAppove?.();
+
+    if (res?.status === "OK") {
+      Swal.fire({
+        title: "Đã từ chối!",
+        text: "Bạn đã từ chối thành công",
+        icon: "success",
+      });
+      setReservation({ ...reservation, status: "reject" });
+      handleCloseAppove?.();
+    } else {
+      Swal.fire({
+        title: "Từ chối thất bại!",
+        icon: "error",
+        draggable: true,
+      });
+    }
   };
 
   const handleReject = async () => {
-    if (returnImgBanking === null) {
+    if (
+      (reasonNoInvalid === "" && returnImgBanking === null && reason === "") ||
+      (returnImgBanking !== null && reason === "") ||
+      (returnImgBanking === null && reason !== "")
+    ) {
       Swal.fire({
         title: "Thiếu chứng từ!",
         text: "Vui lòng cung cấp ảnh chứng từ hoặc tích vào ô 'Chứng từ chuyển khoản không hợp lệ' trước khi từ chối",
@@ -68,15 +107,9 @@ const ConfirmApprove = ({ handleCloseAppove }: IProps) => {
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!",
+        confirmButtonText: "Vâng,  từ chối!",
       }).then((result) => {
         if (result.isConfirmed) {
-          Swal.fire({
-            title: "Đã xóa!",
-            text: "Bạn đã xóa thành công",
-            icon: "success",
-          });
-
           rejectReservation();
         }
       });
@@ -84,8 +117,11 @@ const ConfirmApprove = ({ handleCloseAppove }: IProps) => {
   };
 
   const handleRefund = async () => {
-    console.log("return ", returnImgBanking);
-    if (returnImgBanking === null) {
+    if (
+      (reasonNoInvalid === "" && returnImgBanking === null && reason === "") ||
+      (returnImgBanking !== null && reason === "") ||
+      (returnImgBanking === null && reason !== "")
+    ) {
       Swal.fire({
         title: "Thiếu chứng từ!",
         text: "Vui lòng cung cấp ảnh chứng từ hoặc tích vào ô 'Chứng từ chuyển khoản không hợp lệ' trước khi hoàn tiền",
@@ -94,17 +130,28 @@ const ConfirmApprove = ({ handleCloseAppove }: IProps) => {
       });
     } else {
       const res = await apiReservation.approveReservation({
+        ...detailRes,
         reid: reservation?.id,
         status: "refund",
         returnImgBanking: returnImgBanking,
+        reason: returnImgBanking ? reason : reasonNoInvalid,
       });
-      setReservation({ ...reservation, status: "refund" });
-      Swal.fire({
-        title: "Đã hoàn tiền!",
-        text: "Bạn đã hoàn tiền thành công",
-        icon: "success",
-      });
-      handleCloseAppove?.();
+
+      if (res?.status === "OK") {
+        Swal.fire({
+          title: "Đã hoàn tiền!",
+          text: "Bạn đã hoàn tiền thành công",
+          icon: "success",
+        });
+        setReservation({ ...reservation, status: "refund" });
+        handleCloseAppove?.();
+      } else {
+        Swal.fire({
+          title: "Hoàn tiền thất bại!",
+          icon: "error",
+          draggable: true,
+        });
+      }
     }
   };
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,19 +172,17 @@ const ConfirmApprove = ({ handleCloseAppove }: IProps) => {
   };
   const handleFileRemove = () => {
     setReturnImgBanking(null);
-    setIsChecked(false);
   };
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked;
     setIsChecked(checked);
-
+    setReturnImgBanking(null);
+    setReason("");
     if (checked) {
-      setReturnImgBanking(
-        "https://res.cloudinary.com/dzcgxdbbw/image/upload/v1746350437/phongtro123/vwt0kuavosbv3aiostp4.jpg"
-      );
+      setReasonNoInvalid("Chứng từ thanh toán của bạn không hợp lệ");
     } else {
-      setReturnImgBanking(null);
+      setReasonNoInvalid("");
     }
   };
   return (
@@ -296,6 +341,29 @@ const ConfirmApprove = ({ handleCloseAppove }: IProps) => {
               </label>
             </div>
             <p>Hoặc</p>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="decline-reason" className="font-medium">
+                Lý do từ chối đặt phòng
+              </label>
+              <select
+                id="decline-reason"
+                value={reason}
+                onChange={(e) => {
+                  setReason(e.target.value);
+                  setIsChecked(false);
+                  setReasonNoInvalid("");
+                }}
+                className="p-2 border rounded-md"
+              >
+                <option value="">-- Chọn lý do --</option>
+                {reasons.map((r, idx) => (
+                  <option key={idx} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <p className="text-[-12] italic">Và cung cấp chứng từ hoàn tiền</p>
             <label
               htmlFor="file-upload"
               // onClick={handleFocus}

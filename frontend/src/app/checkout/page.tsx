@@ -15,6 +15,8 @@ import SuccessCheckout from "@/components/checkout/SuccessCheckout";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import validate from "@/utils/validateInput";
 import FailedCheckout from "@/components/checkout/FailedCheckout";
+import apiPayment from "@/api/payment";
+import { IInfoPayment } from "../types/accountPayment";
 interface IDataEnter {
   firstName: string;
   lastName: string;
@@ -31,6 +33,7 @@ interface IInvalidField {
   name: string;
   mes: string;
 }
+
 const CheckoutPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -46,6 +49,7 @@ const CheckoutPage = () => {
 
   const [property, setProperty] = useState<IProperty | null>(null);
   const [room, setRoom] = useState<IRoom | null>(null);
+  const [infoPayment, setInfoPayment] = useState<IInfoPayment | null>(null);
   const [invalidFields, setInvalidFields] = useState<IInvalidField[]>([]);
   const [code, setCode] = useState<string>(
     Math.floor(10000 + Math.random() * 90000).toString()
@@ -129,6 +133,19 @@ const CheckoutPage = () => {
     fetchDataRoom();
   }, [roomId, propertyId]);
 
+  useEffect(() => {
+    if (property?.idUser) {
+      const fectInfoPayment = async () => {
+        const res = await apiPayment.infoAccountPayment(property?.idUser);
+        if (res?.data) {
+          setInfoPayment(res?.data);
+        }
+      };
+
+      fectInfoPayment();
+    }
+  }, [property]);
+
   const handleToISOString = (value: dayjs.Dayjs | null, status: string) => {
     let isoString;
     if (status === "startDay") {
@@ -141,6 +158,7 @@ const CheckoutPage = () => {
     return dateObj.toISOString();
   };
 
+  console.log("property ", infoPayment);
   return (
     <div className="w-[1150px] mx-auto min-h-screen pt-10">
       {show ? (
@@ -177,6 +195,8 @@ const CheckoutPage = () => {
                   endDay={handleToISOString(endDate, "endDay")}
                   roomId={roomId}
                   code={code}
+                  AccountPayment={infoPayment}
+                  propertyId={propertyId}
                 />
               </div>
             )}

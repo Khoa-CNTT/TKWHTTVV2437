@@ -2,6 +2,7 @@ import apiReservation from "@/api/reservation";
 import dayjs from "dayjs";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { CiCircleCheck } from "react-icons/ci";
 
 interface IData {
   nameProperty: string;
@@ -56,8 +57,10 @@ const SuccessCheckout = () => {
         <p className="text-[-16] text-[text] italic">
           Chúc bạn có một chuyến đi vui vẻ
         </p>
-
-        <div className="p-4 border border-gray-300 w-2/3 rounded-2xl bg-yellow-50">
+        <span className="text-[80px] text-green-400">
+          <CiCircleCheck />
+        </span>
+        <div className="p-4 border border-gray-300 w-2/3 rounded-2xl bg-white">
           <div className="flex">
             <img
               src={data?.imageProperty || ""}

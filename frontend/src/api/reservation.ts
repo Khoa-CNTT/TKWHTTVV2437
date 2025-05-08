@@ -17,6 +17,8 @@ const apiReservation = {
     http.get(`reservation/detailReservationOfUser?idRes=${idRes}`),
   updateInfoReservation: (data: object) =>
     http.put(`reservation/updateInfoReservation`, data),
+  updateStatusUserReservation: (data: object) =>
+    http.put(`reservation/updateStatusUserReservation`, data),
 };
 
 export default apiReservation;

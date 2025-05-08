@@ -70,7 +70,7 @@ const InforRoomCheckout: React.FC<IProps> = ({ property, room, code }) => {
       </div>
 
       <div className="border-b-[1px] border-x-[1px] rounded-b-md border-gray-300 px-6 py-8">
-        <h4 className="font-semibold text-xl my-2 border p-4 border-gray-300 bg-yellow-50 rounded-lg">
+        <h4 className="font-semibold text-xl mt-2 mb-4 border p-4 border-gray-300 bg-yellow-50 rounded-lg ">
           Mã xác nhận: {code}
         </h4>
         <h4 className="font-semibold">{property?.name}</h4>
