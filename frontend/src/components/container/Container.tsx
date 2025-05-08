@@ -2,6 +2,7 @@
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
+import { useRouter } from "next/navigation";
 
 import TitleContainer from "./TitleContainer";
 
@@ -17,7 +18,8 @@ interface IProps {
 }
 
 const Container: React.FC<IProps> = ({ cities }) => {
-  console.log(cities);
+  const router = useRouter();
+
   return (
     <div className="container mx-auto pt-8">
       <TitleContainer title="Các thành phố tiêu biểu" />
@@ -36,13 +38,17 @@ const Container: React.FC<IProps> = ({ cities }) => {
         >
           {cities?.map((item, index) => (
             <SwiperSlide key={index}>
-              <div className="relative" key={index}>
+              <div
+                onClick={() => router.push("/search?city=" + item.name)}
+                className="relative cursor-pointer"
+                key={index}
+              >
                 <img
                   className="min-h-[170px] object-fit rounded-lg"
                   src={item.image}
                   alt=""
                 />
-                <p className="text-gray-800 text-lg font-semibold absolute bottom-0 left-[10px] text-white">
+                <p className="text-lg font-semibold absolute bottom-0 left-[10px] text-white">
                   {item.name}
                 </p>
               </div>

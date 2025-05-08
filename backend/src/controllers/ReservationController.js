@@ -51,9 +51,25 @@ const approveReservation = async (req, res) => {
     });
   }
 };
+
+const getDataBarChart = async (req, res) => {
+  try {
+    const response = await ReservationService.getDataBarChart(
+      req.params.id,
+      req.query
+    );
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
 module.exports = {
   createReservation,
   listReservationApprove,
   detailReservationApprove,
   approveReservation,
+  getDataBarChart,
 };

@@ -6,9 +6,8 @@ export interface StatisticsData {
   userCount: number;
   ownerCount: number;
   reservationCount: number;
-  
 }
-type TimeFilter = 'day' | 'month' | 'year';
+type TimeFilter = "day" | "month" | "year";
 
 const apisAdmin = {
   // ========================= Quản lý tài khoản =========================
@@ -83,7 +82,6 @@ const apisAdmin = {
   lockAccount: (id: string) => http.put(`admin/lock-account/${id}`, {}),
   approveOwner: (id: string) => http.put(`admin/approve-owner/${id}`, {}),
 
-
   // ========================= Quản lý danh mục (Category) =========================
   // createCategory: (data: any) => http.post(`admin/create-category`, data),
 
@@ -115,7 +113,6 @@ const apisAdmin = {
   listAmenities: () => http.get(`admin/list-amenities`),
 
   // ========================= Quản lý homestay =========================
- 
 
   updateHomestay: (
     id: string,
@@ -134,9 +131,8 @@ const apisAdmin = {
   deleteHomestay: (id: string) =>
     http.delete(`admin/delete-homestay/${id}`, {}),
   // ========================= Quản lý phòng (Room) =========================
-  listRooms: (propertyId: string) =>
-    http.get(`admin/list-room/${propertyId}`),
-  listProperties: (ownerId:string) => 
+  listRooms: (propertyId: string) => http.get(`admin/list-room/${propertyId}`),
+  listProperties: (ownerId: string) =>
     http.get(`admin/list-properties/${ownerId}`),
   updateRoom: (
     id: string,

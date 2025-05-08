@@ -3,13 +3,13 @@ const db = require("../models");
 const checkRoomAvailabilityByPropertyId = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let { propertyId, startDate, endDate} = data;
+      let { propertyId, startDate, endDate } = data;
 
       startDate = new Date(startDate);
       endDate = new Date(endDate);
 
       const property = await db.Property.findOne({
-        where: {id: propertyId},
+        where: { id: propertyId },
         attributes: ["id"],
         include: [
           {
@@ -23,10 +23,10 @@ const checkRoomAvailabilityByPropertyId = (data) => {
       function getDatesInRange(startDate, endDate) {
         const date = new Date(startDate);
         const dates = [];
-    
+
         while (date <= endDate) {
-            dates.push(new Date(date));
-            date.setDate(date.getDate() + 1);
+          dates.push(new Date(date));
+          date.setDate(date.getDate() + 1);
         }
 
         return dates;
@@ -35,7 +35,11 @@ const checkRoomAvailabilityByPropertyId = (data) => {
       const dateList = await getDatesInRange(startDate, endDate);
 
       // list room
-      const rooms = await property.rooms.map((item) => ({id: item.id, quantity: item.quantity, status: true}));
+      const rooms = await property.rooms.map((item) => ({
+        id: item.id,
+        quantity: item.quantity,
+        status: true,
+      }));
 
       const handleCheck = async (dateList, rooms) => {
         for (const date of dateList) {
@@ -46,7 +50,7 @@ const checkRoomAvailabilityByPropertyId = (data) => {
                 date: date.toISOString().split("T")[0], // Convert to 'YYYY-MM-DD' format
               },
             });
-      
+
             if (roomAvailability) {
               if (roomAvailability.blocked_quantity >= room.quantity) {
                 rooms[indexRoom].status = false;
@@ -68,6 +72,27 @@ const checkRoomAvailabilityByPropertyId = (data) => {
   });
 };
 
+const getListRoomAvailabilityByPropertyId = (propertyId, filter) => {
+  return new Promise(async (resolve, reject) => {
+    const { date } = filter;
+
+    try {
+      const rooms = await db.RoomAvailability.findAll({
+        where: { idProperty: propertyId, date },
+        attributes: ["id", "idRoom", "blocked_quantity"],
+      });
+
+      resolve({
+        status: rooms.length > 0 ? "OK" : "ERR",
+        data: rooms || [],
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
-  checkRoomAvailabilityByPropertyId
+  checkRoomAvailabilityByPropertyId,
+  getListRoomAvailabilityByPropertyId,
 };

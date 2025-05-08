@@ -19,7 +19,7 @@ const {
 class QueryController {
   async query(req, res) {
     const { text, limit = 5 } = req.query;
-    const sessionId = req.sessionId;
+    let sessionId = req.headers["x-session-id"] || req.query.sessionId;
     const startTime = Date.now();
 
     if (!text) {
@@ -40,6 +40,7 @@ class QueryController {
       res.writeHead(200, {
         "Content-Type": "application/json",
         "Transfer-Encoding": "chunked",
+        "x-session-id": sessionId, // Gửi sessionId trong header
       });
 
       let context = contextCache.get(sessionId) || { history: [] };
@@ -51,8 +52,14 @@ class QueryController {
       // Phát hiện intent
       const intents = detectIntent(text);
 
-      // Truy vấn cơ sở dữ liệu với tất cả intents
-      const matchedItems = await queryDatabase(text, limit, intents);
+      console.log("Detected intents:", intents);
+      let matchedItems = [];
+      try {
+        matchedItems = await queryDatabase(text, limit, intents);
+      } catch (dbError) {
+        console.error("Error querying database:", dbError);
+        // Continue with empty results instead of failing completely
+      }
 
       const queryResult = {
         query: text,

@@ -11,7 +11,10 @@ const HighLightRouter = require("./HighLightRouter");
 const ImageRouter = require("./ImageRouter");
 const ReservationRouter = require("./ReservationRouter");
 const SummaryRouter = require("./SummaryRouter");
-
+const AdvertisingRouter = require("./AdvertisingRouter");
+const PaymentRouter = require("./PaymentRoute");
+const AdOrderRouter = require("./AdOrderRouter");
+const CommissionPaymentRouter = require("./CommissionPaymentRouter");
 const AIServiceRouter = require("./AIRouter");
 
 const RoomAvailabilityRouter = require("./RoomAvailibityRouter");
@@ -32,6 +35,10 @@ const initRoutes = (app) => {
   app.use("/api/highlight", HighLightRouter);
   app.use("/api/image", ImageRouter);
   app.use("/api/room-availability", RoomAvailabilityRouter);
+  app.use("/api/advertising", AdvertisingRouter);
+  app.use("/api/payment", PaymentRouter);
+  app.use("/api/ad-order", AdOrderRouter);
+  app.use("/api/commission", CommissionPaymentRouter);
 
   app.use("/api/room", RoomRouter);
   app.use("/api/reservation", ReservationRouter);

@@ -1,11 +1,22 @@
 const db = require("../models");
 const { v4 } = require("uuid");
 
-const getListRoomByPropertyId = (propertyId) => {
+const getListRoomByPropertyId = (propertyId, filters = {}) => {
   return new Promise(async (resolve, reject) => {
     try {
+      const { text, status } = filters;
+
       const rooms = await db.Room.findAll({
-        where: { idProperty: propertyId },
+        where: {
+          idProperty: propertyId,
+          ...(text && {
+            [db.Sequelize.Op.or]: [
+              { name: { [db.Sequelize.Op.like]: `%${text}%` } }, // Tìm kiếm theo tên
+              { code: { [db.Sequelize.Op.like]: `%${text}%` } }, // Tìm kiếm theo mã
+            ],
+          }),
+          ...(status && { status }), // Tìm kiếm theo trạng thái
+        },
         include: [
           {
             model: db.Amenity,
@@ -41,7 +52,7 @@ const searchListRoomForBooking = (propertyId) => {
   return new Promise(async (resolve, reject) => {
     try {
       const rooms = await db.Room.findAll({
-        where: { idProperty: propertyId },
+        where: { idProperty: propertyId, status: "active" },
         include: [
           {
             model: db.Amenity,
@@ -261,10 +272,85 @@ const updateRoom = (roomId, data) => {
   });
 };
 
+const updateStatusRoom = (roomId, status) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const room = await db.Room.update(
+        {
+          status: status,
+        },
+        { where: { id: roomId } }
+      );
+
+      resolve({
+        status: "OK",
+        data: room,
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const getTopReventRoomByPropertyId = async (propertyId) => {
+  try {
+    // Bước 1: Lấy rooms với revenue
+    const rooms = await db.Room.findAll({
+      where: { idProperty: propertyId },
+      attributes: [
+        "id",
+        "name",
+        "price",
+        "code",
+        [
+          db.sequelize.fn("SUM", db.sequelize.col("reservations.totalPrice")),
+          "revenue",
+        ],
+        [
+          db.sequelize.fn("COUNT", db.sequelize.col("reservations.id")),
+          "reservationCount",
+        ],
+      ],
+      include: [
+        {
+          model: db.Reservation,
+          as: "reservations",
+          attributes: [],
+          required: false,
+        },
+      ],
+      group: ["Room.id"],
+      order: [[db.sequelize.literal("revenue"), "DESC"]],
+    });
+
+    // Bước 2: Lấy ảnh cho từng room
+    const roomIds = rooms.map((room) => room.id);
+    const images = await db.ImageRoom.findAll({
+      where: { idRoom: roomIds },
+      attributes: ["id", "image", "idRoom"],
+    });
+
+    // Gộp dữ liệu
+    const roomsWithImages = rooms.map((room) => ({
+      ...room.get({ plain: true }),
+      images: images.filter((img) => img.idRoom === room.id),
+    }));
+
+    return {
+      status: "OK",
+      data: roomsWithImages,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   getListRoomByPropertyId,
   getDetailById,
   createRoom,
   updateRoom,
   searchListRoomForBooking,
+  updateStatusRoom,
+  getTopReventRoomByPropertyId,
 };
