@@ -1,4 +1,5 @@
 import http from "@/libs/http";
+import dayjs from "dayjs";
 import { get } from "http";
 export interface StatisticsData {
   date: string;
@@ -15,7 +16,7 @@ const apisAdmin = {
     http.post(`admin/login`, data),
 
   // ========================= Quản lý chủ sở hữu =========================
-  // registerOwner: (data: any) => http.post(`admin/register-owner`, data),
+
 
   // ========================= Quản lý người dùng =========================
   listUsers: () =>
@@ -25,7 +26,21 @@ const apisAdmin = {
       },
     }),
 
-  createUser: async (data: any) => {
+  createUser: async (data: {
+    email: string;
+    password: string;
+    phone: string;
+    avatar: string;
+    firstName: string;
+    lastName: string;
+    bio: string;
+    gender: string;
+    dateOfBirth: Date;
+    emergencyPhone: string;
+    address: string;
+    role: string;
+    status: string;
+  }) => {
     try {
       return await http.post(`admin/create-user`, data, {
         headers: {
@@ -37,7 +52,21 @@ const apisAdmin = {
     }
   },
 
-  updateUser: (id: string, data: any) =>
+  updateUser: (id: string, data: {
+    email: string;
+    password: string;
+    phone: string;
+    avatar: string;
+    firstName: string;
+    lastName: string;
+    bio: string;
+    gender: string;
+    dateOfBirth: Date;
+    emergencyPhone: string;
+    address: string;
+    role: string;
+    status: string;
+  }) =>
     http.put(`admin/update-user/${id}`, data, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -88,9 +117,18 @@ const apisAdmin = {
   // ========================= Quản lý homestay =========================
  
 
-  updateHomestay: (id: string, data: any) =>
-    http.put(`admin/update-homestay/${id}`, data),
-
+  updateHomestay: (
+    id: string,
+    data: {
+      name: string;
+      description: string;
+      status: string;
+      idCategory: string;
+      idAddress: string;
+      images: string[]; 
+    }
+  ) => http.put(`admin/update-homestay/${id}`, data),
+  
   listHomestays: () => http.get(`admin/list-homestays`),
 
   deleteHomestay: (id: string) =>
@@ -100,9 +138,20 @@ const apisAdmin = {
     http.get(`admin/list-room/${propertyId}`),
   listProperties: (ownerId:string) => 
     http.get(`admin/list-properties/${ownerId}`),
-  updateRoom: (id: string, data: any) =>
-    http.put(`admin/update-room/${id}`, data),
-
+  updateRoom: (
+    id: string,
+    data: {
+      name: string;
+      description: string;
+      maxPerson: number;
+      price: number;
+      status: string; 
+      idProperty: string;
+      images: string[]; 
+      amenities: string[]; 
+    }
+  ) => http.put(`admin/update-room/${id}`, data),
+  
   deleteRoom: (id: string) => http.delete(`admin/delete-room/${id}`),
 
   // ========================= Quản lý thanh toán (Payment) =========================
@@ -118,13 +167,13 @@ const apisAdmin = {
   cancelBooking: (id: string) => http.put(`admin/cancel-booking/${id}`, {}),
 
 
-  getStatistics: (filter: TimeFilter) => 
-    http.get<{ data: StatisticsData[] }>(`/admin/statistics`, {
-      params: { filter },
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-      },
-    }),
+  // getStatistics: (filter: TimeFilter) => 
+  //   http.get<{ data: StatisticsData[] }>(`/admin/statistics`, {
+  //     params: { filter },
+  //     headers: {
+  //       Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+  //     },
+  //   }),
 };
 
 export default apisAdmin;

@@ -6,34 +6,51 @@ import dayjs from "dayjs";
 import { showErrorAlert } from "@/helper/Alert";
 import "font-awesome/css/font-awesome.min.css"; // Import Font Awesome CSS
 import { FaSyncAlt, FaTimes, FaEye, FaUser, FaEnvelope, FaCreditCard, FaDoorOpen, FaClock } from "react-icons/fa";
+interface IUser {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+interface IRoom {
+  id: string;
+  idProperty: string;
+  name: string;
+  description: string;
+  maxPerson: number;
+  price: number;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface IReservation {
+  totalPrice: number;
+  Rooms?: IRoom;
+}
+
 interface IPayment {
   id: string;
   idReservation: string;
   idUser: string;
   paymentDate: string;
   paymentMethod: string;
-  paymentStatus: "Pending" | "Completed" | "Failed"|"Refunded";
+  paymentStatus: "Pending" | "Completed" | "Failed" | "Refunded";
   createdAt: string;
   updatedAt: string;
-  Users?: {
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-  Reservations?: {
-    totalPrice: number;
-    Rooms?: {
-      id: string;
-      idProperty: string;
-      name: string;
-      description: string;
-      maxPerson: number;
-      price: number;
-      status: string;
-      createdAt: string;
-      updatedAt: string;
-    };
-  };
+  Users?: IUser;
+  Reservations?: IReservation;
+}
+interface PaymentDetailModalProps {
+  payment: IPayment;
+  onClose: () => void;
+}
+
+// Props cho DetailItem
+interface DetailItemProps {
+  label: string;
+  value: React.ReactNode;
+  icon?: React.ReactElement;
 }
 const getStatusBadge = (status: string) => {
   switch (status) {
@@ -69,10 +86,10 @@ const PaymentContainer: React.FC = () => {
   try {
     setLoading(true); // Bật trạng thái loading khi bắt đầu fetch
     const response = await apisAdmin.listPayments();
-    const mappedPayments = response.data.map((payment: any) => ({
+    const mappedPayments: IPayment[] = response.data.map((payment: IPayment) => ({
       ...payment,
-      User: payment.User || null,
-      Reservation: payment.Reservation || null 
+      User: payment.Users || null,
+      Reservation: payment.Reservations || null 
     }));
     setPayments(mappedPayments);
   } catch (error) {
@@ -183,7 +200,7 @@ const PaymentContainer: React.FC = () => {
             value={dateFilter.type}
             onChange={(e) => setDateFilter(prev => ({
               ...prev,
-              type: e.target.value as any
+              type: e.target.value as  'paymentDate' | 'createdAt' | ''
             }))}
           >
             <option value="paymentDate">Ngày thanh toán</option>
@@ -324,11 +341,7 @@ const PaymentContainer: React.FC = () => {
     </div>
   );
 };
-const DetailItem: React.FC<{
-  label: string;
-  value: React.ReactNode;
-  icon?: React.ReactElement;
-}> = ({ label, value, icon }) => (
+const DetailItem: React.FC<DetailItemProps> = ({ label, value, icon }) => (
   <div className="flex items-start gap-3">
     {icon && <div className="text-blue-600 mt-1">{icon}</div>}
     <div>
@@ -337,15 +350,8 @@ const DetailItem: React.FC<{
     </div>
   </div>
 );
-const PaymentDetailModal: React.FC<{
-  payment: any; // Temporarily using any to match your exact structure
-  onClose: () => void;
-}> = ({ payment, onClose }) => {
-  // Extract nested objects for easier access
-  const user = payment.Users || {};
-  const room = payment.Reservations?.Rooms || {};
-  const reservation = payment.Reservations || {};
-
+const PaymentDetailModal: React.FC<PaymentDetailModalProps> = ({ payment, onClose }) => {
+ 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 backdrop-blur-sm">
       <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden">
@@ -366,7 +372,7 @@ const PaymentDetailModal: React.FC<{
           <div className="space-y-4">
             <DetailItem
               label="Khách hàng"
-              value={`${user.firstName || ''} ${user.lastName || ''}`.trim() || 'N/A'}
+              value={`${payment.Users?.firstName || ''} ${payment.Users?.lastName || ''}`.trim() || 'N/A'}
             />
             <DetailItem
               label="Mã đặt phòng"
@@ -374,7 +380,7 @@ const PaymentDetailModal: React.FC<{
             />
             <DetailItem
               label="Email"
-              value={user.email || 'N/A'}
+              value={payment.Users?.email || 'N/A'}
             />
             <DetailItem
               label="Phương thức"
@@ -389,25 +395,25 @@ const PaymentDetailModal: React.FC<{
           <div className="space-y-4">
             <DetailItem
               label="Loại phòng"
-              value={room.name || 'N/A'}
+              value={payment.Reservations?.Rooms?.name || 'N/A'}
             />
             <DetailItem
               label="Mô tả phòng"
-              value={room.description || 'N/A'}
+              value={payment.Reservations?.Rooms?.description || 'N/A'}
             />
             <DetailItem
               label="Sức chứa"
-              value={`${room.maxPerson || 'N/A'} người`}
+              value={`${payment.Reservations?.Rooms?.maxPerson || 'N/A'} người`}
             />
             <DetailItem
               label="Giá phòng"
-              value={`${room.price?.toLocaleString('vi-VN') || 'N/A'} VND`}
+              value={`${payment.Reservations?.Rooms?.price?.toLocaleString('vi-VN') || 'N/A'} VND`}
             />
             <DetailItem
               label="Tổng thanh toán"
               value={
                 <div className="text-xl font-semibold text-green-600">
-                  {reservation.totalPrice?.toLocaleString('vi-VN') || 'N/A'} VND
+                  {payment.Reservations?.totalPrice?.toLocaleString('vi-VN') || 'N/A'} VND
                 </div>
               }
             />

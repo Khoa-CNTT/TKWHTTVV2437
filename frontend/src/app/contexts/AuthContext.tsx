@@ -15,6 +15,7 @@ import { IUser } from "../types/user";
 interface AuthContextType {
   user: IUser | null; // Bạn có thể thay thế `any` bằng kiểu dữ liệu cụ thể của user
   setUser: React.Dispatch<React.SetStateAction<IUser | null>>;
+
 }
 
 // Tạo context với kiểu dữ liệu mặc định
