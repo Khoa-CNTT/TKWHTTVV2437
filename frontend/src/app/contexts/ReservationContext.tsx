@@ -20,19 +20,23 @@ interface ReservationContextType {
 // Giá trị mặc định ban đầu
 const defaultReservation: IReservation = {
   id: "",
-  loaiphong: "",
+  nameRoom: "",
   firstName: "",
   lastName: "",
+  message: "",
   checkIn: dayjs(),
   checkOut: dayjs().add(1, "day"),
   totalPrice: 0,
-  trangThai: "",
-  ngayDat: dayjs(),
+  status: "",
   email: "",
   phone: "",
-  deposit: 0,
   createdAt: dayjs(),
   imageBanking: null,
+  numberAccount: "",
+  nameAccount: "",
+  nameBank: "",
+  statusUser: "",
+  code: "",
 };
 
 // Tạo context

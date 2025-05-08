@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "idCategory", // Khóa ngoại trỏ đến Category
         as: "category",
       });
+
       Property.hasMany(models.ImageProperty, {
         foreignKey: "idProperty", // Khóa ngoại trong bảng imageRoom
         as: "images", // Alias để truy cập
@@ -54,6 +55,11 @@ module.exports = (sequelize, DataTypes) => {
       Property.belongsTo(models.Advertising, {
         foreignKey: "idAdvertising", // Khóa ngoại trong bảng imageRoom
         as: "advertisingDetail", // Alias để truy cập
+      });
+
+      Property.belongsTo(models.User, {
+        foreignKey: "idUser",
+        as: "users",
       });
     }
   }

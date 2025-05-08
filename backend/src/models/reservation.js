@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Reservation.belongsTo(models.User, {
         foreignKey: "idUser", // Khóa ngoại trỏ đến Category
-        as: "Users",
+        as: "users",
       });
       Reservation.belongsTo(models.Room, {
         foreignKey: "idRoom", // Khóa ngoại trong bảng Property
@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       });
       Reservation.hasMany(models.Payment, {
         foreignKey: "idReservation", // Khóa ngoại trong bảng imageRoom
-        as: "Payments", // Alias để truy cập
+        as: "payments", // Alias để truy cập
       });
     }
   }
@@ -26,15 +26,28 @@ module.exports = (sequelize, DataTypes) => {
     {
       idUser: DataTypes.STRING,
       idRoom: DataTypes.STRING,
-      firstName: DataTypes.STRING,
-      lastName: DataTypes.STRING,
-      email: DataTypes.STRING,
-      phone: DataTypes.STRING,
+      // firstName: DataTypes.STRING,
+      // lastName: DataTypes.STRING,
+      // email: DataTypes.STRING,
+      // phone: DataTypes.STRING,
       checkIndate: DataTypes.DATE,
       checkOutdate: DataTypes.DATE,
       numGuest: DataTypes.INTEGER,
       totalPrice: DataTypes.DOUBLE,
       status: DataTypes.STRING,
+      message: DataTypes.STRING,
+      nameAccount: DataTypes.STRING,
+      numberAccount: DataTypes.STRING,
+      nameBank: DataTypes.STRING,
+      statusUser: DataTypes.STRING,
+      returnImgBanking: DataTypes.STRING,
+      code: DataTypes.STRING,
+      firstName: DataTypes.STRING,
+      lastName: DataTypes.STRING,
+      email: DataTypes.STRING,
+      phone: DataTypes.STRING,
+      imageBanking: DataTypes.STRING,
+      reason: DataTypes.STRING,
     },
     {
       sequelize,

@@ -21,9 +21,10 @@ interface IReview {
 interface IProps {
   property: IProperty | null;
   room: IRoom | null;
+  code: string;
 }
 
-const InforRoomCheckout: React.FC<IProps> = ({ property, room }) => {
+const InforRoomCheckout: React.FC<IProps> = ({ property, room, code }) => {
   // const { propertyId, startDate, endDate, guest } = useCheckoutContext(); // Lấy hàm setRoomId từ context
   const { propertyId, startDate, endDate } = useCheckoutContext();
 
@@ -69,6 +70,9 @@ const InforRoomCheckout: React.FC<IProps> = ({ property, room }) => {
       </div>
 
       <div className="border-b-[1px] border-x-[1px] rounded-b-md border-gray-300 px-6 py-8">
+        <h4 className="font-semibold text-xl mt-2 mb-4 border p-4 border-gray-300 bg-yellow-50 rounded-lg ">
+          Mã xác nhận: {code}
+        </h4>
         <h4 className="font-semibold">{property?.name}</h4>
         <h3 className="font-medium">{room?.name}</h3>
         <p className="mt-2">{property?.propertyAddress?.city}</p>

@@ -586,6 +586,11 @@ const getDetailProperyById = (propertyId) => {
             model: db.Address,
             as: "propertyAddress",
           },
+          {
+            model: db.User,
+            as: "users", // alias này cần đúng với định nghĩa trong model
+            attributes: ["email", "phone"],
+          },
         ],
         // attributes: ["name"],
       });

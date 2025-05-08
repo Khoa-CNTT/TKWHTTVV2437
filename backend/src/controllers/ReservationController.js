@@ -39,10 +39,14 @@ const detailReservationApprove = async (req, res) => {
 
 const approveReservation = async (req, res) => {
   try {
-    const { reid, status } = req.body;
+    const { reid, status, returnImgBanking, reason, ...payload } = req.body;
+
     const response = await ReservationService.approveReservation({
       reid,
       status,
+      returnImgBanking,
+      payload,
+      reason,
     });
     return res.status(200).json(response);
   } catch (error) {
@@ -52,6 +56,17 @@ const approveReservation = async (req, res) => {
   }
 };
 
+const listReservationOfUser = async (req, res) => {
+  try {
+    const { idUser } = req.query;
+    const response = await ReservationService.listReservationOfUser(idUser);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
 const getDataBarChart = async (req, res) => {
   try {
     const response = await ReservationService.getDataBarChart(
@@ -66,10 +81,49 @@ const getDataBarChart = async (req, res) => {
   }
 };
 
+const detailReservationOfUser = async (req, res) => {
+  try {
+    const { idRes } = req.query;
+    const response = await ReservationService.detailReservationOfUser(idRes);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
+const updateInfoReservation = async (req, res) => {
+  try {
+    const response = await ReservationService.updateInfoReservation(req.body);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
+const updateStatusUserReservation = async (req, res) => {
+  try {
+    const response = await ReservationService.updateStatusUserReservation(
+      req.body
+    );
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
 module.exports = {
   createReservation,
   listReservationApprove,
   detailReservationApprove,
   approveReservation,
+  listReservationOfUser,
+  detailReservationOfUser,
+  updateInfoReservation,
   getDataBarChart,
+  updateStatusUserReservation,
 };

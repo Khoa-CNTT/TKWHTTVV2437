@@ -7,9 +7,11 @@ import apisProperty from "@/apis/property";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import { IoMdCloseCircle } from "react-icons/io";
-import { MdOutlineEmail } from "react-icons/md";
+import { MdNextWeek, MdOutlineEmail } from "react-icons/md";
+import { GrFormNext } from "react-icons/gr";
 import { IoCallOutline } from "react-icons/io5";
-
+import ActionMyTrip from "@/components/myTrip/ActionMyTrip";
+import EditInfo from "@/components/myTrip/EditInfo";
 interface IProps {
   params: { slug: string };
 }
@@ -33,6 +35,21 @@ const DetailPage = async (props: IProps) => {
   console.log("room", room);
   console.log("property", property);
 
+  const getStatusText = (status: string | undefined): string => {
+    switch (status) {
+      case "waiting":
+        return "Đang chờ xác nhận";
+      case "confirmed":
+        return "Đã xác nhận";
+      case "reject":
+        return "Đã từ chối và hoàn tiền";
+      case "refund":
+        return "Đã hoàn tiền";
+      default:
+        return "Không rõ trạng thái";
+    }
+  };
+
   return (
     <div>
       <div className="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -40,8 +57,38 @@ const DetailPage = async (props: IProps) => {
 
         <div className="lg:col-span-2 flex flex-col gap-6">
           {/* Thông báo xác nhận */}
-          <div>
-            <p className="text-green-600 font-semibold mb-2">Đã xác nhận</p>
+          <div className="">
+            <div className="flex items-center gap-4 p-4 border border-gray-300 rounded-xl mb-4">
+              <p
+                className={`text-green-600 font-semibold ${reservation.data.statusUser === "canceled" && "text-red-600"} `}
+              >
+                {reservation.data.statusUser === "created"
+                  ? "Đã đặt"
+                  : "Đã hủy"}
+              </p>
+              <span className="text-green-600 text-4xl flex items-center">
+                <GrFormNext />
+              </span>
+              <p
+                className={` font-semibold  ${reservation?.data?.status === "waiting" ? "text-black" : "text-green-600"}`}
+              >
+                {getStatusText(reservation?.data?.status)}
+              </p>
+            </div>
+
+            {reservation?.data?.reason && (
+              <div className="p-4 border border-red-600 mb-4 rounded-xl text-red-500 flex flex-col gap-2">
+                <p className="font-semibold">
+                  Lí do: {reservation?.data?.reason}
+                </p>
+                {reservation?.data?.returnImgBanking && (
+                  <p className="text-[12px] italic">
+                    Thông tin hoàn tiền ở dưới{" "}
+                  </p>
+                )}
+              </div>
+            )}
+
             <h1 className="text-2xl font-bold mb-4">
               Đặt phòng của bạn ở {property?.data.propertyAddress.city} đã được
               xác nhận.
@@ -77,19 +124,19 @@ const DetailPage = async (props: IProps) => {
                     <SlCalender className="w-6 h-6" />
                   </span>
                   <div className="grid grid-cols-2 gap-6 text-sm">
-                    <div className="pr-14 border-r border-gray-400 flex flex-col gap-1">
+                    <div className="pr-4 border-r border-gray-400 flex flex-col gap-1">
                       <p className="font-semibold">Nhận phòng</p>
                       <p className="font-bold text-[-18]">
-                        {dayjs(reservation?.data?.checkInDate).format(
+                        {dayjs(reservation?.data?.checkIndate).format(
                           "dddd, D [tháng] M, YYYY"
                         )}
                       </p>
                       <p>14:00 - 23:00</p>
                     </div>
-                    <div className="pl-5 flex flex-col gap-1">
+                    <div className="ml-3 flex flex-col gap-1">
                       <p className="font-semibold">Trả phòng</p>
                       <p className="font-bold text-[-18]">
-                        {dayjs(reservation?.data?.checkOutDate).format(
+                        {dayjs(reservation?.data?.checkOutdate).format(
                           "dddd, D [tháng] M, YYYY"
                         )}
                       </p>
@@ -106,10 +153,13 @@ const DetailPage = async (props: IProps) => {
                     <p>
                       {dayjs(reservation.data.checkIndate) &&
                         dayjs(reservation.data.checkOutdate) &&
-                        Math.abs(
-                          dayjs(reservation.data.checkIndate)?.diff(
-                            dayjs(reservation.data.checkOutdate),
-                            "day"
+                        Math.ceil(
+                          Math.abs(
+                            dayjs(reservation.data.checkIndate)?.diff(
+                              dayjs(reservation.data.checkOutdate),
+                              "day",
+                              true
+                            )
                           )
                         )}{" "}
                       đêm - 1 phòng cho {room?.data.maxPerson} người lớn
@@ -134,7 +184,7 @@ const DetailPage = async (props: IProps) => {
                     {/* Thông tin phòng */}
                     <div className="flex items-start gap-4 mb-8">
                       <img
-                        src="https://vcdn1-dulich.vnecdn.net/2022/06/01/Hoi-An-VnExpress-5851-16488048-4863-2250-1654057244.jpg?w=0&h=0&q=100&dpr=1&fit=crop&s=Z2ea_f0O7kgGZllKmJF92g"
+                        src={room?.data?.images[0]?.image}
                         alt="Phòng Có Giường Cỡ King"
                         className="w-32 h-24 object-cover rounded"
                       />
@@ -211,7 +261,7 @@ const DetailPage = async (props: IProps) => {
                 </div>
               </div>
               <img
-                src="https://vcdn1-dulich.vnecdn.net/2022/06/01/Hoi-An-VnExpress-5851-16488048-4863-2250-1654057244.jpg?w=0&h=0&q=100&dpr=1&fit=crop&s=Z2ea_f0O7kgGZllKmJF92g"
+                src={property?.data?.images[0]?.image}
                 alt="Hotel room"
                 className="w-32 h-24 rounded object-cover"
               />
@@ -235,10 +285,13 @@ const DetailPage = async (props: IProps) => {
                   x{" "}
                   {dayjs(reservation.data.checkIndate) &&
                     dayjs(reservation.data.checkOutdate) &&
-                    Math.abs(
-                      dayjs(reservation.data.checkIndate)?.diff(
-                        dayjs(reservation.data.checkOutdate),
-                        "day"
+                    Math.ceil(
+                      Math.abs(
+                        dayjs(reservation.data.checkIndate)?.diff(
+                          dayjs(reservation.data.checkOutdate),
+                          "day",
+                          true
+                        )
                       )
                     )}{" "}
                   đêm
@@ -251,10 +304,13 @@ const DetailPage = async (props: IProps) => {
                 {Number(
                   Number(room?.data.price) *
                     Number(
-                      Math.abs(
-                        dayjs(reservation.data.checkIndate)?.diff(
-                          dayjs(reservation.data.checkOutdate),
-                          "day"
+                      Math.ceil(
+                        Math.abs(
+                          dayjs(reservation.data.checkIndate)?.diff(
+                            dayjs(reservation.data.checkOutdate),
+                            "day",
+                            true
+                          )
                         )
                       )
                     )
@@ -268,12 +324,24 @@ const DetailPage = async (props: IProps) => {
               <h1 className="font-semibold">Chứng từ thanh toán của bạn</h1>
               <div className="mt-2 flex justify-center bg-blue-50 border border-blue-800">
                 <img
-                  src="https://einvoice.vn/FileUpload/ArticleMaterials/images/mau-hoa-don-3(2).png"
+                  src={reservation?.data?.imageBanking || ""}
                   alt=""
                   className="h-72 object-contain"
                 />
               </div>
             </div>
+            {reservation?.data?.returnImgBanking && (
+              <div className="my-4">
+                <h1 className="font-semibold">Chứng từ hoàn tiền</h1>
+                <div className="mt-2 flex justify-center bg-blue-50 border border-blue-800">
+                  <img
+                    src={reservation?.data?.returnImgBanking || ""}
+                    alt=""
+                    className="h-72 object-contain"
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="my-10 border-y border-t-gray-200 border-b-gray-200 py-6 flex flex-col gap-4">
               <h1 className="text-xl font-semibold">Liên hệ chỗ nghĩ</h1>
@@ -291,7 +359,7 @@ const DetailPage = async (props: IProps) => {
                     Hãy email cho chỗ nghĩ và họ sẽ trả lời sớm nhất có thể
                   </p>
                   <a
-                    href="mailto:badagor999@gmail.com"
+                    href={`mailto:${property?.data?.users.mail}`}
                     className="font-semibold text-primary hover:opacity-70 cursor-pointer"
                   >
                     Gởi email
@@ -307,10 +375,10 @@ const DetailPage = async (props: IProps) => {
                   <h3 className="font-semibold">Gọi điện cho chỗ nghỉ</h3>
 
                   <a
-                    href="tel:0707560285"
+                    href={`tel:${property?.data?.users.phone}`}
                     className="font-semibold text-primary hover:opacity-70 cursor-pointer"
                   >
-                    0123456789
+                    {property?.data?.users.phone}
                   </a>
                 </div>
               </div>
@@ -333,41 +401,48 @@ const DetailPage = async (props: IProps) => {
           </div>
 
           {/* Các hành động */}
-          <div className="border rounded-lg shadow p-6 flex flex-col gap-4">
-            <p className="font-semibold">Tất cả các thông tin có đúng không?</p>
-            <div className="flex items-center text-primary font-semibold underline gap-1 cursor-pointer hover:opacity-70 w-fit">
-              <span className="w-4 h-4">
-                <IoMdCloseCircle />
-              </span>
-              <span>Huỷ đặt phòng ?</span>
-            </div>
-            <div className="flex items-center text-primary font-semibold underline gap-1 cursor-pointer hover:opacity-70 w-fit">
-              <span className="w-4 h-4">
-                <FaUserEdit />
-              </span>
-              <span>Chỉnh sửa thông tin của bạn?</span>
-            </div>
-          </div>
+          <ActionMyTrip
+            id={reservation.data.id}
+            statusUser={reservation.data.statusUser}
+            status={reservation.data.status}
+            startDay={reservation.data.checkIndate}
+            endDay={reservation.data.checkOutdate}
+            idRoom={reservation.data.idRoom}
+          />
 
           {/* Liên hệ chỗ nghỉ */}
           <div className="border rounded-lg shadow p-6 flex flex-col gap-4 text-sm">
             <p className="font-semibold">Liên hệ chỗ nghỉ</p>
-            <p>Điện thoại: +84 961 932 532</p>
+            <p>Điện thoại: {property?.data?.users.phone}</p>
             <a
-              href="mailto:badagor999@gmail.com"
+              href={`mailto:${property?.data?.users.email}`}
               className="text-blue-600 underline text-left hover:text-blue-800"
             >
-              Nhắn tin
+              Gởi email: {property?.data?.users.email}
             </a>
             <a
-              href="tel:0707560285"
+              href={`tel:${property?.data?.users.phone}`}
               className="text-blue-600 underline text-left hover:text-blue-800"
             >
-              Gửi email
+              Gọi điện: {property?.data?.users.phone}
             </a>
           </div>
         </div>
       </div>
+      <EditInfo
+        data={{
+          id: reservation?.data?.id,
+          firstName: reservation?.data?.firstName,
+          lastName: reservation?.data?.lastName,
+          phone: reservation?.data?.phone,
+          email: reservation?.data?.email,
+          message: reservation?.data?.message,
+          numberAccount: reservation?.data?.numberAccount,
+          nameAccount: reservation?.data?.nameAccount,
+          nameBank: reservation?.data?.nameBank,
+          imageBanking: reservation?.data?.imageBanking,
+        }}
+      />
     </div>
   );
 };
