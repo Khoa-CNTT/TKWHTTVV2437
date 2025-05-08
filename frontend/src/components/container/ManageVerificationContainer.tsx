@@ -28,7 +28,7 @@ const VerificationContainer: React.FC = () => {
   const fetchOwners = async () => {
     try {
       const response = await apisAdmin.listUsers();
-      const filteredOwners = response.data.filter((user: any) => user.role === "Owner" && user.status == "Pending");
+      const filteredOwners :IOwner[] = response.data.filter((user: IOwner) => user.role === "Owner" && user.status == "Pending");
       setOwners(filteredOwners);
     } catch (err) {
       setError("Không thể tải danh sách chủ sở hữu");

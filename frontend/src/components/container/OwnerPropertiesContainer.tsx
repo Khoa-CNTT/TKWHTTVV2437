@@ -5,6 +5,19 @@ import apisAdmin from "@/api/admin";
 import dayjs from "dayjs";
 import "font-awesome/css/font-awesome.min.css";
 
+interface IRoom {
+  id: string;
+  name: string;
+  price: number;
+  maxPerson: number;
+  status: string;
+  images: string[];
+  amenities: { name: string }[];
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface IProperty {
   id: string;
   name: string;
@@ -20,17 +33,33 @@ interface IProperty {
   rooms: IRoom[];
 }
 
-interface IRoom {
+interface IApiProperty {
   id: string;
   name: string;
-  price: number;
-  maxPerson: number;
-  status: string;
-  images: string[]; // Thay đổi từ 'image' sang 'images'
-  amenities: { name: string }[];
   description: string;
+  status: string;
+  image: string;
   createdAt: string;
   updatedAt: string;
+  idUser: string;
+  address?: {
+    city?: string;
+  };
+  category?: {
+    name?: string;
+  };
+  rooms?: {
+    id: string;
+    name?: string;
+    price?: number;
+    maxPerson?: number;
+    status?: string;
+    images?: { image: string }[];
+    amenities?: { name: string }[];
+    description?: string;
+    createdAt: string;
+    updatedAt: string;
+  }[];
 }
 const OwnerPropertiesContainer: React.FC = () => {
   const router = useRouter();
@@ -53,30 +82,42 @@ const OwnerPropertiesContainer: React.FC = () => {
 
       try {
         const response = await apisAdmin.listProperties(ownerId);
-
+        const data: IApiProperty[] = response.data;
         // Sửa logic xử lý dữ liệu
-    const processedProps = response.data
-  .filter((p: any) => p.idUser === ownerId)
-  .map((property: any) => ({
-    ...property,
-    city: property.address?.city || "Không xác định",
-    type: property.category?.name || "Không có loại",
-    rooms: (property.rooms || []).map((room: any) => ({
-      id: room.id,
-      name: room.name || "Chưa đặt tên",
-      price: room.price || 0,
-      maxPerson: room.maxPerson || 0, // Sửa tên trường theo API
-      status: room.status || "Unknown",
-      images: room.images?.map((img: any) => img.image) || [], // Xử lý images
-      amenities: room.amenities?.map((am: any) => ({ name: am.name })) || [],
-      description: room.description || "Không có mô tả",
-      createdAt: room.createdAt,
-      updatedAt: room.updatedAt
-    })),
-    priceRange: property.rooms?.length > 0 
-      ? `${Math.min(...property.rooms.map((r: any) => r.price)).toLocaleString()} ~ ${Math.max(...property.rooms.map((r: any) => r.price)).toLocaleString()}`
-      : "Không có giá"
-  }));
+
+        const processedProps: IProperty[] = data
+          .filter((p) => p.idUser === ownerId)
+          .map((property) => {
+            const roomPrices = property.rooms?.map((r) => r.price ?? 0) || [];
+            return {
+              id: property.id,
+              name: property.name,
+              description: property.description,
+              status: property.status,
+              image: property.image,
+              createdAt: property.createdAt,
+              updatedAt: property.updatedAt,
+              city: property.address?.city || "Không xác định",
+              type: property.category?.name || "Không có loại",
+              amenities: [], // Có thể xử lý nếu cần
+              rooms: (property.rooms || []).map((room) => ({
+                id: room.id,
+                name: room.name || "Chưa đặt tên",
+                price: room.price || 0,
+                maxPerson: room.maxPerson || 0,
+                status: room.status || "Unknown",
+                images: room.images?.map((img) => img.image) || [],
+                amenities: room.amenities?.map((am) => ({ name: am.name })) || [],
+                description: room.description || "Không có mô tả",
+                createdAt: room.createdAt,
+                updatedAt: room.updatedAt,
+              })),
+              priceRange:
+                roomPrices.length > 0
+                  ? `${Math.min(...roomPrices).toLocaleString()} ~ ${Math.max(...roomPrices).toLocaleString()}`
+                  : "Không có giá",
+            };
+          });
 
         setProperties(processedProps);
       } catch (error) {

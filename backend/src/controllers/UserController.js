@@ -187,6 +187,28 @@ const verifyOTPLogin = async (req, res) => {
   }
 };
 
+const getTotalUserForAdminDashboard = async (req, res) => {
+  try {
+    const response = await UserService.getTotalUserForAdminDashboard();
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
+const getDataLineChartUserAdmin = async (req, res) => {
+  try {
+    const response = await UserService.getDataLineChartUserAdmin(req.query);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
 module.exports = {
   registerUser,
   signInUser,
@@ -197,4 +219,6 @@ module.exports = {
   sendMailOTP,
   verifyOTP,
   verifyOTPLogin,
+  getTotalUserForAdminDashboard,
+  getDataLineChartUserAdmin,
 };

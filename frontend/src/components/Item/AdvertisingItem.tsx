@@ -16,6 +16,7 @@ interface IProps {
   description: string;
   id: string;
   advertising: { type?: number; id?: string };
+  propertyId: string;
 }
 
 const iconData: { [key: string]: JSX.Element } = {
@@ -31,6 +32,7 @@ const AdvertisingItem: React.FC<IProps> = ({
   description,
   id,
   advertising,
+  propertyId,
 }) => {
   const router = useRouter();
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -85,6 +87,7 @@ const AdvertisingItem: React.FC<IProps> = ({
             price={price}
             type={type}
             description={description}
+            propertyId={propertyId}
           />
         </div>
       )}

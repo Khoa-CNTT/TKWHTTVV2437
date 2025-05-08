@@ -132,7 +132,7 @@ const ManageReservationContainer: React.FC = () => {
       setLoading(true);
       try {
         const response = await apisAdmin.listBookings();
-        const reservationsWithUser = response.data.map((res: any) => ({
+        const reservationsWithUser :IReservation[] = response.data.map((res: IReservation) => ({
           ...res,
           firstName: res.User?.firstName || res.firstName,
           lastName: res.User?.lastName || res.lastName,
@@ -364,7 +364,7 @@ const ManageReservationContainer: React.FC = () => {
             value={dateFilter.type}
             onChange={(e) => setDateFilter(prev => ({
               ...prev,
-              type: e.target.value as any
+              type: e.target.value as 'checkIn' | 'checkOut' | 'createdAt' 
             }))}
           >
             <option value="">Chọn loại ngày</option>

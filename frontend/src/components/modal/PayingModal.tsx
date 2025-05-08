@@ -23,6 +23,7 @@ interface IProps {
   description: string;
   id: string;
   onShowModal: (value: boolean) => void;
+  propertyId: string;
 }
 
 const iconData: { [key: string]: JSX.Element } = {
@@ -38,6 +39,7 @@ const PayingModal: React.FC<IProps> = ({
   type,
   description,
   onShowModal,
+  propertyId,
 }) => {
   const { user } = useAuth();
 
@@ -50,6 +52,7 @@ const PayingModal: React.FC<IProps> = ({
         idUser: user?.id,
         methodPay: "vnpay",
         quantity: 1,
+        idProperty: propertyId,
       });
 
       if (order.data) {

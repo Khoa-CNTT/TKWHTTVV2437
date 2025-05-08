@@ -12,6 +12,11 @@ import apisProperty from "@/apis/property";
 import TopRoomContainer from "@/components/container/TopRoomContainer";
 import { useAuth } from "@/app/contexts/AuthContext";
 import apisReservation from "@/apis/reservation";
+import { useSearchParams } from "next/navigation";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import clsx from "clsx";
 
 interface ITotal {
   review: { averageRating: string };
@@ -32,11 +37,24 @@ interface IBarChar {
 }
 
 const chartData = {
-  labels: [],
+  labels: [
+    "06/2024",
+    "07/2024",
+    "08/2024",
+    "09/2024",
+    "10/2024",
+    "11/2024",
+    "12/2024",
+    "01/2025",
+    "02/2025",
+    "03/2025",
+    "04/2025",
+    "05/2025",
+  ],
   datasets: [
     {
       label: "Doanh thu",
-      data: [],
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       backgroundColor: "rgba(54, 162, 235, 0.6)", // Blue with 60% opacity
       borderColor: "rgba(54, 162, 235, 1)",
       borderWidth: 1,
@@ -49,7 +67,7 @@ const chartOptions = {
   plugins: {
     title: {
       display: true,
-      text: "Báo cáo doanh thu theo tháng",
+      text: "Báo cáo doanh thu",
     },
   },
 };
@@ -58,6 +76,10 @@ const Dashboard = () => {
   const [propertyId, setPropertyId] = useState<string>("");
   const { user } = useAuth();
   const [total, setTotal] = useState<ITotal>();
+  const searchParams = useSearchParams(); // Lấy query từ URL
+  const router = useRouter();
+  const [type, setType] = useState<string>("month");
+
   const [barChart, setBarChart] = useState<IBarChar>(chartData);
 
   useEffect(() => {
@@ -87,7 +109,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetDataBarChart = async () => {
       const response = await apisReservation.getDataBarChart(propertyId, {
-        type: "month",
+        type: type,
       });
 
       setBarChart({
@@ -105,7 +127,18 @@ const Dashboard = () => {
     };
 
     fetDataBarChart();
-  }, [propertyId]);
+  }, [propertyId, type]);
+
+  useEffect(() => {
+    const status = searchParams.get("status");
+    if (status === "true") {
+      toast.success("Thanh toán thành công");
+      router.push("/homestay/dashboard");
+    } else if (status === "false") {
+      toast.error("Thanh toán thất bại");
+      router.push("/homestay/dashboard");
+    }
+  }, [searchParams]);
 
   return (
     <div className="w-full">
@@ -124,7 +157,7 @@ const Dashboard = () => {
                   <p className="text-gray-500 font-semibold">Tổng đặt</p>
 
                   <p className="text-2xl font-semibold">
-                    {total?.totalBooking}
+                    {total?.totalBooking || 0}
                   </p>
                 </div>
               </div>
@@ -136,7 +169,7 @@ const Dashboard = () => {
                   <p className="text-gray-500 font-semibold">Loại phòng</p>
 
                   <p className="text-2xl font-semibold">
-                    {total?.totalRoomType}
+                    {total?.totalRoomType || 0}
                   </p>
                 </div>
               </div>
@@ -148,7 +181,7 @@ const Dashboard = () => {
                   <p className="text-gray-500 font-semibold">Số lượng phòng</p>
 
                   <p className="text-2xl font-semibold">
-                    {total?.totalRoomType}
+                    {total?.totalRoomType || 0}
                   </p>
                 </div>
               </div>
@@ -160,13 +193,44 @@ const Dashboard = () => {
                   <p className="text-gray-500 font-semibold">Đánh giá</p>
 
                   <p className="text-2xl font-semibold">
-                    {total?.review.averageRating}/5
+                    {total?.review.averageRating || 0}/5
                   </p>
                 </div>
               </div>
             </div>
 
             <div className="mt-8 w-full">
+              <div className="flex justify-end">
+                <ul className="flex items-center gap-4 font-semibold">
+                  <li
+                    className={clsx(
+                      "cursor-pointer",
+                      type === "month" ? "text-blue-600" : "text-gray-500"
+                    )}
+                    onClick={() => setType("month")}
+                  >
+                    Tháng
+                  </li>
+                  <li
+                    className={clsx(
+                      "cursor-pointer",
+                      type === "quarter" ? "text-blue-600" : "text-gray-500"
+                    )}
+                    onClick={() => setType("quarter")}
+                  >
+                    Quý
+                  </li>
+                  <li
+                    className={clsx(
+                      "cursor-pointer",
+                      type === "year" ? "text-blue-600" : "text-gray-500"
+                    )}
+                    onClick={() => setType("year")}
+                  >
+                    Năm
+                  </li>
+                </ul>
+              </div>
               <BarChartContainer data={barChart} options={chartOptions} />
             </div>
 
@@ -176,7 +240,7 @@ const Dashboard = () => {
           </div>
 
           <div className="flex-2">
-            <PayCommissionContainer />
+            <PayCommissionContainer userId={user?.id || ""} />
           </div>
         </div>
       </div>
