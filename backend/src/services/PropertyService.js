@@ -275,7 +275,7 @@ const getListSearchText = (text) => {
             required: true, // Chỉ lấy properties có address
           },
         ],
-        limit: 10, // Giới hạn kết quả trả về
+        limit: 4, // Giới hạn kết quả trả về
       });
 
       resolve({
@@ -791,6 +791,17 @@ const renewalAdByUserId = (userId, advertisingId, term, type) => {
       const property = await db.Property.findOne({ where: { idUser: userId } });
 
       if (property.expiredAd === null || property.expiredAd < moment()) {
+        await db.Property.update(
+          {
+            idAdvertising: advertisingId,
+            advertising: type,
+            expiredAd: moment().add(term, "months"),
+          },
+          {
+            where: { idUser: userId },
+          }
+        );
+      } else if (property.advertising != type) {
         await db.Property.update(
           {
             idAdvertising: advertisingId,

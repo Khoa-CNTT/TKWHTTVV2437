@@ -171,7 +171,7 @@ const MenuSearchContainer: React.FC<IProps> = ({ provinces }) => {
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="flex flex-col gap-2 flex-2">
+        <div className="flex flex-col gap-2 flex-2 w-[170px]">
           {/* <label className="font-semibold text-md">Tỉnh / Thành phố</label> */}
           <FormControl fullWidth>
             <Select

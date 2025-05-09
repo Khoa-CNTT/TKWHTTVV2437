@@ -73,7 +73,10 @@ const ViewReviewButton: React.FC<IProps> = ({
   return (
     <div className="relative">
       <div
-        onClick={() => setShowModalReview(true)}
+        onClick={() => {
+          if (Number(avgRating) === 0) return;
+          setShowModalReview(true);
+        }}
         className="cusor-pointer flex items-center gap-2 mt-2 text-blue-600 text-sm cursor-pointer"
       >
         <span className="">Xem tất cả đánh giá</span>

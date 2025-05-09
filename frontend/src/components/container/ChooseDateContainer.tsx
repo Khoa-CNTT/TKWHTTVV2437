@@ -11,6 +11,11 @@ import React, { useState, useRef, useEffect } from "react";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateRangePickerDay } from "@mui/x-date-pickers-pro/DateRangePickerDay";
 import { useCheckoutContext } from "@/app/contexts/CheckoutContext";
+import { LicenseInfo } from "@mui/x-license";
+
+LicenseInfo.setLicenseKey(
+  "8734ab1314fbd6cb24a1327c5640e63aTz0xNzIxNjc3NTAxNzU1LEU9MTc1MzIzNDQyNzc1NSxTPXByZW1pdW0sTE09YW5udWFsLEtWPTI="
+);
 
 const ChooseDateContainer = () => {
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -46,10 +51,6 @@ const ChooseDateContainer = () => {
     setEndDate(selectedDateRange[1] || null);
     setShowDateRange(false); // Ẩn lịch sau khi chọn
   };
-
-  // const handleSearchRoom = () => {
-    
-  // };
 
   return (
     <div className="flex gap-2 items-center mt-2">

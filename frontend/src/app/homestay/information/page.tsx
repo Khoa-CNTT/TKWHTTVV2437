@@ -311,7 +311,7 @@ const HomestayPage = () => {
       data.street.trim() !== "" &&
       selectedAmenities.length > 0 &&
       selectedHighLight.length > 0 &&
-      selectedImage.length > 0
+      selectedImage.length >= 5
     );
   };
 
@@ -394,7 +394,10 @@ const HomestayPage = () => {
     <div className="p-8">
       <h1 className="text-2xl font-semibold">Thông tin homestay</h1>
 
-      <h3 className="mt-8 text-md font-semibold">Thông tin ảnh</h3>
+      <h3 className="mt-8 text-md font-semibold flex items-center gap-2">
+        Thông tin ảnh
+        <p className="text-sm text=gray-300">(Chọn tối thiểu 5 ảnh)</p>
+      </h3>
 
       <div className="grid grid-cols-6 gap-2 mt-2">
         {selectedImage?.map((item: { image: string; id: string }) => (

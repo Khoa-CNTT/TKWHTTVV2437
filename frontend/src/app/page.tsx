@@ -6,6 +6,7 @@ import InforContainer from "@/components/container/InforContainer";
 import apisProperty from "@/apis/property";
 import apisCity from "@/apis/city";
 import IconChat from "@/components/chat/IconChat";
+import Footer from "@/components/header/Footer";
 
 export default async function Home() {
   const properties = await apisProperty.getListTop10Rating();
@@ -18,7 +19,7 @@ export default async function Home() {
       </div>
       <Banner />
 
-      <div className="w-[1260px] mx-auto">
+      <div className="w-[1260px] mx-auto z-0">
         <ContainerRecomend />
 
         <Container cities={cities.data} />
@@ -29,6 +30,8 @@ export default async function Home() {
 
         <InforContainer />
       </div>
+
+      <Footer />
     </div>
   );
 }

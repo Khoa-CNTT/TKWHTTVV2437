@@ -3,9 +3,6 @@
 import { useState, useEffect } from "react";
 import { IoTicketOutline } from "react-icons/io5";
 import PayingModal from "../modal/PayingModal";
-import { toast } from "react-toastify";
-import { useSearchParams } from "next/navigation";
-import { useRouter } from "next/navigation";
 
 interface IProps {
   name: string;
@@ -34,20 +31,7 @@ const AdvertisingItem: React.FC<IProps> = ({
   advertising,
   propertyId,
 }) => {
-  const router = useRouter();
   const [showModal, setShowModal] = useState<boolean>(false);
-  const searchParams = useSearchParams(); // Lấy query từ URL
-
-  useEffect(() => {
-    const status = searchParams.get("status");
-    if (status === "true") {
-      toast.success("Thanh toán thành công");
-      router.push("/homestay/advertising");
-    } else if (status === "false") {
-      toast.error("Thanh toán thất bại");
-      router.push("/homestay/advertising");
-    }
-  }, [searchParams]);
 
   return (
     <div className="relative border border-gray-300 rounded-md p-4">

@@ -32,7 +32,7 @@ const iconMap: { [key: string]: JSX.Element } = {
 const AnmenityRoomContainer: React.FC<IProps> = ({ amenities }) => {
   return (
     <div>
-      {amenities.map((item: Amenity, index: number) => (
+      {amenities.slice(0, 6).map((item: Amenity, index: number) => (
         <p key={item.icon} className="flex items-center gap-2 mt-2 text-sm">
           {iconMap[item.icon]}
           {item.name}

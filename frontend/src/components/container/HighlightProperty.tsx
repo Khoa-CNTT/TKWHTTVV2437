@@ -18,22 +18,20 @@ const iconMapHighlight: { [key: string]: JSX.Element } = {
   FaBusAlt: <FaBusAlt size={30} />,
 };
 
-const HighlightProperty:React.FC<IProps> = ({highlights}) => {
-  console.log({highlights});
+const HighlightProperty: React.FC<IProps> = ({ highlights }) => {
+  console.log({ highlights });
   return (
     <div className="border-[1px] border-gray-300 rounded-xl p-5 shadow-sm">
       <h3 className="text-lg font-semibold">Các điểm nổi bật tại chỗ nghỉ</h3>
 
-      {highlights.map(item => (
+      {highlights.map((item) => (
         <div key={item.id} className="flex items-center gap-3 mt-4">
-        {iconMapHighlight[item.icon]}
-        <div>
-          <span className="text-md font-semibold">{item.name}</span>
-          <p className="text-gray-500 text-sm">
-            {item.description}
-          </p>
+          {iconMapHighlight[item.icon]}
+          <div>
+            <span className="text-md font-semibold">{item.name}</span>
+            <p className="text-gray-500 text-sm">{item.description}</p>
+          </div>
         </div>
-      </div>
       ))}
 
       {/* <div className="flex items-center gap-3 mt-4">
@@ -54,10 +52,10 @@ const HighlightProperty:React.FC<IProps> = ({highlights}) => {
         </div>
       </div> */}
 
-      <button className="w-full border-[1px] border-blue-700 text-center rounded-md py-3 text-blue-700 font-semibold flex items-center justify-center gap-3 mt-4 cursor-pointer hover:bg-blue-100 transition-all duration-200">
+      {/* <button className="w-full border-[1px] border-blue-700 text-center rounded-md py-3 text-blue-700 font-semibold flex items-center justify-center gap-3 mt-4 cursor-pointer hover:bg-blue-100 transition-all duration-200">
         <IoIosHeartEmpty size={20} className="text-blue-700" />
         <span className="text-sm">Thêm vào danh sách yêu thích</span>
-      </button>
+      </button> */}
     </div>
   );
 };
