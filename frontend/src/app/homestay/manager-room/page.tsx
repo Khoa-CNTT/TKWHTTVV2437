@@ -19,6 +19,7 @@ import { toast } from "react-toastify";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import { useDebounce } from "use-debounce";
+import MessageNotFound from "@/components/Item/MessageNotFound";
 
 const ManagerRoom = () => {
   const [valueSearch, setValueSearch] = useState<string>("");
@@ -186,7 +187,7 @@ const ManagerRoom = () => {
           </div>
         </div>
         <div className="overflow-hidden mt-4 rounded-xl">
-          <table className="min-w-full text-black">
+          <table className="min-w-full relative text-black">
             <thead className="bg-gray-200 text-sm text-gray-500 font-bold ">
               <tr>
                 <th className="px-4 py-3 text-left">Mã phòng</th>
@@ -199,52 +200,60 @@ const ManagerRoom = () => {
                 <th></th>
               </tr>
             </thead>
-            <tbody className=" text-[-14] font-semibold">
-              {rooms.map((item) => (
-                <tr
-                  onClick={() => router.push(`manager-room/update/${item.id}`)}
-                  key={item?.id}
-                  className="border-b border-gray-200 cursor-pointer hover:bg-gray-100"
-                >
-                  <td className="px-4 py-5">{item?.code}</td>
-                  <td className="pl-4">
-                    <img
-                      className="w-[50px] h-[50px] object-cover rounded-md"
-                      src={item?.images[0]?.image}
-                    ></img>
-                  </td>
-                  <td className="pl-4 py-5">{item.name}</td>
-                  <td className="pl-4 py-5">{item.quantity}</td>
-                  <td className="px-4 py-5 flex items-center gap-2">
-                    {Array(item?.maxPerson)
-                      .fill(0)
-                      .map((_, index) => (
-                        <IoPersonSharp key={index} size={20} />
-                      ))}
-                  </td>
-                  <td className="px-4 py-5">
-                    {item.price.toLocaleString("it-IT", {
-                      style: "currency",
-                      currency: "VND",
-                    })}{" "}
-                    / đêm
-                  </td>
-                  <td
-                    onClick={(e) => e.stopPropagation()}
-                    className="px-4 py-5 "
+            {rooms.length === 0 ? (
+              <MessageNotFound />
+            ) : (
+              <tbody className=" text-[-14] font-semibold">
+                {rooms.map((item) => (
+                  <tr
+                    onClick={() =>
+                      router.push(`manager-room/update/${item.id}`)
+                    }
+                    key={item?.id}
+                    className="border-b border-gray-200 cursor-pointer hover:bg-gray-100"
                   >
-                    <Switch
-                      checked={item.status === "active" ? true : false}
-                      onChange={() => handleChangeStatus(item.id, item.status)}
-                    />
-                  </td>
-                  <td className="flex items-center gap-4 justify-end mr-4">
-                    <FaEdit size={23} className="cursor-pointer" />
-                    {/* <MdDelete size={23} className="cursor-pointer" /> */}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+                    <td className="px-4 py-5">{item?.code}</td>
+                    <td className="pl-4">
+                      <img
+                        className="w-[50px] h-[50px] object-cover rounded-md"
+                        src={item?.images[0]?.image}
+                      ></img>
+                    </td>
+                    <td className="pl-4 py-5">{item.name}</td>
+                    <td className="pl-4 py-5">{item.quantity}</td>
+                    <td className="px-4 py-5 flex items-center gap-2">
+                      {Array(item?.maxPerson)
+                        .fill(0)
+                        .map((_, index) => (
+                          <IoPersonSharp key={index} size={20} />
+                        ))}
+                    </td>
+                    <td className="px-4 py-5">
+                      {item?.price?.toLocaleString("it-IT", {
+                        style: "currency",
+                        currency: "VND",
+                      })}{" "}
+                      / đêm
+                    </td>
+                    <td
+                      onClick={(e) => e.stopPropagation()}
+                      className="px-4 py-5 "
+                    >
+                      <Switch
+                        checked={item.status === "active" ? true : false}
+                        onChange={() =>
+                          handleChangeStatus(item.id, item.status)
+                        }
+                      />
+                    </td>
+                    <td className="flex items-center gap-4 justify-end mr-4">
+                      <FaEdit size={23} className="cursor-pointer" />
+                      {/* <MdDelete size={23} className="cursor-pointer" /> */}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            )}
           </table>
         </div>
       </div>

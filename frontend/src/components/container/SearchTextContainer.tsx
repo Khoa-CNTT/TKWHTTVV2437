@@ -5,6 +5,7 @@ import { normalizeText } from "@/helper/norlizeText";
 import { useState, useEffect } from "react";
 import { IoLocationOutline } from "react-icons/io5";
 import { FaHome } from "react-icons/fa";
+import { useDebounce } from "use-debounce";
 
 interface IProps {
   text: string;
@@ -28,11 +29,12 @@ const SearchTextContainer: React.FC<IProps> = ({
   onShowChooseSearch,
 }) => {
   const [textSearchs, setTextSearchs] = useState<ITextSearch[]>([]);
+  const [textValue] = useDebounce(text, 500);
 
   useEffect(() => {
     const fetchData = async () => {
       const response = await apisProperty.getTextSearchProperty({
-        text: text,
+        text: textValue,
       });
 
       if (response?.data) {
@@ -41,7 +43,7 @@ const SearchTextContainer: React.FC<IProps> = ({
         const data = response?.data
           ?.map((item: ITextSearch) => {
             const normalizedName = normalizeText(item.name);
-            const normalizedText = normalizeText(text);
+            const normalizedText = normalizeText(textValue);
 
             if (normalizedName.includes(normalizedText)) {
               return { ...item, status: 1 };
@@ -65,12 +67,10 @@ const SearchTextContainer: React.FC<IProps> = ({
     };
 
     fetchData();
-  }, [text]);
-
-  console.log({ textSearchs });
+  }, [textValue]);
 
   return (
-    <div className="bg-white p-4 rounded-md shadow-lg w-[408px] min-h-[200px]">
+    <div className="bg-white p-4 rounded-md shadow-lg w-[408px] z-10 min-h-[200px]">
       <h4 className="font-semibold text-sm">Tìm kiếm theo từ khóa</h4>
 
       {textSearchs.map((item: ITextSearch, index: number) =>

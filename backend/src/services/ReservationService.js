@@ -1201,6 +1201,7 @@ const getDataBarChart = async (propertyId, filter) => {
                   month.endOf("month").toDate(),
                 ],
               },
+              status: "confirmed",
             },
             include: [
               {
@@ -1230,6 +1231,7 @@ const getDataBarChart = async (propertyId, filter) => {
                   quarter.endOf("quarter").toDate(),
                 ],
               },
+              status: "confirmed",
             },
             include: [
               {
@@ -1259,6 +1261,7 @@ const getDataBarChart = async (propertyId, filter) => {
                   year.endOf("year").toDate(),
                 ],
               },
+              status: "confirmed",
             },
             include: [
               {

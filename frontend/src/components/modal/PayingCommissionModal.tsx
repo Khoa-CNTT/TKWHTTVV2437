@@ -70,7 +70,7 @@ const PayingCommissionModal: React.FC<IProps> = ({
             <div className="flex items-center justify-between">
               <p>Doanh thu của tháng:</p>
               <p className="text-semibold">
-                {evenue.toLocaleString("it-IT", {
+                {evenue?.toLocaleString("it-IT", {
                   style: "currency",
                   currency: "VND",
                 })}
@@ -83,7 +83,7 @@ const PayingCommissionModal: React.FC<IProps> = ({
             <div className="flex mt-2 items-center justify-between">
               <p>Phí tháng 4 ({rateCommission}%):</p>
               <p className="text-semibold">
-                {amount.toLocaleString("it-IT", {
+                {amount?.toLocaleString("it-IT", {
                   style: "currency",
                   currency: "VND",
                 })}
@@ -96,7 +96,7 @@ const PayingCommissionModal: React.FC<IProps> = ({
           <div className="flex items-center justify-between">
             <p className="text-sm">Tổng thanh toán</p>
             <p className="text-lg text-red-600 font-semibold">
-              {amount.toLocaleString("it-IT", {
+              {amount?.toLocaleString("it-IT", {
                 style: "currency",
                 currency: "VND",
               })}

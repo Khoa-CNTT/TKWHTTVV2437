@@ -2,6 +2,8 @@
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import main_logo from "@/assets/images/main_icon.png";
+import Image from "next/image";
 import {
   CiUser,
   CiRollingSuitcase,
@@ -10,6 +12,7 @@ import {
   CiLogout,
 } from "react-icons/ci";
 import { GiAirplaneDeparture } from "react-icons/gi";
+import Link from "next/link";
 const Header = () => {
   const router = useRouter();
   const { user } = useAuth();
@@ -97,9 +100,13 @@ const Header = () => {
   return (
     <header className="bg-white text-white p-4 shadow-md border-b-2 border-gray-200 z-10">
       <div className="w-[1260px] mx-auto flex justify-between items-center">
-        <a href="/" className="font-bold text-[22px] text-blue-700">
-          HRTravel
-        </a>
+        <Link
+          href={"/"}
+          className="font-bold text-[22px] text-blue-800 flex gap-2"
+        >
+          <Image src={main_logo} alt="logo" width={45} height={45} />
+          <h2 className="text-2xl font-bold text-blue-800 mt-2">LoveTrip</h2>
+        </Link>
         {user ? (
           <div className="relative ">
             <button

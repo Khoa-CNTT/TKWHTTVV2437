@@ -100,6 +100,8 @@ const MenuSearchContainer: React.FC<IProps> = ({ provinces }) => {
       amenities: selectedAmenities.join(","), // Tiện nghi (danh sách ID, phân cách bằng dấu phẩy)
     });
 
+    query.set("page", "1");
+
     // Cập nhật URL với query string
     router.push(`/search?${query.toString()}`);
 
@@ -128,6 +130,7 @@ const MenuSearchContainer: React.FC<IProps> = ({ provinces }) => {
     if (category) {
       // Cập nhật URL với giá trị category
       query.set("category", category.toString()); // Thêm hoặc cập nhật giá trị category
+      query.set("page", "1");
     } else {
       query.delete("category");
     }
@@ -140,6 +143,7 @@ const MenuSearchContainer: React.FC<IProps> = ({ provinces }) => {
     if (city !== "0") {
       // Cập nhật URL với giá trị category
       query.set("city", city.toString()); // Thêm hoặc cập nhật giá trị category
+      query.set("page", "1");
     } else {
       // Xóa giá trị city khỏi URL
       query.delete("city");
@@ -167,7 +171,7 @@ const MenuSearchContainer: React.FC<IProps> = ({ provinces }) => {
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="flex flex-col gap-2 flex-2">
+        <div className="flex flex-col gap-2 flex-2 w-[170px]">
           {/* <label className="font-semibold text-md">Tỉnh / Thành phố</label> */}
           <FormControl fullWidth>
             <Select
@@ -233,14 +237,14 @@ const MenuSearchContainer: React.FC<IProps> = ({ provinces }) => {
                     id="outlined-basic"
                     label="Giá tối thiểu"
                     variant="outlined"
-                    value={(value[0] * 200000).toLocaleString("vi-VN")}
+                    value={(value[0] * 200000)?.toLocaleString("vi-VN")}
                     sx={{ width: "100%" }}
                   />
                   <TextField
                     id="outlined-basic"
                     label="Giá tối đa"
                     variant="outlined"
-                    value={(value[1] * 200000).toLocaleString("vi-VN")}
+                    value={(value[1] * 200000)?.toLocaleString("vi-VN")}
                     sx={{ width: "100%" }}
                   />
                 </div>

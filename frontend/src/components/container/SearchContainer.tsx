@@ -108,7 +108,7 @@ const SearchContainer = () => {
         )}
 
         {showChooseSearch && data?.text.length > 0 && (
-          <div className="absolute top-[110%] left-0">
+          <div className="absolute top-[110%] left-0 z-10">
             <SearchTextContainer
               onShowChooseSearch={setShowChooseSearch}
               onSetData={setData}

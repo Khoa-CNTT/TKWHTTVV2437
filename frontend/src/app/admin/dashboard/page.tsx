@@ -184,7 +184,7 @@ const DashboardPage = () => {
     };
 
     fetDataBarChart();
-  }, [typeCommission]);
+  }, [typeCommission, typeAd]);
 
   return (
     <div>

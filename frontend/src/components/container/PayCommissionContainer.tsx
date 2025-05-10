@@ -3,13 +3,12 @@ import { useState, useEffect } from "react";
 import { ICommissionPayment } from "@/app/types/commissionPayment";
 import PayingCommissionModal from "../modal/PayingCommissionModal";
 
-const propertyId = "1b61baa4-6992-4c67-bdd1-c5eec0e05570";
-
 interface IProps {
   userId: string;
+  propertyId: string;
 }
 
-const PayCommissionContainer: React.FC<IProps> = ({ userId }) => {
+const PayCommissionContainer: React.FC<IProps> = ({ userId, propertyId }) => {
   const [commissionPayment, setCommissionPayment] = useState<
     ICommissionPayment[]
   >([]);
@@ -35,7 +34,10 @@ const PayCommissionContainer: React.FC<IProps> = ({ userId }) => {
   return (
     <div>
       {commissionPayment?.map((item) => (
-        <div className="ralative border-gray-300 border rounded-md p-4 mt-4">
+        <div
+          key={item.id}
+          className="ralative border-gray-300 border rounded-md p-4 mt-4"
+        >
           <h4 className="text-center font-semibold">
             Thông tin thanh toán tiền hoa hồng tháng {item.month}/{item.year}
           </h4>
@@ -45,7 +47,7 @@ const PayCommissionContainer: React.FC<IProps> = ({ userId }) => {
               <div className="flex items-center justify-between">
                 <p>Doanh thu:</p>
                 <p className="text-semibold">
-                  {item.totalRevenue.toLocaleString("it-IT", {
+                  {item.totalRevenue?.toLocaleString("it-IT", {
                     style: "currency",
                     currency: "VND",
                   })}
@@ -58,7 +60,7 @@ const PayCommissionContainer: React.FC<IProps> = ({ userId }) => {
               <div className="flex mt-2 items-center justify-between">
                 <p>Phí tháng 4 ({item.commissionRate}%):</p>
                 <p className="text-semibold">
-                  {item.commissionAmount.toLocaleString("it-IT", {
+                  {item.commissionAmount?.toLocaleString("it-IT", {
                     style: "currency",
                     currency: "VND",
                   })}
@@ -71,7 +73,7 @@ const PayCommissionContainer: React.FC<IProps> = ({ userId }) => {
             <div className="flex items-center justify-between">
               <p>Tổng tiền:</p>
               <p className="text-red-500 font-semibold">
-                {item.commissionAmount.toLocaleString("it-IT", {
+                {item.commissionAmount?.toLocaleString("it-IT", {
                   style: "currency",
                   currency: "VND",
                 })}

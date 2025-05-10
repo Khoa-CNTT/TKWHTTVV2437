@@ -1,6 +1,7 @@
 "use client";
+
 import moment from "moment";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import InforRoomCheckout from "@/components/checkout/InforRoomCheckout";
 import ContentCheckout from "@/components/checkout/ContentCheckout";
 import { useCheckoutContext } from "@/app/contexts/CheckoutContext";
@@ -29,12 +30,21 @@ interface IDataEnter {
   numberAccount: string;
   nameBank: string;
 }
+
 interface IInvalidField {
   name: string;
   mes: string;
 }
 
 const CheckoutPage = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CheckoutContent />
+    </Suspense>
+  );
+};
+
+const CheckoutContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -66,6 +76,7 @@ const CheckoutPage = () => {
     numberAccount: "",
     nameBank: "",
   });
+
   useEffect(() => {
     setDataEnter({
       firstName: user?.firstName || "",
@@ -83,10 +94,12 @@ const CheckoutPage = () => {
       numberAccount: "",
       nameBank: "",
     });
-  }, [user, room]);
+  }, [user, room, startDate, endDate]);
+
   useEffect(() => {
     setShow(isOpen);
   }, [isOpen]);
+
   const handleStep2 = (value: object) => {
     const valid = validate(
       {

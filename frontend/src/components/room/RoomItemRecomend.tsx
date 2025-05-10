@@ -29,7 +29,7 @@ const RoomItemRecomend: React.FC<IProps> = ({
   };
 
   return (
-    <div className="mt-2">
+    <div className="mt-2 z-0">
       <div
         onClick={() => handleNavigate()}
         className="border border-gray-300 rounded-xl shadow-md hover:shadow-lg transition duration-300 cursor-pointer"

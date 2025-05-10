@@ -7,6 +7,9 @@ import { IoTicketOutline } from "react-icons/io5";
 import apisProperty from "@/apis/property";
 import AdvertisingItem from "@/components/Item/AdvertisingItem";
 import { IAdvertising } from "@/app/types/advertising";
+import { toast } from "react-toastify";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const iconData: { [key: string]: JSX.Element } = {
   IoTicketOutline: <IoTicketOutline size={50} />,
@@ -19,6 +22,9 @@ interface IProps {
 const MyAdvertisingItem: React.FC<IProps> = ({ advertisings }) => {
   const { user } = useAuth();
   const [propertyId, setPropertyId] = useState<string>("");
+  const searchParams = useSearchParams(); // Lấy query từ URL
+  const router = useRouter();
+
   const [advertising, setAdvertising] = useState<
     | {
         expiredAd: string;
@@ -61,6 +67,17 @@ const MyAdvertisingItem: React.FC<IProps> = ({ advertisings }) => {
     };
     fetchDataProperty();
   }, [propertyId]);
+
+  useEffect(() => {
+    const status = searchParams.get("status");
+    if (status === "true") {
+      toast.success("Thanh toán thành công");
+      router.push("/homestay/advertising");
+    } else if (status === "false") {
+      toast.error("Thanh toán thất bại");
+      router.push("/homestay/advertising");
+    }
+  }, [searchParams]);
 
   return (
     <div>

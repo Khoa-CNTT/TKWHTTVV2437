@@ -10,7 +10,10 @@ router.get(
   "/data-bar-chart-admin",
   commissionPaymentController.getDataBarChartCommissionAdmin
 );
-
+router.get(
+  "/list-commission-admin",
+  commissionPaymentController.getListCommissionPaymentByAdmin
+);
 router.put("/:id", commissionPaymentController.updateCommissionPayment);
 
 module.exports = router;

@@ -43,11 +43,11 @@ const EditAddressInfo = () => {
         address: editUser?.address,
       });
       if (res?.status === "OK" && res?.msg === "Update") {
-        Swal.fire({
-          title: "Update thành công!",
-          icon: "success",
-          draggable: true,
-        });
+        // Swal.fire<any>({
+        //   title: "Update thành công!",
+        //   icon: "success",
+        //   draggable: true,
+        // });
         setUser({ ...editUser });
         closeModal();
       }

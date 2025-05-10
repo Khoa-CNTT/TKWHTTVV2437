@@ -81,7 +81,7 @@ const SuccessCheckout = () => {
               </div>
 
               <div className="text-lg font-bold ">
-                {Number(data?.totalPrice).toLocaleString("it-IT", {
+                {Number(data?.totalPrice)?.toLocaleString("it-IT", {
                   style: "currency",
                   currency: "VND",
                 })}
