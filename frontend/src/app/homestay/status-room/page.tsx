@@ -214,7 +214,7 @@ const ManagerStatus = () => {
                           ))}
                       </td>
                       <td className="px-4 py-5">
-                        {item.price.toLocaleString("it-IT", {
+                        {item?.price?.toLocaleString("it-IT", {
                           style: "currency",
                           currency: "VND",
                         })}{" "}

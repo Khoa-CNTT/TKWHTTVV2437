@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "idCategory", // Khóa ngoại trỏ đến Category
         as: "category",
       });
+
       Property.hasMany(models.ImageProperty, {
         foreignKey: "idProperty", // Khóa ngoại trong bảng imageRoom
         as: "images", // Alias để truy cập
@@ -55,6 +56,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "idAdvertising", // Khóa ngoại trong bảng imageRoom
         as: "advertisingDetail", // Alias để truy cập
       });
+
+      Property.belongsTo(models.User, {
+        foreignKey: "idUser",
+        as: "users",
+      });
     }
   }
   Property.init(
@@ -69,6 +75,7 @@ module.exports = (sequelize, DataTypes) => {
       expiredAd: DataTypes.DATE,
       idAdvertising: DataTypes.STRING,
       payCommissionAt: DataTypes.DATE,
+      status: DataTypes.STRING,
     },
     {
       sequelize,

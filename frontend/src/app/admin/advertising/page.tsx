@@ -12,6 +12,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import { useDebounce } from "use-debounce";
 import MessageNotFound from "@/components/Item/MessageNotFound";
+import moment from "moment";
 
 interface IPagination {
   totalItems: number;
@@ -181,6 +182,7 @@ const Advertising = () => {
                 <th className="px-4 py-3 text-left">Giá</th>
                 <th className="px-4 py-3 text-left">Phương thức</th>
                 <th className="px-4 py-3 text-left">Trạng thái</th>
+                <th className="px-4 py-3 text-left">Ngày mua</th>
               </tr>
             </thead>
             {dataAdOrder?.length === 0 ? (
@@ -207,12 +209,15 @@ const Advertising = () => {
                     </td>
                     <td className="px-4 py-5">
                       {item?.status === "pending"
-                        ? "Chờ xác nhận"
+                        ? "Đang thực hiện"
                         : item?.status === "done"
                           ? "Thành công"
                           : item?.status === "failed"
                             ? "Đã hủy"
                             : item?.status}
+                    </td>
+                    <td className="px-4 py-5">
+                      {moment(item?.createdAt).format("HH:mm DD/MM/YYYY")}
                     </td>
                   </tr>
                 ))}

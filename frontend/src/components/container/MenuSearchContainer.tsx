@@ -237,14 +237,14 @@ const MenuSearchContainer: React.FC<IProps> = ({ provinces }) => {
                     id="outlined-basic"
                     label="Giá tối thiểu"
                     variant="outlined"
-                    value={(value[0] * 200000).toLocaleString("vi-VN")}
+                    value={(value[0] * 200000)?.toLocaleString("vi-VN")}
                     sx={{ width: "100%" }}
                   />
                   <TextField
                     id="outlined-basic"
                     label="Giá tối đa"
                     variant="outlined"
-                    value={(value[1] * 200000).toLocaleString("vi-VN")}
+                    value={(value[1] * 200000)?.toLocaleString("vi-VN")}
                     sx={{ width: "100%" }}
                   />
                 </div>

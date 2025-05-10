@@ -6,34 +6,51 @@
 // import { showErrorAlert } from "@/helper/Alert";
 // import "font-awesome/css/font-awesome.min.css"; // Import Font Awesome CSS
 // import { FaSyncAlt, FaTimes, FaEye, FaUser, FaEnvelope, FaCreditCard, FaDoorOpen, FaClock } from "react-icons/fa";
+// interface IUser {
+//   firstName: string;
+//   lastName: string;
+//   email: string;
+// }
+
+// interface IRoom {
+//   id: string;
+//   idProperty: string;
+//   name: string;
+//   description: string;
+//   maxPerson: number;
+//   price: number;
+//   status: string;
+//   createdAt: string;
+//   updatedAt: string;
+// }
+
+// interface IReservation {
+//   totalPrice: number;
+//   Rooms?: IRoom;
+// }
+
 // interface IPayment {
 //   id: string;
 //   idReservation: string;
 //   idUser: string;
 //   paymentDate: string;
 //   paymentMethod: string;
-//   paymentStatus: "Pending" | "Completed" | "Failed"|"Refunded";
+//   paymentStatus: "Pending" | "Completed" | "Failed" | "Refunded";
 //   createdAt: string;
 //   updatedAt: string;
-//   Users?: {
-//     firstName: string;
-//     lastName: string;
-//     email: string;
-//   };
-//   Reservations?: {
-//     totalPrice: number;
-//     Rooms?: {
-//       id: string;
-//       idProperty: string;
-//       name: string;
-//       description: string;
-//       maxPerson: number;
-//       price: number;
-//       status: string;
-//       createdAt: string;
-//       updatedAt: string;
-//     };
-//   };
+//   Users?: IUser;
+//   Reservations?: IReservation;
+// }
+// interface PaymentDetailModalProps {
+//   payment: IPayment;
+//   onClose: () => void;
+// }
+
+// // Props cho DetailItem
+// interface DetailItemProps {
+//   label: string;
+//   value: React.ReactNode;
+//   icon?: React.ReactElement;
 // }
 // const getStatusBadge = (status: string) => {
 //   switch (status) {
@@ -69,10 +86,10 @@
 //   try {
 //     setLoading(true); // Bật trạng thái loading khi bắt đầu fetch
 //     const response = await apisAdmin.listPayments();
-//     const mappedPayments = response.data.map((payment: any) => ({
+//     const mappedPayments: IPayment[] = response.data.map((payment: IPayment) => ({
 //       ...payment,
-//       User: payment.User || null,
-//       Reservation: payment.Reservation || null
+//       User: payment.Users || null,
+//       Reservation: payment.Reservations || null
 //     }));
 //     setPayments(mappedPayments);
 //   } catch (error) {
@@ -183,6 +200,18 @@
 //             onChange={(e) => setDateFilter(prev => ({
 //               ...prev,
 //               type: e.target.value as any
+//             }))}
+//           >
+//             <option value="paymentDate">Ngày thanh toán</option>
+
+//         {/* Filter ngày */}
+//         <div className="flex gap-2">
+//           <select
+//             className="border rounded px-2 py-2 text-sm"
+//             value={dateFilter.type}
+//             onChange={(e) => setDateFilter(prev => ({
+//               ...prev,
+//               type: e.target.value as  'paymentDate' | 'createdAt' | ''
 //             }))}
 //           >
 //             <option value="paymentDate">Ngày thanh toán</option>
@@ -323,11 +352,7 @@
 //     </div>
 //   );
 // };
-// const DetailItem: React.FC<{
-//   label: string;
-//   value: React.ReactNode;
-//   icon?: React.ReactElement;
-// }> = ({ label, value, icon }) => (
+// const DetailItem: React.FC<DetailItemProps> = ({ label, value, icon }) => (
 //   <div className="flex items-start gap-3">
 //     {icon && <div className="text-blue-600 mt-1">{icon}</div>}
 //     <div>
@@ -336,14 +361,7 @@
 //     </div>
 //   </div>
 // );
-// const PaymentDetailModal: React.FC<{
-//   payment: any; // Temporarily using any to match your exact structure
-//   onClose: () => void;
-// }> = ({ payment, onClose }) => {
-//   // Extract nested objects for easier access
-//   const user = payment.Users || {};
-//   const room = payment.Reservations?.Rooms || {};
-//   const reservation = payment.Reservations || {};
+// const PaymentDetailModal: React.FC<PaymentDetailModalProps> = ({ payment, onClose }) => {
 
 //   return (
 //     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 backdrop-blur-sm">
@@ -365,7 +383,7 @@
 //           <div className="space-y-4">
 //             <DetailItem
 //               label="Khách hàng"
-//               value={`${user.firstName || ''} ${user.lastName || ''}`.trim() || 'N/A'}
+//               value={`${payment.Users?.firstName || ''} ${payment.Users?.lastName || ''}`.trim() || 'N/A'}
 //             />
 //             <DetailItem
 //               label="Mã đặt phòng"
@@ -373,7 +391,7 @@
 //             />
 //             <DetailItem
 //               label="Email"
-//               value={user.email || 'N/A'}
+//               value={payment.Users?.email || 'N/A'}
 //             />
 //             <DetailItem
 //               label="Phương thức"
@@ -388,25 +406,25 @@
 //           <div className="space-y-4">
 //             <DetailItem
 //               label="Loại phòng"
-//               value={room.name || 'N/A'}
+//               value={payment.Reservations?.Rooms?.name || 'N/A'}
 //             />
 //             <DetailItem
 //               label="Mô tả phòng"
-//               value={room.description || 'N/A'}
+//               value={payment.Reservations?.Rooms?.description || 'N/A'}
 //             />
 //             <DetailItem
 //               label="Sức chứa"
-//               value={`${room.maxPerson || 'N/A'} người`}
+//               value={`${payment.Reservations?.Rooms?.maxPerson || 'N/A'} người`}
 //             />
 //             <DetailItem
 //               label="Giá phòng"
-//               value={`${room.price?.toLocaleString('vi-VN') || 'N/A'} VND`}
+//               value={`${payment.Reservations?.Rooms?.price?.toLocaleString('vi-VN') || 'N/A'} VND`}
 //             />
 //             <DetailItem
 //               label="Tổng thanh toán"
 //               value={
 //                 <div className="text-xl font-semibold text-green-600">
-//                   {reservation.totalPrice?.toLocaleString('vi-VN') || 'N/A'} VND
+//                   {payment.Reservations?.totalPrice?.toLocaleString('vi-VN') || 'N/A'} VND
 //                 </div>
 //               }
 //             />
@@ -425,7 +443,7 @@
 //           </div>
 //         </div>
 
-//         <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+//          <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
 //           <button
 //             onClick={onClose}
 //             className="px-4 py-2 text-gray-600 hover:text-gray-800 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"

@@ -2,15 +2,28 @@ import { IPropertyCreate } from "@/app/types/property";
 
 const apisProperty = {
   getListTop10Rating: async () => {
-    const response = await fetch(
-      `${process.env.URL_SERVER_API}/property/list-top-10-rating`,
-      {
-        method: "GET",
-        cache: "no-store",
-      }
-    );
+    try {
+      const response = await fetch(
+        `${process.env.URL_SERVER_API}/property/list-top-10-rating`,
+        {
+          method: "GET",
+          cache: "no-store",
+        }
+      );
 
-    return response.json();
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error("Error fetching top 10 rating properties:", error);
+      return {
+        status: "ERR",
+        data: [],
+        message: "Không thể kết nối đến server",
+      };
+    }
   },
 
   getPropertyIdByUserId: async (userId: string) => {

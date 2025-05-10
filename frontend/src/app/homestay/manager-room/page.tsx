@@ -187,7 +187,7 @@ const ManagerRoom = () => {
           </div>
         </div>
         <div className="overflow-hidden mt-4 rounded-xl">
-          <table className="min-w-full text-black">
+          <table className="min-w-full relative text-black">
             <thead className="bg-gray-200 text-sm text-gray-500 font-bold ">
               <tr>
                 <th className="px-4 py-3 text-left">Mã phòng</th>
@@ -229,7 +229,7 @@ const ManagerRoom = () => {
                         ))}
                     </td>
                     <td className="px-4 py-5">
-                      {item.price.toLocaleString("it-IT", {
+                      {item?.price?.toLocaleString("it-IT", {
                         style: "currency",
                         currency: "VND",
                       })}{" "}

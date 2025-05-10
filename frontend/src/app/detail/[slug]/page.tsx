@@ -108,6 +108,7 @@ const DetailPage = async (props: IProps) => {
                 city={property.data.propertyAddress.city}
                 price={property.data.price}
                 slug={property.data.slug}
+                status={property.data.status}
               />
             </div>
 

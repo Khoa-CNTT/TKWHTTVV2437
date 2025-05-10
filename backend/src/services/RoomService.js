@@ -317,6 +317,9 @@ const getTopReventRoomByPropertyId = async (propertyId) => {
           as: "reservations",
           attributes: [],
           required: false,
+          where: {
+            status: "confirmed",
+          },
         },
       ],
       group: ["Room.id"],

@@ -50,11 +50,11 @@ const SidebarAdmin = () => {
       icon: <FaWpforms />,
       path: "/admin/Reservation",
     },
-    {
-      title: "Verification",
-      icon: <FaCheckCircle />,
-      path: "/admin/Verification",
-    },
+    // {
+    //   title: "Verification",
+    //   icon: <FaCheckCircle />,
+    //   path: "/admin/Verification",
+    // },
     // {
     //   title: "Thanh toán",
     //   icon: <FaMoneyBill />,

@@ -9,7 +9,6 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-
     }
   }
   RoomAvailability.init(
@@ -17,11 +16,12 @@ module.exports = (sequelize, DataTypes) => {
       idRoom: DataTypes.STRING,
       date: DataTypes.DATEONLY,
       blocked_quantity: DataTypes.INTEGER,
+      idProperty: DataTypes.STRING,
     },
     {
       sequelize,
       modelName: "RoomAvailability",
-      tableName: "RoomAvailabilities"
+      tableName: "RoomAvailabilities",
     }
   );
   return RoomAvailability;

@@ -14,6 +14,7 @@ interface IProps {
   city: string;
   price: string;
   slug: string;
+  status: string;
 }
 
 interface IData {
@@ -26,6 +27,7 @@ interface IData {
   city: string;
   price: string;
   slug: string;
+  status: string;
 }
 
 const ViewReviewButton: React.FC<IProps> = ({
@@ -38,6 +40,7 @@ const ViewReviewButton: React.FC<IProps> = ({
   city,
   price,
   slug,
+  status,
 }) => {
   const [showModalReview, setShowModalReview] = useState<boolean>(false);
 
@@ -65,6 +68,7 @@ const ViewReviewButton: React.FC<IProps> = ({
       city,
       price,
       slug,
+      status,
     });
 
     localStorage.setItem("dataRecommend", JSON.stringify(Array.from(data)));

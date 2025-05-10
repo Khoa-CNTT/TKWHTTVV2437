@@ -41,7 +41,7 @@ const AdvertisingItem: React.FC<IProps> = ({
       <p className="text-gray-400 text-center text-sm font-semibold">Nạp</p>
 
       <p className="font-semibold text-center text-red-600 text-xl mt-2">
-        {price.toLocaleString("it-IT", {
+        {price?.toLocaleString("it-IT", {
           style: "currency",
           currency: "VND",
         })}

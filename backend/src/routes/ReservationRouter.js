@@ -12,8 +12,24 @@ router.get(
   reservationController.detailReservationApprove
 );
 
+router.get(
+  "/listReservationOfUser",
+  reservationController.listReservationOfUser
+);
+
+router.get(
+  "/detailReservationOfUser",
+  reservationController.detailReservationOfUser
+);
 router.get("/bar-chart/:id", reservationController.getDataBarChart);
 
 router.put("/approveReservation", reservationController.approveReservation);
-
+router.put(
+  "/updateInfoReservation",
+  reservationController.updateInfoReservation
+);
+router.put(
+  "/updateStatusUserReservation",
+  reservationController.updateStatusUserReservation
+);
 module.exports = router;

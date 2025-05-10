@@ -5,6 +5,19 @@ import apisAdmin from "@/api/admin";
 import dayjs from "dayjs";
 import "font-awesome/css/font-awesome.min.css";
 
+interface IRoom {
+  id: string;
+  name: string;
+  price: number;
+  maxPerson: number;
+  status: string;
+  images: string[];
+  amenities: { name: string }[];
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface IProperty {
   id: string;
   name: string;
@@ -20,17 +33,33 @@ interface IProperty {
   rooms: IRoom[];
 }
 
-interface IRoom {
+interface IApiProperty {
   id: string;
   name: string;
-  price: number;
-  maxPerson: number;
-  status: string;
-  images: string[]; // Thay đổi từ 'image' sang 'images'
-  amenities: { name: string }[];
   description: string;
+  status: string;
+  image: string;
   createdAt: string;
   updatedAt: string;
+  idUser: string;
+  address?: {
+    city?: string;
+  };
+  category?: {
+    name?: string;
+  };
+  rooms?: {
+    id: string;
+    name?: string;
+    price?: number;
+    maxPerson?: number;
+    status?: string;
+    images?: { image: string }[];
+    amenities?: { name: string }[];
+    description?: string;
+    createdAt: string;
+    updatedAt: string;
+  }[];
 }
 const OwnerPropertiesContainer: React.FC = () => {
   const router = useRouter();
@@ -42,7 +71,9 @@ const OwnerPropertiesContainer: React.FC = () => {
   const [propSearchTerm, setPropSearchTerm] = useState("");
   const [propSortOrder, setPropSortOrder] = useState<"asc" | "desc">("asc");
   const [propCurrentPage, setPropCurrentPage] = useState(1);
-  const [expandedPropertyId, setExpandedPropertyId] = useState<string | null>(null);
+  const [expandedPropertyId, setExpandedPropertyId] = useState<string | null>(
+    null
+  );
   const [showRoomDetail, setShowRoomDetail] = useState(false);
   const [propSortField, setPropSortField] = useState<keyof IProperty | "">("");
   const rowsPerPage = 10;
@@ -53,30 +84,43 @@ const OwnerPropertiesContainer: React.FC = () => {
 
       try {
         const response = await apisAdmin.listProperties(ownerId);
-
+        const data: IApiProperty[] = response.data;
         // Sửa logic xử lý dữ liệu
-    const processedProps = response.data
-  .filter((p: any) => p.idUser === ownerId)
-  .map((property: any) => ({
-    ...property,
-    city: property.address?.city || "Không xác định",
-    type: property.category?.name || "Không có loại",
-    rooms: (property.rooms || []).map((room: any) => ({
-      id: room.id,
-      name: room.name || "Chưa đặt tên",
-      price: room.price || 0,
-      maxPerson: room.maxPerson || 0, // Sửa tên trường theo API
-      status: room.status || "Unknown",
-      images: room.images?.map((img: any) => img.image) || [], // Xử lý images
-      amenities: room.amenities?.map((am: any) => ({ name: am.name })) || [],
-      description: room.description || "Không có mô tả",
-      createdAt: room.createdAt,
-      updatedAt: room.updatedAt
-    })),
-    priceRange: property.rooms?.length > 0 
-      ? `${Math.min(...property.rooms.map((r: any) => r.price)).toLocaleString()} ~ ${Math.max(...property.rooms.map((r: any) => r.price)).toLocaleString()}`
-      : "Không có giá"
-  }));
+
+        const processedProps: IProperty[] = data
+          .filter((p) => p.idUser === ownerId)
+          .map((property) => {
+            const roomPrices = property.rooms?.map((r) => r.price ?? 0) || [];
+            return {
+              id: property.id,
+              name: property.name,
+              description: property.description,
+              status: property.status,
+              image: property.image,
+              createdAt: property.createdAt,
+              updatedAt: property.updatedAt,
+              city: property.address?.city || "Không xác định",
+              type: property.category?.name || "Không có loại",
+              amenities: [], // Có thể xử lý nếu cần
+              rooms: (property.rooms || []).map((room) => ({
+                id: room.id,
+                name: room.name || "Chưa đặt tên",
+                price: room.price || 0,
+                maxPerson: room.maxPerson || 0,
+                status: room.status || "Unknown",
+                images: room.images?.map((img) => img.image) || [],
+                amenities:
+                  room.amenities?.map((am) => ({ name: am.name })) || [],
+                description: room.description || "Không có mô tả",
+                createdAt: room.createdAt,
+                updatedAt: room.updatedAt,
+              })),
+              priceRange:
+                roomPrices.length > 0
+                  ? `${Math.min(...roomPrices)?.toLocaleString()} ~ ${Math.max(...roomPrices)?.toLocaleString()}`
+                  : "Không có giá",
+            };
+          });
 
         setProperties(processedProps);
       } catch (error) {
@@ -89,9 +133,10 @@ const OwnerPropertiesContainer: React.FC = () => {
 
   // Xử lý sorting và pagination cho Properties
   const processedProperties = properties
-    .filter(p =>
-      p.name.toLowerCase().includes(propSearchTerm.toLowerCase()) ||
-      p.city.toLowerCase().includes(propSearchTerm.toLowerCase())
+    .filter(
+      (p) =>
+        p.name.toLowerCase().includes(propSearchTerm.toLowerCase()) ||
+        p.city.toLowerCase().includes(propSearchTerm.toLowerCase())
     )
     .sort((a, b) => {
       if (!propSortField) return 0;
@@ -106,7 +151,7 @@ const OwnerPropertiesContainer: React.FC = () => {
   );
 
   const toggleExpand = (propertyId: string) => {
-    setExpandedPropertyId(prev => prev === propertyId ? null : propertyId);
+    setExpandedPropertyId((prev) => (prev === propertyId ? null : propertyId));
   };
 
   return (
@@ -134,7 +179,7 @@ const OwnerPropertiesContainer: React.FC = () => {
           </tr>
         </thead>
         <tbody className="text-sm font-semibold">
-          {propPaginated.map(property => (
+          {propPaginated.map((property) => (
             <React.Fragment key={property.id}>
               <tr
                 className="border-b border-gray-200 hover:bg-gray-100 cursor-pointer"
@@ -144,10 +189,13 @@ const OwnerPropertiesContainer: React.FC = () => {
                 <td className="px-4 py-5">{property.city}</td>
                 <td className="px-4 py-5">{property.type}</td>
                 <td className="px-4 py-5">
-                  <span className={`px-2 py-1 rounded-full ${property.status === 'Active'
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-red-100 text-red-700'
-                    }`}>
+                  <span
+                    className={`px-2 py-1 rounded-full ${
+                      property.status === "Active"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
                     {property.status}
                   </span>
                 </td>
@@ -160,7 +208,7 @@ const OwnerPropertiesContainer: React.FC = () => {
                       toggleExpand(property.id);
                     }}
                   >
-                    {expandedPropertyId === property.id ? '▼' : '▶'}
+                    {expandedPropertyId === property.id ? "▼" : "▶"}
                   </button>
                 </td>
               </tr>
@@ -169,7 +217,9 @@ const OwnerPropertiesContainer: React.FC = () => {
                 <tr className="bg-gray-50">
                   <td colSpan={6} className="px-4 py-5">
                     <div className="ml-8">
-                      <h3 className="text-lg font-semibold mb-4">Danh sách Rooms</h3>
+                      <h3 className="text-lg font-semibold mb-4">
+                        Danh sách Rooms
+                      </h3>
                       <table className="w-full">
                         <thead className="bg-gray-100 text-gray-600 font-bold text-sm">
                           <tr>
@@ -182,18 +232,26 @@ const OwnerPropertiesContainer: React.FC = () => {
                         <tbody>
                           {property.rooms.map((room) => (
                             <tr
-                            
                               key={`${room.id}`} // Sử dụng kết hợp property.id và index
                               className="border-b border-gray-200 hover:bg-gray-100"
                             >
-                              <td className="px-4 py-4">{room.name || "Chưa đặt tên"}</td>
-                              <td className="px-4 py-4">{room.price?.toLocaleString() || 0} VND</td>
-                              <td className="px-4 py-4">{room.maxPerson || 0}</td>
                               <td className="px-4 py-4">
-                                <span className={`px-2 py-1 rounded-full ${room.status === 'Active'
-                                    ? 'bg-green-100 text-green-700'
-                                    : 'bg-red-100 text-red-700'
-                                  }`}>
+                                {room.name || "Chưa đặt tên"}
+                              </td>
+                              <td className="px-4 py-4">
+                                {room.price?.toLocaleString() || 0} VND
+                              </td>
+                              <td className="px-4 py-4">
+                                {room.maxPerson || 0}
+                              </td>
+                              <td className="px-4 py-4">
+                                <span
+                                  className={`px-2 py-1 rounded-full ${
+                                    room.status === "Active"
+                                      ? "bg-green-100 text-green-700"
+                                      : "bg-red-100 text-red-700"
+                                  }`}
+                                >
                                   {room.status || "Unknown"}
                                 </span>
                               </td>
@@ -212,16 +270,22 @@ const OwnerPropertiesContainer: React.FC = () => {
 
       {/* Phân trang */}
       <div className="flex justify-center mt-4 gap-2">
-        {Array.from({ length: Math.ceil(processedProperties.length / rowsPerPage) }, (_, i) => (
-          <button
-            key={i + 1}
-            className={`px-3 py-1 rounded ${propCurrentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
+        {Array.from(
+          { length: Math.ceil(processedProperties.length / rowsPerPage) },
+          (_, i) => (
+            <button
+              key={i + 1}
+              className={`px-3 py-1 rounded ${
+                propCurrentPage === i + 1
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200"
               }`}
-            onClick={() => setPropCurrentPage(i + 1)}
-          >
-            {i + 1}
-          </button>
-        ))}
+              onClick={() => setPropCurrentPage(i + 1)}
+            >
+              {i + 1}
+            </button>
+          )
+        )}
       </div>
     </div>
   );

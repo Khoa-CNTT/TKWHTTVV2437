@@ -12,6 +12,9 @@ const listTop10HomestayRating = () => {
   return new Promise(async (resolve, reject) => {
     try {
       const properties = await db.Property.findAll({
+        where: {
+          status: "active",
+        },
         attributes: {
           include: [
             // Tính trung bình điểm rating và làm tròn đến 1 chữ số thập phân
@@ -137,7 +140,10 @@ const getListProperty = (filter, limit = 12) => {
       // const currentTime = new Date();
 
       const properties = await db.Property.findAndCountAll({
-        where: whereConditions,
+        where: {
+          ...whereConditions,
+          status: "active",
+        },
         attributes: {
           include: [
             [
@@ -260,6 +266,7 @@ const getListSearchText = (text) => {
 
       const properties = await db.Property.findAll({
         where: {
+          status: "active",
           [Op.or]: [
             { name: { [Op.like]: `%${text}%` } },
             { "$propertyAddress.city$": { [Op.like]: `%${text}%` } },
@@ -293,9 +300,10 @@ const getListSearchText = (text) => {
 
 const createProperty = (data) => {
   return new Promise(async (resolve, reject) => {
+    console.log({ data });
     try {
       // Kiểm tra dữ liệu đầu vào cơ bản
-      if (!data.name || !data.description || !data.idUser || !data.categoryId) {
+      if (!data.name || !data.description || !data.userId || !data.categoryId) {
         return reject({
           status: "ERR",
           message: "Missing required property information",
@@ -309,6 +317,7 @@ const createProperty = (data) => {
         description: data.description,
         idUser: data.userId,
         idCategory: data.categoryId,
+        // status: "active",
         slug: slugify(data.name, {
           lower: true,
           strict: true,
@@ -585,6 +594,11 @@ const getDetailProperyById = (propertyId) => {
           {
             model: db.Address,
             as: "propertyAddress",
+          },
+          {
+            model: db.User,
+            as: "users", // alias này cần đúng với định nghĩa trong model
+            attributes: ["email", "phone"],
           },
         ],
         // attributes: ["name"],

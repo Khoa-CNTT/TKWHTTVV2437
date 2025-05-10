@@ -262,7 +262,7 @@ const Commission = () => {
                       </td>
                       <td className="px-4 py-5">{`${item?.commissionRate}%`}</td>
                       <td className="px-4 py-5 text-red-600">
-                        {item?.commissionAmount.toLocaleString("it-IT", {
+                        {item?.commissionAmount?.toLocaleString("it-IT", {
                           style: "currency",
                           currency: "VND",
                         })}

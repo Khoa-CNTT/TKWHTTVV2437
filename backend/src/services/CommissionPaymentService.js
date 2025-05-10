@@ -4,6 +4,7 @@ const moment = require("moment");
 
 const getListCommissionPaymentByPropertyId = (propertyId) => {
   return new Promise(async (resolve, reject) => {
+    console.log({ propertyId });
     try {
       const currentDate = new Date();
       const currentMonth = currentDate.getMonth() + 1; // Months are 0-indexed in JS, so +1
