@@ -163,15 +163,12 @@ const ConfirmApprove = ({ handleCloseAppove }: IProps) => {
           title: "Đã hoàn tiền!",
           text: "Bạn đã hoàn tiền thành công",
           icon: "success",
-          allowOutsideClick: true,
           allowEscapeKey: true,
           allowEnterKey: true,
           showConfirmButton: true,
           confirmButtonText: "OK",
           confirmButtonColor: "#3085d6",
         });
-        setReservation({ ...reservation, status: "refund" });
-        handleCloseAppove?.();
       } else {
         Swal.fire({
           title: "Hoàn tiền thất bại!",

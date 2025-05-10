@@ -18,7 +18,6 @@ import validate from "@/utils/validateInput";
 import FailedCheckout from "@/components/checkout/FailedCheckout";
 import apiPayment from "@/api/payment";
 import { IInfoPayment } from "../types/accountPayment";
-
 interface IDataEnter {
   firstName: string;
   lastName: string;

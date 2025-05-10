@@ -41,7 +41,7 @@ interface IReservationApprove {
   };
 }
 
-const ListReservationApproveContent = () => {
+const ListReservationApprovePage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isOpenApprove, setIsOpenAppove] = useState(false);
@@ -251,12 +251,12 @@ const ListReservationApproveContent = () => {
   );
 };
 
-const ListReservationApprovePage = () => {
+const ListReservationApproveContent = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <ListReservationApproveContent />
+      <ListReservationApprovePage />
     </Suspense>
   );
 };
 
-export default ListReservationApprovePage;
+export default ListReservationApproveContent;
