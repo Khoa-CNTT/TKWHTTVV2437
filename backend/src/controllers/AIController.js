@@ -14,6 +14,7 @@ const {
 const {
   getOrCreateCollection,
   deleteAllCollections,
+  deleteAllDocuments,
 } = require("../services/collectionService");
 
 class QueryController {
@@ -104,7 +105,7 @@ class QueryController {
         prompt += `Ngữ cảnh từ câu hỏi trước:\n- Câu hỏi: "${previousQuery.query}"\n- Câu trả lời: "${previousQuery.response}"\n\n`;
       }
 
-      prompt += `Vui lòng trả lời bằng tiếng Việt, ngắn gọn (tối đa 2-3 câu), đúng trọng tâm và tự nhiên.Nếu có trạng thái của khách sạn, hãy đưa ra thông tin về trạng thái đó. Nếu có thông tin, hãy phản hồi các thuộc tính liên quan như địa điểm, tiện nghi, giá, v.v. Nếu không có kết quả phù hợp, hãy đưa ra một gợi ý tích cực và lịch sự.Tránh sử dụng các cụm như "không có thông tin" hay "không tìm thấy".\n\nCâu trả lời:`;
+      prompt += `Vui lòng trả lời bằng tiếng Việt, ngắn gọn (tối đa 2-3 câu), đúng trọng tâm và tự nhiên.Nếu có trạng thái của khách sạn, hãy đưa ra thông tin về trạng thái đó. Nếu có thông tin, hãy phản hồi các thuộc tính liên quan như địa điểm, tiện nghi, giá, v.v.Đưa ra các url như hình ảnh , hoặc đường dẫn đến trang web nếu có . Nếu không có kết quả phù hợp, hãy đưa ra một gợi ý tích cực và lịch sự.Tránh sử dụng các cụm như "không có thông tin" hay "không tìm thấy" . Và luôn dẫn tới đúng đường dẫn '"http://localhost:3000" không chèn param nếu không có câu trả lời.\n\nCâu trả lời:`;
 
       const [groqResult, deepSeekResult] = await Promise.all([
         callDeepSeekWithTimeout(prompt, 3000).catch((err) => ({
@@ -298,6 +299,18 @@ class QueryController {
       res
         .status(500)
         .json({ error: "Error deleting collections", details: error.message });
+    }
+  }
+
+  async deleteAllDocuments(req, res) {
+    try {
+      const result = await deleteAllDocuments();
+      res.status(200).json(result);
+    } catch (error) {
+      console.error("Error deleting documents:", error);
+      res
+        .status(500)
+        .json({ error: "Error deleting documents", details: error.message });
     }
   }
 

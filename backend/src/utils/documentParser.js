@@ -26,18 +26,24 @@ function parseStringDocument(text) {
     id: null,
     propertyId: null,
     description: null,
-    address: [],
+    address: null,
     maxGuests: null,
     price: null,
     status: null,
     images: [],
     averageRating: null,
     property: null,
+    link: null,
   };
 
   const lines = text.split("\n");
-
-  console.log(lines, "lines lalalalalal");
+  let isAddressSection = false;
+  let addressObj = {
+    street: null,
+    district: null,
+    city: null,
+    country: null,
+  };
 
   lines.forEach((line) => {
     // Handle hotel name and ID
@@ -53,11 +59,32 @@ function parseStringDocument(text) {
       result.description = line.replace("Mô tả:", "").trim();
     }
 
+    // Handle link
+    if (line.startsWith("Link:")) {
+      result.link = line.replace("Link:", "").trim();
+    }
+
     // Handle address
-    if (line.startsWith("Địa chỉ:")) {
-      const address = line.replace("Địa chỉ:", "").trim();
-      if (address !== "N/A") {
-        result.address.push(address);
+    if (line.trim() === "Địa chỉ:") {
+      isAddressSection = true;
+      return;
+    }
+
+    if (isAddressSection && line.trim().startsWith("-")) {
+      const addressLine = line.trim().replace("-", "").trim();
+      if (addressLine.startsWith("Đường:")) {
+        addressObj.street = addressLine.replace("Đường:", "").trim();
+      } else if (addressLine.startsWith("Quận/Huyện:")) {
+        addressObj.district = addressLine.replace("Quận/Huyện:", "").trim();
+      } else if (addressLine.startsWith("Thành phố:")) {
+        addressObj.city = addressLine.replace("Thành phố:", "").trim();
+      } else if (addressLine.startsWith("Quốc gia:")) {
+        addressObj.country = addressLine.replace("Quốc gia:", "").trim();
+      }
+    } else if (isAddressSection && line.trim() !== "") {
+      isAddressSection = false;
+      if (Object.values(addressObj).some((value) => value !== null)) {
+        result.address = addressObj;
       }
     }
 
@@ -107,11 +134,6 @@ function parseStringDocument(text) {
       result.property = line.replace("Thuộc khách sạn :", "").trim();
     }
 
-    // Handle description
-    if (line.startsWith("Mô tả:")) {
-      result.description = line.replace("Mô tả:", "").trim();
-    }
-
     // Handle max guests
     if (line.startsWith("Số người tối đa:")) {
       result.maxGuests = parseInt(line.replace("Số người tối đa:", "").trim());
@@ -121,11 +143,6 @@ function parseStringDocument(text) {
     if (line.startsWith("Giá:")) {
       const priceStr = line.replace("Giá:", "").trim();
       result.price = priceStr;
-    }
-
-    // Handle status
-    if (line.startsWith("Trạng thái:")) {
-      result.status = line.replace("Trạng thái:", "").trim();
     }
 
     // Handle amenities
@@ -148,6 +165,14 @@ function parseStringDocument(text) {
       result.summary = line.replace("Tóm tắt:", "").trim();
     }
   });
+
+  // Final check for address if we're still in address section
+  if (
+    isAddressSection &&
+    Object.values(addressObj).some((value) => value !== null)
+  ) {
+    result.address = addressObj;
+  }
 
   return result;
 }
