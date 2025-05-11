@@ -15,6 +15,7 @@ function detectIntent(text) {
       "di chuyển",
       "đi đến",
       "địa chỉ",
+      
     ],
     room: [
       "phòng",

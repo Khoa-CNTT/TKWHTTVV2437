@@ -76,6 +76,8 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
       if (typeof document === "string") {
         const parsedDoc = parseStringDocument(document);
 
+        console.log(parsedDoc, "parsedDoc lalalalalal");
+
         if (metadata.type === "hotel" || parsedDoc.type === "hotel") {
           response += `${index + 1}. 🏨 ${
             metadata.name || parsedDoc.name || "Khách sạn"
@@ -83,11 +85,25 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
           response += `   Mô tả: ${
             parsedDoc.description || "Không có mô tả"
           }\n`;
-          response += `   Địa chỉ: ${parsedDoc.address?.join(", ") || "N/A"}\n`;
+          response += `   Địa chỉ:\n`;
+          if (parsedDoc.address && typeof parsedDoc.address === "object") {
+            if (parsedDoc.address.street)
+              response += `   - Đường: ${parsedDoc.address.street}\n`;
+            if (parsedDoc.address.district)
+              response += `   - Quận/Huyện: ${parsedDoc.address.district}\n`;
+            if (parsedDoc.address.city)
+              response += `   - Thành phố: ${parsedDoc.address.city}\n`;
+            if (parsedDoc.address.country)
+              response += `   - Quốc gia: ${parsedDoc.address.country}\n`;
+          } else {
+            response += `   N/A\n`;
+          }
           response += `   Tiện ích: ${
             metadata.amenities || "Wifi miễn phí, hồ bơi, bãi đỗ xe"
           }\n`;
-          response += `Http link: ${metadata.link || "Không có đường dẫn"}\n`;
+          response += `   Link: ${
+            parsedDoc.link || metadata.link || "Không có đường dẫn"
+          }\n`;
 
           if (parsedDoc.images && parsedDoc.images.length > 0) {
             response += `   Hình ảnh: ${parsedDoc.images.join(", ")}\n`;
@@ -103,6 +119,7 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
             metadata.name || parsedDoc.name || "Phòng"
           } (Khách sạn ID: ${metadata.propertyId || parsedDoc.propertyId})\n`;
           response += `   Giá: ${parsedDoc.price || "N/A"}\n`;
+          response += `   Thuộc khách sạn: ${parsedDoc.property || "N/A"}\n`;
           response += `   Số người tối đa: ${parsedDoc.maxGuests || "N/A"}\n`;
           response += `   Trạng thái: ${parsedDoc.status || "N/A"}\n`;
           response += `   Tiện nghi: ${
@@ -135,9 +152,22 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
               ? description[1].trim().substring(0, 150) + "..."
               : "N/A"
           }\n`;
-          response += `   Địa chỉ: ${
-            parsedDoc["Địa chỉ"] ? parsedDoc["Địa chỉ"].join(", ") : "N/A"
-          }\n`;
+          response += `   Địa chỉ:\n`;
+          if (
+            parsedDoc["Địa chỉ"] &&
+            typeof parsedDoc["Địa chỉ"] === "object"
+          ) {
+            if (parsedDoc["Địa chỉ"].street)
+              response += `   - Đường: ${parsedDoc["Địa chỉ"].street}\n`;
+            if (parsedDoc["Địa chỉ"].district)
+              response += `   - Quận/Huyện: ${parsedDoc["Địa chỉ"].district}\n`;
+            if (parsedDoc["Địa chỉ"].city)
+              response += `   - Thành phố: ${parsedDoc["Địa chỉ"].city}\n`;
+            if (parsedDoc["Địa chỉ"].country)
+              response += `   - Quốc gia: ${parsedDoc["Địa chỉ"].country}\n`;
+          } else {
+            response += `   N/A\n`;
+          }
           response += `   Đánh giá cặp đôi: ${
             metadata.rating || "Chưa có đánh giá"
           }\n`;

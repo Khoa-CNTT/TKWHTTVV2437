@@ -30,7 +30,62 @@ const BoxChat: React.FC<IProps> = ({ onSetBox }) => {
   ]);
   const [inputValue, setInputValue] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null); // Thêm ref
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Add URL detection function
+  const detectAndFormatUrls = (text: string) => {
+    // Loại bỏ dấu ngoặc vuông quanh URL nếu có
+    const cleanedText = text.replace(
+      /\[(https?:\/\/res\.cloudinary\.com[^\]]+)\]/g,
+      "$1"
+    );
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = cleanedText.split(urlRegex);
+
+    return parts.map((part, index) => {
+      if (part.match(urlRegex)) {
+        let url = part;
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+          url = "https://" + url;
+        }
+        // Nếu là Cloudinary URL thì hiển thị ảnh inline
+        if (url.includes("res.cloudinary.com")) {
+          return (
+            <img
+              key={index}
+              src={url}
+              alt="Cloudinary image"
+              className="inline-block max-h-60 max-w-xs rounded-lg shadow-md align-middle mx-1"
+              style={{ verticalAlign: "middle" }}
+            />
+          );
+        }
+        // Các URL khác vẫn là link
+        try {
+          new URL(url);
+          return (
+            <a
+              key={index}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:underline"
+              onClick={(e) => {
+                e.preventDefault();
+                window.open(url, "_blank", "noopener,noreferrer");
+              }}
+            >
+              {part}
+            </a>
+          );
+        } catch {
+          return part;
+        }
+      }
+      return part;
+    });
+  };
+
   const handleSendMessage = async () => {
     if (inputValue.trim()) {
       setMessages((prev) => [
@@ -119,7 +174,7 @@ const BoxChat: React.FC<IProps> = ({ onSetBox }) => {
                     }
                   )}
                 >
-                  {message.text}
+                  {detectAndFormatUrls(message.text)}
                 </span>
               )}
             </li>
