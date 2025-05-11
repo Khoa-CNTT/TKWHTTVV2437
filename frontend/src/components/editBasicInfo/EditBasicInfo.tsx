@@ -59,11 +59,11 @@ const EditBasicInfo = () => {
           : null,
       });
       if (res?.status === "OK" && res?.msg === "Update") {
-        Swal.fire({
-          title: "Update thành công!",
-          icon: "success",
-          draggable: true,
-        });
+        // Swal.fire({
+        //   title: "Update thành công!",
+        //   icon: "success",
+        //   draggable: true,
+        // });
         setUser({ ...editUser });
         closeModal();
       }

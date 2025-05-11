@@ -179,7 +179,12 @@ const EditEmail = () => {
                 Swal.fire({
                   title: "Thay đổi email thành công!",
                   icon: "success",
-                  draggable: true,
+                  allowOutsideClick: true,
+                  allowEscapeKey: true,
+                  allowEnterKey: true,
+                  showConfirmButton: true,
+                  confirmButtonText: "OK",
+                  confirmButtonColor: "#3085d6",
                 });
 
                 closeModal();

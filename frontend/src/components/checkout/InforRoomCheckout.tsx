@@ -111,7 +111,7 @@ const InforRoomCheckout: React.FC<IProps> = ({ property, room, code }) => {
         <div className="mt-4 border-t-[1px] border-gray-300 pt-4">
           <div className="flex justify-between items-center">
             <p>
-              {room?.price.toLocaleString("it-IT", {
+              {room?.price?.toLocaleString("it-IT", {
                 style: "currency",
                 currency: "VND",
               })}{" "}
@@ -127,7 +127,7 @@ const InforRoomCheckout: React.FC<IProps> = ({ property, room, code }) => {
                 room?.price &&
                 Number(
                   room?.price * Math.abs(startDate?.diff(endDate, "day"))
-                ).toLocaleString("it-IT", {
+                )?.toLocaleString("it-IT", {
                   style: "currency",
                   currency: "VND",
                 })}
@@ -136,7 +136,7 @@ const InforRoomCheckout: React.FC<IProps> = ({ property, room, code }) => {
           <div className="flex justify-between items-center">
             <p>Giá</p>
             <p>
-              {room?.price.toLocaleString("it-IT", {
+              {room?.price?.toLocaleString("it-IT", {
                 style: "currency",
                 currency: "VND",
               })}

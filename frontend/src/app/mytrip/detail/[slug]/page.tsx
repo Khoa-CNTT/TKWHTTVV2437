@@ -273,7 +273,7 @@ const DetailPage = async (props: IProps) => {
               <div className="flex justify-between items-start">
                 <div>1 phòng</div>
                 <p>
-                  {Number(room?.data.price).toLocaleString("it-IT", {
+                  {Number(room?.data.price)?.toLocaleString("it-IT", {
                     style: "currency",
                     currency: "VND",
                   })}
@@ -314,7 +314,7 @@ const DetailPage = async (props: IProps) => {
                         )
                       )
                     )
-                ).toLocaleString("it-IT", {
+                )?.toLocaleString("it-IT", {
                   style: "currency",
                   currency: "VND",
                 })}

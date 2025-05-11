@@ -1,10 +1,12 @@
 "use client";
+
+import { Suspense } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import EditPassword from "@/components/securityUser/EditPassword";
 import SecurityUser from "@/components/securityUser/SecurityUser";
 import EditEmail from "@/components/securityUser/EditEmail";
 
-const Security = () => {
+const SecurityContent = () => {
   const searchParams = useSearchParams();
   const isEditPassword = searchParams.get("edit") === "password";
   const isEditEmail = searchParams.get("edit") === "email";
@@ -18,4 +20,13 @@ const Security = () => {
     </div>
   );
 };
-export default Security;
+
+const SecurityPage = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SecurityContent />
+    </Suspense>
+  );
+};
+
+export default SecurityPage;

@@ -6,12 +6,15 @@ const hightlightProperty = require("../models/hightlightProperty");
 const { saveEmbedding } = require("./queryService");
 const { sequelize } = require("../models");
 const moment = require("moment");
-const reviewService = require("./ReviewService");
+const { deleteCollection } = require("./collectionService");
 
 const listTop10HomestayRating = () => {
   return new Promise(async (resolve, reject) => {
     try {
       const properties = await db.Property.findAll({
+        where: {
+          status: "active",
+        },
         attributes: {
           include: [
             // Tính trung bình điểm rating và làm tròn đến 1 chữ số thập phân
@@ -137,7 +140,10 @@ const getListProperty = (filter, limit = 12) => {
       // const currentTime = new Date();
 
       const properties = await db.Property.findAndCountAll({
-        where: whereConditions,
+        where: {
+          ...whereConditions,
+          status: "active",
+        },
         attributes: {
           include: [
             [
@@ -260,6 +266,7 @@ const getListSearchText = (text) => {
 
       const properties = await db.Property.findAll({
         where: {
+          status: "active",
           [Op.or]: [
             { name: { [Op.like]: `%${text}%` } },
             { "$propertyAddress.city$": { [Op.like]: `%${text}%` } },
@@ -275,7 +282,7 @@ const getListSearchText = (text) => {
             required: true, // Chỉ lấy properties có address
           },
         ],
-        limit: 10, // Giới hạn kết quả trả về
+        limit: 4, // Giới hạn kết quả trả về
       });
 
       resolve({
@@ -293,9 +300,10 @@ const getListSearchText = (text) => {
 
 const createProperty = (data) => {
   return new Promise(async (resolve, reject) => {
+    console.log({ data });
     try {
       // Kiểm tra dữ liệu đầu vào cơ bản
-      if (!data.name || !data.description || !data.idUser || !data.categoryId) {
+      if (!data.name || !data.description || !data.userId || !data.categoryId) {
         return reject({
           status: "ERR",
           message: "Missing required property information",
@@ -309,6 +317,7 @@ const createProperty = (data) => {
         description: data.description,
         idUser: data.userId,
         idCategory: data.categoryId,
+        // status: "active",
         slug: slugify(data.name, {
           lower: true,
           strict: true,
@@ -323,10 +332,10 @@ const createProperty = (data) => {
         district: data.district,
         city: data.city,
         country: data.country,
-        slug: slugify(data.city, {
-          lower: true, // chuyển thành chữ thường
-          strict: true, // bỏ các ký tự đặc biệt
-        }),
+        // slug: slugify(data.city, {
+        //   lower: true, // chuyển thành chữ thường
+        //   strict: true, // bỏ các ký tự đặc biệt
+        // }),
       });
 
       // Tạo images
@@ -352,52 +361,15 @@ const createProperty = (data) => {
         }))
       );
 
-      const newdata = [
-        { property: property },
-        { address: address },
-        { amenities: amenities },
-        { highlights: highlights },
-        { images: images },
-      ];
-
-      // Chuẩn bị dữ liệu cho embedding - FIX: Tạo đúng định dạng cho saveEmbedding
-      const propertyData = {
-        id: property.id,
-        name: property.name,
-        description: property.description,
-        slug: property.slug,
-        address: {
-          street: address.street,
-          district: address.district,
-          city: address.city,
-          country: address.country,
-        },
-        images: images.map((img) => ({
-          id: img.id,
-          image: img.image,
-        })),
-        amenities: amenities.map((am) => am.idAmenity),
-        highlights: highlights.map((hl) => hl.idHighlight),
-      };
-
       try {
-        // Thực hiện embedding sau khi đã tạo dữ liệu - FIX: truyền đúng định dạng
-        const embeddingResult = await saveEmbedding("hotel", propertyData);
-        console.log("Embedding result:", embeddingResult);
-      } catch (embeddingError) {
-        console.error("Failed to save embedding:", embeddingError);
-        // Vẫn tiếp tục để trả về dữ liệu đã tạo
+        await createPropertyFromEmbedding(property.id);
+      } catch (error) {
+        console.error("Failed to save embedding:", error);
       }
-
-      console.log(
-        "🚀 ~ file: PropertyService.js:1 ~ createProperty ~ embedding completed:",
-        JSON.stringify(propertyData, null, 2)
-      );
 
       // Trả về kết quả thành công
       resolve({
         status: "OK",
-        data: propertyData,
       });
     } catch (error) {
       console.error("Property creation error:", error);
@@ -411,6 +383,47 @@ const createProperty = (data) => {
   });
 };
 
+const createPropertyFromEmbedding = (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const getProperty = await getDetailProperyById(id);
+      console.log(getProperty, "getProperty");
+      const propertyData = {
+        id: getProperty.data.dataValues.id,
+        name: getProperty.data.dataValues.name,
+        description: getProperty.data.dataValues.description,
+        status: getProperty.data.dataValues.status,
+        address: {
+          street: getProperty.data.dataValues.propertyAddress.street,
+          district: getProperty.data.dataValues.propertyAddress.district,
+          city: getProperty.data.dataValues.propertyAddress.city,
+          country: getProperty.data.dataValues.propertyAddress.country,
+        },
+        images: getProperty.data.dataValues.images.map((img) => ({
+          id: img.id,
+          image: img.image,
+        })),
+        amenities: getProperty.data.dataValues.amenities.map(
+          (am) => am.idAmenity
+        ),
+        highlights: getProperty.data.dataValues.highlights.map(
+          (hl) => hl.idHighlight
+        ),
+        link: `http://localhost:3000/detail/${getProperty.data.dataValues.slug}`,
+      };
+      try {
+        // Thực hiện embedding sau khi đã tạo dữ liệu - FIX: truyền đúng định dạng
+        const embeddingResult = await saveEmbedding("hotel", propertyData);
+        console.log("Embedding result:", embeddingResult);
+      } catch (embeddingError) {
+        console.error("Failed to save embedding:", embeddingError);
+        // Vẫn tiếp tục để trả về dữ liệu đã tạo
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 const updateProperty = (propertyId, data) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -480,6 +493,14 @@ const updateProperty = (propertyId, data) => {
         highlights,
       };
 
+      try {
+        await deleteEmbeddingProperty(propertyId);
+
+        await createPropertyFromEmbedding(propertyId);
+      } catch (error) {
+        console.error("Failed to save embedding:", error);
+      }
+
       resolve({
         status: "OK",
         data: updatedData,
@@ -490,6 +511,16 @@ const updateProperty = (propertyId, data) => {
         status: "ERR",
         message: `Error updating property: ${error.message || error}`,
       });
+    }
+  });
+};
+
+const deleteEmbeddingProperty = (propertyId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await deleteCollection(`hotel_${propertyId}`);
+    } catch (error) {
+      reject(error);
     }
   });
 };
@@ -652,93 +683,6 @@ const getDetailProperyByUserId = (userId) => {
   });
 };
 
-const fetchFullData = async (filters = {}) => {
-  try {
-    const properties = await db.Property.findAll({
-      attributes: ["name", "description", "address", "slug"],
-      where: {
-        ...(filters.name && {
-          name: { [Op.iLike]: `%${filters.name}%` },
-        }),
-        ...(filters.address && {
-          address: { [Op.iLike]: `%${filters.address}%` },
-        }),
-      },
-      include: [
-        {
-          association: "rooms",
-          attributes: ["name", "description", "price", "maxPerson"],
-          where: filters.roomStatus
-            ? { status: filters.roomStatus }
-            : undefined,
-        },
-        {
-          association: "images",
-          attributes: ["image"],
-        },
-        {
-          association: "reviews",
-          attributes: ["text", "rating"],
-        },
-        {
-          association: "amenities",
-          attributes: ["name"],
-          where:
-            filters.amenities && filters.amenities.length
-              ? {
-                  name: {
-                    [Op.in]: filters.amenities,
-                  },
-                }
-              : undefined,
-        },
-      ],
-    });
-
-    // Chuyển đổi sang text
-    const result = properties.map((property) => {
-      const roomDescriptions = property.rooms
-        ?.map((room) => {
-          return `Room name: ${room.name}, Price: ${room.price}, Max person: ${
-            room.maxPerson
-          }, Description: ${room.description || "No description"}`;
-        })
-        .join("\n");
-
-      const imageDescriptions = property.images
-        ?.map((image) => `Image URL: ${image.image}`)
-        .join("\n");
-
-      const reviewTexts = property.reviews
-        ?.map((review) => `Review: ${review.text}, Rating: ${review.rating}`)
-        .join("\n");
-
-      const amenities = property.amenities
-        ?.map((amenity) => `Amenity: ${amenity.name}`)
-        .join("\n");
-
-      return {
-        name: property.name,
-        description: property.description,
-        address: property.address,
-        rooms: roomDescriptions,
-        images: imageDescriptions,
-        reviews: reviewTexts,
-        amenities: amenities,
-      };
-    });
-
-    return result;
-  } catch (error) {
-    console.error("Error in fetchFullData:", error);
-    throw error;
-  }
-};
-console.log(
-  "🚀 ~ file: PropertyService.js:1 ~ fetchFullData ~ fetchFullData:",
-  fetchFullData
-);
-
 const getListAmenityByPropertyId = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -796,6 +740,17 @@ const renewalAdByUserId = (userId, advertisingId, term, type) => {
       const property = await db.Property.findOne({ where: { idUser: userId } });
 
       if (property.expiredAd === null || property.expiredAd < moment()) {
+        await db.Property.update(
+          {
+            idAdvertising: advertisingId,
+            advertising: type,
+            expiredAd: moment().add(term, "months"),
+          },
+          {
+            where: { idUser: userId },
+          }
+        );
+      } else if (property.advertising != type) {
         await db.Property.update(
           {
             idAdvertising: advertisingId,
@@ -910,7 +865,6 @@ module.exports = {
   listTop10HomestayRating,
   getDetailBySlug,
   getDetailProperyById,
-  fetchFullData,
   createProperty,
   getListAmenityByPropertyId,
   getListHightlightByPropertyId,

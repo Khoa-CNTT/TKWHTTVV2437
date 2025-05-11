@@ -75,6 +75,7 @@ module.exports = (sequelize, DataTypes) => {
       expiredAd: DataTypes.DATE,
       idAdvertising: DataTypes.STRING,
       payCommissionAt: DataTypes.DATE,
+      status: DataTypes.STRING,
     },
     {
       sequelize,

@@ -59,8 +59,18 @@ async function deleteAllCollections() {
   }
 }
 
+async function deleteCollection(id) {
+  try {
+    const collection = await getOrCreateCollection("unified_data_embeddings");
+    await collection.delete({ ids: [id] });
+  } catch (error) {
+    console.error("Error deleting document:", error);
+  }
+}
+
 module.exports = {
   getOrCreateCollection,
   listAllCollections,
   deleteAllCollections,
+  deleteCollection,
 };

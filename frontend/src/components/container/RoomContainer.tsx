@@ -4,7 +4,11 @@ import apisAdmin from "@/api/admin";
 import { useSearchParams, useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import "font-awesome/css/font-awesome.min.css";
-import { showErrorAlert ,showConfirmAlert,showSuccessAlert} from "@/helper/Alert";
+import {
+  showErrorAlert,
+  showConfirmAlert,
+  showSuccessAlert,
+} from "@/helper/Alert";
 
 interface IRoom {
   id: string;
@@ -37,16 +41,19 @@ const RoomContainer: React.FC = () => {
   const [showDetail, setShowDetail] = useState(false);
   const [editingRoom, setEditingRoom] = useState<IRoom | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [amenitiesList, setAmenitiesList] = useState<{ id: string; name: string }[]>([]);
+  const [amenitiesList, setAmenitiesList] = useState<
+    { id: string; name: string }[]
+  >([]);
   const rowsPerPage = 10;
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
 
   const filteredRooms = rooms
-    .filter((room) =>
-      room.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      room.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      room.type.toLowerCase().includes(searchTerm.toLowerCase())
+    .filter(
+      (room) =>
+        room.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        room.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        room.type.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .sort((a, b) => {
       if (!sortField) return 0;
@@ -72,7 +79,7 @@ const RoomContainer: React.FC = () => {
     setError(null);
     try {
       const response = await apisAdmin.listRooms(propertyId);
-      const mappedRooms : IRoom[] = response.data.map((room: IRoom) => ({
+      const mappedRooms: IRoom[] = response.data.map((room: IRoom) => ({
         id: room.id,
         name: room.name,
         price: room.price,
@@ -95,7 +102,9 @@ const RoomContainer: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-              const confirm = await showConfirmAlert("Bạn chắc chắn muốn hủy đặt phòng này?");
+    const confirm = await showConfirmAlert(
+      "Bạn chắc chắn muốn hủy đặt phòng này?"
+    );
     if (confirm) {
       try {
         await apisAdmin.deleteRoom(id);
@@ -114,7 +123,11 @@ const RoomContainer: React.FC = () => {
     setShowDetail(true);
   };
 
-  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleEditChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
     if (editingRoom) {
       setEditingRoom({
         ...editingRoom,
@@ -130,7 +143,9 @@ const RoomContainer: React.FC = () => {
     const exists = editingRoom.amenities.some((a) => a.name === amenity.name);
     let newAmenities;
     if (exists) {
-      newAmenities = editingRoom.amenities.filter((a) => a.name !== amenity.name);
+      newAmenities = editingRoom.amenities.filter(
+        (a) => a.name !== amenity.name
+      );
     } else {
       newAmenities = [...editingRoom.amenities, { name: amenity.name }];
     }
@@ -195,11 +210,15 @@ const RoomContainer: React.FC = () => {
         />
       </div>
 
-      {loading && <p className="text-center text-blue-500">Đang tải dữ liệu...</p>}
+      {loading && (
+        <p className="text-center text-blue-500">Đang tải dữ liệu...</p>
+      )}
       {error && <p className="text-center text-red-500">{error}</p>}
 
       {!loading && !error && rooms.length === 0 && (
-        <p className="text-center text-gray-500">Không có phòng nào được tìm thấy.</p>
+        <p className="text-center text-gray-500">
+          Không có phòng nào được tìm thấy.
+        </p>
       )}
 
       {!loading && !error && rooms.length > 0 && (
@@ -208,30 +227,59 @@ const RoomContainer: React.FC = () => {
             <thead className="bg-gray-200 text-gray-500 font-bold text-sm">
               <tr>
                 <th className="px-4 py-3 text-left">Hình ảnh</th>
-                <th className="px-4 py-3 text-left cursor-pointer" onClick={() => handleSort("name")}>
-                  Tên phòng {sortField === "name" && (sortOrder === "asc" ? "▲" : "▼")}
+                <th
+                  className="px-4 py-3 text-left cursor-pointer"
+                  onClick={() => handleSort("name")}
+                >
+                  Tên phòng{" "}
+                  {sortField === "name" && (sortOrder === "asc" ? "▲" : "▼")}
                 </th>
-                <th className="px-4 py-3 text-left cursor-pointer" onClick={() => handleSort("price")}>
-                  Giá {sortField === "price" && (sortOrder === "asc" ? "▲" : "▼")}
+                <th
+                  className="px-4 py-3 text-left cursor-pointer"
+                  onClick={() => handleSort("price")}
+                >
+                  Giá{" "}
+                  {sortField === "price" && (sortOrder === "asc" ? "▲" : "▼")}
                 </th>
-                <th className="px-4 py-3 text-left cursor-pointer" onClick={() => handleSort("maxPerson")}>
-                  Số người tối đa {sortField === "maxPerson" && (sortOrder === "asc" ? "▲" : "▼")}
+                <th
+                  className="px-4 py-3 text-left cursor-pointer"
+                  onClick={() => handleSort("maxPerson")}
+                >
+                  Số người tối đa{" "}
+                  {sortField === "maxPerson" &&
+                    (sortOrder === "asc" ? "▲" : "▼")}
                 </th>
-                <th className="px-4 py-3 text-left cursor-pointer" onClick={() => handleSort("status")}>
-                  Trạng thái {sortField === "status" && (sortOrder === "asc" ? "▲" : "▼")}
+                <th
+                  className="px-4 py-3 text-left cursor-pointer"
+                  onClick={() => handleSort("status")}
+                >
+                  Trạng thái{" "}
+                  {sortField === "status" && (sortOrder === "asc" ? "▲" : "▼")}
                 </th>
-                <th className="px-4 py-3 text-left cursor-pointer" onClick={() => handleSort("createdAt")}>
-                  Ngày tạo {sortField === "createdAt" && (sortOrder === "asc" ? "▲" : "▼")}
+                <th
+                  className="px-4 py-3 text-left cursor-pointer"
+                  onClick={() => handleSort("createdAt")}
+                >
+                  Ngày tạo{" "}
+                  {sortField === "createdAt" &&
+                    (sortOrder === "asc" ? "▲" : "▼")}
                 </th>
                 <th className="px-4 py-3 text-left">Hành động</th>
               </tr>
             </thead>
             <tbody className="text-sm font-semibold">
               {currentRows.map((room) => (
-                <tr key={room.id} className="border-b border-gray-200 hover:bg-gray-100">
+                <tr
+                  key={room.id}
+                  className="border-b border-gray-200 hover:bg-gray-100"
+                >
                   <td className="px-4 py-5">
                     {room.image ? (
-                      <img src={room.image} alt="Room" className="w-16 h-16 rounded-md" />
+                      <img
+                        src={room.image}
+                        alt="Room"
+                        className="w-16 h-16 rounded-md"
+                      />
                     ) : (
                       <div className="w-16 h-16 bg-gray-200 flex items-center justify-center rounded-md">
                         <span className="text-gray-500 text-sm">No Image</span>
@@ -239,10 +287,14 @@ const RoomContainer: React.FC = () => {
                     )}
                   </td>
                   <td className="px-4 py-5">{room.name}</td>
-                  <td className="px-4 py-5">{room.price.toLocaleString()} VND</td>
+                  <td className="px-4 py-5">
+                    {room.price?.toLocaleString()} VND
+                  </td>
                   <td className="px-4 py-5">{room.maxPerson}</td>
                   <td className="px-4 py-5">{room.status}</td>
-                  <td className="px-4 py-5">{dayjs(room.createdAt).format("DD/MM/YYYY")}</td>
+                  <td className="px-4 py-5">
+                    {dayjs(room.createdAt).format("DD/MM/YYYY")}
+                  </td>
                   <td className="px-4 py-5">
                     <div className="flex items-center gap-3">
                       <button
@@ -258,7 +310,6 @@ const RoomContainer: React.FC = () => {
                         onClick={() => handleDelete(room.id)}
                       >
                         <i className="fa fa-trash text-red-500 text-lg cursor-pointer hover:text-red-700"></i>
-                        
                       </button>
                     </div>
                   </td>
@@ -280,7 +331,9 @@ const RoomContainer: React.FC = () => {
               <button
                 key={index + 1}
                 className={`px-3 py-1 rounded ${
-                  currentPage === index + 1 ? "bg-orange-500 text-white" : "bg-gray-300 hover:bg-gray-400"
+                  currentPage === index + 1
+                    ? "bg-orange-500 text-white"
+                    : "bg-gray-300 hover:bg-gray-400"
                 }`}
                 onClick={() => handlePageChange(index + 1)}
               >
@@ -321,7 +374,11 @@ const RoomContainer: React.FC = () => {
             >
               <div className="mb-4 flex justify-center">
                 {selectedRoom.image ? (
-                  <img src={selectedRoom.image} alt="Room" className="w-32 h-32 rounded-md" />
+                  <img
+                    src={selectedRoom.image}
+                    alt="Room"
+                    className="w-32 h-32 rounded-md"
+                  />
                 ) : (
                   <div className="w-32 h-32 bg-gray-200 flex items-center justify-center rounded-md">
                     <span className="text-gray-500 text-sm">No Image</span>
@@ -333,7 +390,9 @@ const RoomContainer: React.FC = () => {
                 <input
                   type="text"
                   name="name"
-                  value={isEditing ? editingRoom?.name ?? "" : selectedRoom.name}
+                  value={
+                    isEditing ? (editingRoom?.name ?? "") : selectedRoom.name
+                  }
                   disabled={!isEditing}
                   onChange={handleEditChange}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
@@ -344,18 +403,26 @@ const RoomContainer: React.FC = () => {
                 <input
                   type="number"
                   name="price"
-                  value={isEditing ? editingRoom?.price ?? "" : selectedRoom.price}
+                  value={
+                    isEditing ? (editingRoom?.price ?? "") : selectedRoom.price
+                  }
                   disabled={!isEditing}
                   onChange={handleEditChange}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium">Số người tối đa</label>
+                <label className="block text-sm font-medium">
+                  Số người tối đa
+                </label>
                 <input
                   type="number"
                   name="maxPerson"
-                  value={isEditing ? editingRoom?.maxPerson ?? "" : selectedRoom.maxPerson}
+                  value={
+                    isEditing
+                      ? (editingRoom?.maxPerson ?? "")
+                      : selectedRoom.maxPerson
+                  }
                   disabled={!isEditing}
                   onChange={handleEditChange}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
@@ -365,7 +432,11 @@ const RoomContainer: React.FC = () => {
                 <label className="block text-sm font-medium">Trạng thái</label>
                 <select
                   name="status"
-                  value={isEditing ? editingRoom?.status ?? "" : selectedRoom.status}
+                  value={
+                    isEditing
+                      ? (editingRoom?.status ?? "")
+                      : selectedRoom.status
+                  }
                   disabled={!isEditing}
                   onChange={handleEditChange}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
@@ -378,7 +449,11 @@ const RoomContainer: React.FC = () => {
                 <label className="block text-sm font-medium">Mô tả</label>
                 <textarea
                   name="description"
-                  value={isEditing ? editingRoom?.description ?? "" : selectedRoom.description}
+                  value={
+                    isEditing
+                      ? (editingRoom?.description ?? "")
+                      : selectedRoom.description
+                  }
                   disabled={!isEditing}
                   onChange={handleEditChange}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
@@ -392,12 +467,10 @@ const RoomContainer: React.FC = () => {
                       <input
                         type="checkbox"
                         disabled={!isEditing}
-                        checked={
-                          (isEditing
-                            ? editingRoom?.amenities ?? []
-                            : selectedRoom.amenities ?? []
-                          ).some((a) => a.name === am.name)
-                        }
+                        checked={(isEditing
+                          ? (editingRoom?.amenities ?? [])
+                          : (selectedRoom.amenities ?? [])
+                        ).some((a) => a.name === am.name)}
                         onChange={() => handleAmenityChange(am.id)}
                       />
                       <span>{am.name}</span>
@@ -411,7 +484,10 @@ const RoomContainer: React.FC = () => {
                     type="button"
                     className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
                     onClick={() => {
-                      setEditingRoom({ ...selectedRoom, amenities: [...selectedRoom.amenities] });
+                      setEditingRoom({
+                        ...selectedRoom,
+                        amenities: [...selectedRoom.amenities],
+                      });
                       setIsEditing(true);
                     }}
                   >

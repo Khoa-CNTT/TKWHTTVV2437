@@ -17,6 +17,7 @@ import apisProperty from "@/apis/property";
 import { IRoom } from "@/app/types/room";
 import apisRoom from "@/apis/room";
 import apisRoomAvailability from "@/apis/roomAvailability";
+import MessageNotFound from "@/components/Item/MessageNotFound";
 
 const ManagerStatus = () => {
   const [valueSearch, setValueSearch] = useState<string>("");
@@ -111,7 +112,7 @@ const ManagerStatus = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <div className="w-full">
+      <div className="w-full relative">
         <div className="p-10">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold">Thông tin tình trạng phòng</h1>
@@ -187,38 +188,42 @@ const ManagerStatus = () => {
                   <th className="px-4 py-3 text-left ">Giá</th>
                 </tr>
               </thead>
-              <tbody className=" text-[-14] font-semibold">
-                {rooms.map((item) => (
-                  <tr
-                    key={item?.id}
-                    className="border-b border-gray-200 cursor-pointer hover:bg-gray-100"
-                  >
-                    <td className="px-4 py-5">{item?.code}</td>
-                    <td className="pl-4">
-                      <img
-                        className="w-[50px] h-[50px] object-cover rounded-md"
-                        src={item?.images[0]?.image}
-                      ></img>
-                    </td>
-                    <td className="pl-4 py-5">{item.name}</td>
-                    <td className="pl-4 py-5">{`${roomAvailabilities.find((subItem) => subItem.idRoom === item.id)?.blocked_quantity || 0}/${item.quantity}`}</td>
-                    <td className="px-4 py-5 flex items-center gap-2">
-                      {Array(item?.maxPerson)
-                        .fill(0)
-                        .map((_, index) => (
-                          <IoPersonSharp key={index} size={20} />
-                        ))}
-                    </td>
-                    <td className="px-4 py-5">
-                      {item.price.toLocaleString("it-IT", {
-                        style: "currency",
-                        currency: "VND",
-                      })}{" "}
-                      / đêm
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+              {rooms.length === 0 ? (
+                <MessageNotFound />
+              ) : (
+                <tbody className=" text-[-14] font-semibold">
+                  {rooms.map((item) => (
+                    <tr
+                      key={item?.id}
+                      className="border-b border-gray-200 cursor-pointer hover:bg-gray-100"
+                    >
+                      <td className="px-4 py-5">{item?.code}</td>
+                      <td className="pl-4">
+                        <img
+                          className="w-[50px] h-[50px] object-cover rounded-md"
+                          src={item?.images[0]?.image}
+                        ></img>
+                      </td>
+                      <td className="pl-4 py-5">{item.name}</td>
+                      <td className="pl-4 py-5">{`${roomAvailabilities.find((subItem) => subItem.idRoom === item.id)?.blocked_quantity || 0}/${item.quantity}`}</td>
+                      <td className="px-4 py-5 flex items-center gap-2">
+                        {Array(item?.maxPerson)
+                          .fill(0)
+                          .map((_, index) => (
+                            <IoPersonSharp key={index} size={20} />
+                          ))}
+                      </td>
+                      <td className="px-4 py-5">
+                        {item?.price?.toLocaleString("it-IT", {
+                          style: "currency",
+                          currency: "VND",
+                        })}{" "}
+                        / đêm
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              )}
             </table>
           </div>
         </div>

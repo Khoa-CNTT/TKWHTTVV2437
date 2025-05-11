@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { FaCaretDown } from "react-icons/fa";
 import ConfirmApprove from "@/components/MangeAprove/ConfirmApprove";
 import { useEffect, useState } from "react";
@@ -190,7 +191,7 @@ const ListReservationApprovePage = () => {
                         {dayjs(item?.checkOutdate)?.format("DD/MM/YYYY HH:mm")}
                       </td>
                       <td className="px-4 py-5 ">
-                        {item?.totalPrice.toLocaleString("it-IT", {
+                        {item?.totalPrice?.toLocaleString("it-IT", {
                           style: "currency",
                           currency: "VND",
                         })}
@@ -250,4 +251,12 @@ const ListReservationApprovePage = () => {
   );
 };
 
-export default ListReservationApprovePage;
+const ListReservationApproveContent = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ListReservationApprovePage />
+    </Suspense>
+  );
+};
+
+export default ListReservationApproveContent;

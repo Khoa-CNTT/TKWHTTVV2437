@@ -153,7 +153,7 @@ const ListRoomContainer: React.FC<IProps> = ({ propertyId }) => {
                   <div className="flex items-center">
                     <p className="font-semibold text-md">
                       Giá:{" "}
-                      {item.price.toLocaleString("it-IT", {
+                      {item?.price?.toLocaleString("it-IT", {
                         style: "currency",
                         currency: "VND",
                       })}

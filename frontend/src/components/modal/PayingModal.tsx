@@ -96,7 +96,7 @@ const PayingModal: React.FC<IProps> = ({
               <p className="font-semibold">{name}</p>
               <div className="flex font-semibold items-center justify-between">
                 <p className="text-red-600 text-sm font-semibold">
-                  {price.toLocaleString("it-IT", {
+                  {price?.toLocaleString("it-IT", {
                     style: "currency",
                     currency: "VND",
                   })}
@@ -154,7 +154,7 @@ const PayingModal: React.FC<IProps> = ({
           <div className="flex items-center justify-between">
             <p className="text-sm">Tổng thanh toán</p>
             <p className="text-lg text-red-600 font-semibold">
-              {price.toLocaleString("it-IT", {
+              {price?.toLocaleString("it-IT", {
                 style: "currency",
                 currency: "VND",
               })}

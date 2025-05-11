@@ -135,12 +135,12 @@ const vnpay_ipn = async (req, res) => {
     //   );
     // }
 
-    // if (paymentStatus !== "0") {
-    //   return res.status(200).json({
-    //     RspCode: "02",
-    //     Message: "This order has been updated to the payment status",
-    //   });
-    // }
+    if (paymentStatus !== "0") {
+      return res.status(200).json({
+        RspCode: "02",
+        Message: "This order has been updated to the payment status",
+      });
+    }
 
     if (rspCode === "00") {
       const advertising = await db.Advertising.findOne({
@@ -165,6 +165,12 @@ const vnpay_ipn = async (req, res) => {
 
       return res.redirect(
         `${process.env.URL_CLIENT}/homestay/advertising?status=true`
+      );
+    } else {
+      await AdOrderService.updateStatusAdOrder(orderId, "failed");
+
+      return res.redirect(
+        `${process.env.URL_CLIENT}/homestay/advertising?status=false`
       );
     }
   } catch (error) {
@@ -289,6 +295,10 @@ const vnpay_ipn_comission = async (req, res) => {
 
       return res.redirect(
         `${process.env.URL_CLIENT}/homestay/dashboard?status=true`
+      );
+    } else {
+      return res.redirect(
+        `${process.env.URL_CLIENT}/homestay/dashboard?status=false`
       );
     }
   } catch (error) {

@@ -1,5 +1,7 @@
 import apiUser from "@/api/user";
 import { jwtDecode } from "jwt-decode";
+import { SweetAlertOptions } from "sweetalert2";
+import Swal from "sweetalert2";
 
 type CustomOptions = RequestInit & {
   baseUrl?: string | undefined;
@@ -8,9 +10,10 @@ type CustomOptions = RequestInit & {
 const request = async <Response>(
   method: "GET" | "POST" | "PUT" | "DELETE",
   url: string,
-  options?: CustomOptions | undefined | any
+  options?: CustomOptions | undefined
 ) => {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body = options?.body ? JSON.stringify(options.body) : undefined;
 
     const baseHeaders = {
@@ -73,6 +76,7 @@ const http = {
   },
   post<Response>(
     url: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     body: any,
     options?: Omit<CustomOptions, "body">
   ) {
@@ -81,7 +85,12 @@ const http = {
       body,
     });
   },
-  put<Response>(url: string, body: any, options?: Omit<CustomOptions, "body">) {
+  put<Response>(
+    url: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    body: any,
+    options?: Omit<CustomOptions, "body">
+  ) {
     return request<Response>("PUT", url, {
       ...options,
       body,
@@ -90,6 +99,31 @@ const http = {
   delete<Response>(url: string, options?: Omit<CustomOptions, "body">) {
     return request<Response>("DELETE", url, options);
   },
+};
+
+export const showSuccessAlert = (title: string = "Thành công!") => {
+  Swal.fire({
+    title,
+    icon: "success",
+    allowOutsideClick: true,
+    allowEscapeKey: true,
+    allowEnterKey: true,
+    showConfirmButton: true,
+    showCloseButton: true,
+    showCancelButton: false,
+    focusConfirm: true,
+    focusCancel: false,
+    confirmButtonText: "OK",
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    reverseButtons: false,
+    showClass: {
+      popup: "animate__animated animate__fadeInDown",
+    },
+    hideClass: {
+      popup: "animate__animated animate__fadeOutUp",
+    },
+  } as SweetAlertOptions);
 };
 
 export default http;

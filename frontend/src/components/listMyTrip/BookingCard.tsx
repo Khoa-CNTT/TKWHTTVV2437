@@ -84,7 +84,7 @@ const BookingCard = ({ data }: IProps) => {
           <div className="flex items-center ml-4 ">
             <div className="flex flex-col justify-between h-28 items-end">
               <div className="text-lg font-bold whitespace-nowrap">
-                {Number(data?.totalPrice).toLocaleString("it-IT", {
+                {Number(data?.totalPrice)?.toLocaleString("it-IT", {
                   style: "currency",
                   currency: "VND",
                 })}

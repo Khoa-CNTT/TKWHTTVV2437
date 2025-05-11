@@ -44,7 +44,7 @@ const ContainerRecomend = () => {
   }
 
   return (
-    <div className="mt-8">
+    <div className="mt-8 z-0">
       <TitleContainer title="Đề xuất cho bạn" />
 
       <Swiper

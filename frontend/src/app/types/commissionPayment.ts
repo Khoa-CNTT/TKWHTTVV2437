@@ -12,3 +12,23 @@ export interface ICommissionPayment {
   methodPay: string;
   orderQuantity: number;
 }
+
+export interface ICommissionPaymentAdmin {
+  id: string;
+  status: string;
+  createdAt: string;
+  property: {
+    name: string;
+  };
+  user: {
+    firstName: string;
+    lastName: string;
+  };
+  commissionAmount: number;
+  commissionRate: number;
+  totalRevenue: number;
+  paymentDate: string;
+  methodPay: string;
+  month: number;
+  year: number;
+}

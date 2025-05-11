@@ -392,7 +392,7 @@ const InformationRoom: React.FC<IProps> = ({ id }) => {
 
       <div className="mt-4 flex items-center gap-8">
         <div className="flex flex-col gap-2 w-[70%]">
-          <label className="font-semibold text-md">Tên homestay</label>
+          <label className="font-semibold text-md">Tên phòng</label>
           <TextField
             value={data?.name}
             onChange={(e) => setData({ ...data, name: e.target.value })}
