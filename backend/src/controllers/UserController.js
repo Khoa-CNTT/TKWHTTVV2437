@@ -142,6 +142,27 @@ const sendMailOTP = async (req, res) => {
   }
 };
 
+const checkMail = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(200).json({
+        status: "ERR",
+        msg: "Email is required",
+      });
+    }
+
+    const respone = await UserService.checkMail(email);
+
+    return res.status(200).json(respone);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
 const verifyOTP = async (req, res) => {
   try {
     const { email, OTP } = req.body;
@@ -221,4 +242,5 @@ module.exports = {
   verifyOTPLogin,
   getTotalUserForAdminDashboard,
   getDataLineChartUserAdmin,
+  checkMail,
 };

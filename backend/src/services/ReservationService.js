@@ -6,10 +6,158 @@ import sendMail from "../utils/sendMail";
 import convertToVietnameseDate from "../utils/convertToVietNameseDate";
 import getDatesInRange from "../utils/getDatesInRange";
 
+const lockBooking = (body) => {
+  return new Promise(async (resolve, reject) => {
+    let t;
+    try {
+      const { roomId, properyId, userId, startDay, endDay, total } = body;
+      const dates = getDatesInRange(startDay, endDay);
+
+      t = await db.sequelize.transaction();
+
+      const room = await db.Room.findByPk(roomId, { transaction: t });
+
+      if (!room) {
+        await t.rollback();
+        resolve({
+          status: "OK",
+          msg: "Không tìm thấy phòng",
+        });
+      }
+
+      for (const date of dates) {
+        const availability = await db.RoomAvailability.findOne({
+          where: {
+            idRoom: roomId,
+            date: date.toISOString().slice(0, 10),
+          },
+          transaction: t,
+        });
+
+        if ((availability?.blocked_quantity || 0) >= room.quantity) {
+          await t.rollback();
+          resolve({
+            status: "OK",
+            msg: "Hết phòng",
+          });
+        }
+      }
+
+      for (const date of dates) {
+        const [availability, created] = await db.RoomAvailability.findOrCreate({
+          where: {
+            idRoom: roomId,
+            date: date.toISOString().slice(0, 10),
+          },
+          defaults: {
+            id: v4(),
+            blocked_quantity: 0,
+            date: date.toISOString().slice(0, 10),
+            idRoom: roomId,
+            idProperty: properyId,
+          },
+          transaction: t,
+          lock: t.LOCK.UPDATE,
+        });
+
+        await availability.update(
+          { blocked_quantity: (availability.blocked_quantity || 0) + 1 },
+          { transaction: t }
+        );
+      }
+
+      const booking = await db.Reservation.create(
+        {
+          id: v4(),
+          idUser: userId,
+          idRoom: roomId,
+          checkIndate: startDay,
+          checkOutdate: endDay,
+          totalPrice: total,
+          statusLock: "pending",
+          locked_until: new Date(Date.now() + 15 * 60 * 1000),
+        },
+        {
+          transaction: t,
+        }
+      );
+
+      await t.commit();
+
+      resolve({
+        status: "OK",
+        msg: "Đã giữ phòng, vui lòng thanh toán trong 15 phút.",
+        data: booking,
+      });
+    } catch (error) {
+      if (t && !t.finished) {
+        await t.rollback();
+      }
+      reject("error " + error);
+    }
+  });
+};
+
+const removeExpiredBookings = () => {
+  return new Promise(async (resolve, reject) => {
+    let t;
+    try {
+      t = await db.sequelize.transaction();
+      const expiredBookings = await db.Reservation.findAll({
+        where: {
+          statusLock: "pending",
+          locked_until: { [Op.lt]: new Date() }, // Hết hạn
+        },
+        transaction: t,
+      });
+
+      for (const booking of expiredBookings) {
+        const room = await db.Room.findByPk(booking.idRoom, { transaction: t });
+        const dates = getDatesInRange(
+          booking.checkIndate,
+          booking.checkOutdate
+        );
+
+        for (const date of dates) {
+          const availability = await db.RoomAvailability.findOne({
+            where: {
+              idRoom: booking.idRoom,
+              date: date.toISOString().slice(0, 10),
+            },
+            transaction: t,
+            lock: t.LOCK.UPDATE,
+          });
+
+          if (availability && availability.blocked_quantity > 0) {
+            await availability.update(
+              { blocked_quantity: availability.blocked_quantity - 1 },
+              { transaction: t }
+            );
+          }
+        }
+
+        await booking.update({ statusLock: "expired" }, { transaction: t });
+      }
+
+      await t.commit();
+      resolve({
+        status: "OK",
+        msg: "Đã xóa hết đặt phòng hết hạn thanh toán",
+      });
+    } catch (error) {
+      if (t && !t.finished) {
+        await t.rollback();
+      }
+      reject("error" + error);
+    }
+  });
+};
+
 const createReservation = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
       const {
+        resId,
         userId,
         email,
         phone,
@@ -126,36 +274,17 @@ const createReservation = (data) => {
     <div class="email-container">
       <div class="top-bar">HRTRAVEL</div>
 
-      <div class="header-text">Thanh Toán Đã Được Xác Nhận</div>
+      <div class="header-text">Thanh toán đang chờ xử lí!</div>
 
       <div class="content">
         <p>Xin chào <strong>${firstName} ${lastName}</strong>,</p>
 
-        <p>Chúng tôi đã nhận được thông tin thanh toán của bạn. Phòng đặt của bạn sẽ được xử lý trong vòng <strong>12 giờ</strong> và chúng sẽ giới thông tin xác nhận về email của bạn.</p>
+        <p>Chúng tôi đã nhận được thông tin thanh toán của bạn. Phòng đặt của bạn đang được xử lý trong vòng <strong>12 giờ</strong> và chúng sẽ giới thông tin xác nhận về email của bạn.</p>
 
         <p><strong>Thông tin thanh toán:</strong></p>
 
         <table class="details-table">
-          <tr>
-            <td class="label">Mã xác nhận:</td>
-            <td>${code}</td>
-          </tr>
-          <tr>
-            <td class="label">Check-in:</td>
-            <td>14 giờ - ${checkIn}</td>
-          </tr>
-          <tr>
-            <td class="label">Check-out:</td>
-            <td>12 giờ - ${checkOut}</td>
-          </tr>
-          <tr>
-            <td class="label">Số tiền:</td>
-            <td>${total} VND</td>
-          </tr>
-          <tr>
-            <td class="label">Trạng thái:</td>
-            <td><span class="status-success">Đã thanh toán</span></td>
-          </tr>
+          
           <tr>
             <td class="label">Chứng từ:</td>
             <td>
@@ -176,6 +305,15 @@ const createReservation = (data) => {
 
 `;
 
+      const booking = await db.Reservation.findByPk(resId);
+      const now = new Date();
+      if (booking.statusLock !== "pending" || now > booking.locked_until) {
+        resolve({
+          status: "OK",
+          msg: "Đã hết thời gian thanh toán phòng.",
+        });
+      }
+
       await sendMail({
         email: email,
         text: "Cảm ơn",
@@ -183,61 +321,61 @@ const createReservation = (data) => {
         html: html,
       });
 
-      const dates = getDatesInRange(startDay, endDay);
+      // const dates = getDatesInRange(startDay, endDay);
 
-      for (const date of dates) {
-        const existing = await db.RoomAvailability.findOne({
-          where: {
-            idRoom: roomId,
-            date: date.toISOString().slice(0, 10),
-          },
-        });
+      // for (const date of dates) {
+      //   const existing = await db.RoomAvailability.findOne({
+      //     where: {
+      //       idRoom: roomId,
+      //       date: date.toISOString().slice(0, 10),
+      //     },
+      //   });
 
-        if (existing) {
-          await db.RoomAvailability.update(
-            {
-              blocked_quantity: existing.blocked_quantity + 1,
-            },
-            {
-              where: { id: existing.id },
-            }
-          );
-        } else {
-          await db.RoomAvailability.create({
-            idRoom: roomId,
-            date: date.toISOString().slice(0, 10),
-            blocked_quantity: 1,
-            idProperty: propertyId,
-            id: v4(),
-          });
+      //   if (existing) {
+      //     await db.RoomAvailability.update(
+      //       {
+      //         blocked_quantity: existing.blocked_quantity + 1,
+      //       },
+      //       {
+      //         where: { id: existing.id },
+      //       }
+      //     );
+      //   } else {
+      //     await db.RoomAvailability.create({
+      //       idRoom: roomId,
+      //       date: date.toISOString().slice(0, 10),
+      //       blocked_quantity: 1,
+      //       idProperty: propertyId,
+      //       id: v4(),
+      //     });
+      //   }
+      // }
+
+      const response = await db.Reservation.update(
+        {
+          firstName,
+          lastName,
+          email,
+          phone,
+          imageBanking,
+          message,
+          nameAccount,
+          numberAccount,
+          nameBank,
+          code,
+          statusUser: "created",
+          status: "waiting",
+          statusLock: "confirmed",
+        },
+        {
+          where: { id: resId }, // Chỉ rõ bản ghi cần update
         }
-      }
-
-      const response = await db.Reservation.create({
-        idUser: userId,
-        idRoom: roomId,
-        firstName,
-        lastName,
-        email,
-        phone,
-        imageBanking,
-        message,
-        nameAccount,
-        numberAccount,
-        nameBank,
-        code,
-        statusUser: "created",
-        checkIndate: startDay,
-        checkOutdate: endDay,
-        totalPrice: total,
-        status: "waiting",
-        id: v4(),
-      });
-
+      );
+      const data = await db.Reservation.findByPk(resId);
       resolve({
         status: "OK",
         message: "Create success",
-        data: response,
+        data: data,
       });
     } catch (error) {
       reject("error " + error);
@@ -267,7 +405,10 @@ const listReservationApprove = ({ filter }) => {
       }
 
       const response = await db.Reservation.findAndCountAll({
-        where: { status: "waiting" },
+        where: {
+          status: "waiting",
+          statusLock: "confirmed",
+        },
         include: [
           {
             model: db.Room,
@@ -968,7 +1109,10 @@ const listReservationOfUser = (idUser) => {
       let order = [["createdAt", "DESC"]];
 
       const response = await db.Reservation.findAndCountAll({
-        where: { idUser: idUser },
+        where: {
+          idUser: idUser,
+          statusLock: "confirmed",
+        },
         include: [
           {
             model: db.Room,
@@ -1285,6 +1429,8 @@ const getDataBarChart = async (propertyId, filter) => {
 };
 
 module.exports = {
+  lockBooking,
+  removeExpiredBookings,
   createReservation,
   listReservationApprove,
   detailReservationApprove,
