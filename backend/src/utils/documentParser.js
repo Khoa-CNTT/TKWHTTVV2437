@@ -32,6 +32,7 @@ function parseStringDocument(text) {
     status: null,
     images: [],
     averageRating: null,
+    property: null,
   };
 
   const lines = text.split("\n");
@@ -76,11 +77,6 @@ function parseStringDocument(text) {
       }
     }
 
-    // Handle price
-    if (line.startsWith("Giá:")) {
-      result.price = line.replace("Giá:", "").trim();
-    }
-
     // Handle status
     if (line.startsWith("Trạng thái:")) {
       result.status = line.replace("Trạng thái:", "").trim();
@@ -94,6 +90,62 @@ function parseStringDocument(text) {
       if (ratingMatch && ratingMatch[1]) {
         result.averageRating = ratingMatch[1];
       }
+    }
+
+    // Handle room name
+    if (line.startsWith("Phòng:")) {
+      result.name = line.replace("Phòng:", "").trim();
+    }
+
+    // Handle room ID
+    if (line.startsWith("ID phòng:")) {
+      result.id = line.replace("ID phòng:", "").trim();
+    }
+
+    // Handle hotel name
+    if (line.startsWith("Thuộc khách sạn :")) {
+      result.property = line.replace("Thuộc khách sạn :", "").trim();
+    }
+
+    // Handle description
+    if (line.startsWith("Mô tả:")) {
+      result.description = line.replace("Mô tả:", "").trim();
+    }
+
+    // Handle max guests
+    if (line.startsWith("Số người tối đa:")) {
+      result.maxGuests = parseInt(line.replace("Số người tối đa:", "").trim());
+    }
+
+    // Handle price
+    if (line.startsWith("Giá:")) {
+      const priceStr = line.replace("Giá:", "").trim();
+      result.price = priceStr;
+    }
+
+    // Handle status
+    if (line.startsWith("Trạng thái:")) {
+      result.status = line.replace("Trạng thái:", "").trim();
+    }
+
+    // Handle amenities
+    if (line.startsWith("Tiện nghi:")) {
+      const amenities = line.replace("Tiện nghi:", "").trim();
+      if (amenities !== "N/A") {
+        result.amenities = amenities.split(", ").map((item) => item.trim());
+      }
+    }
+
+    if (line.trim().startsWith("- [")) {
+      const imageUrl = line.split("] ")[1]?.trim();
+      if (imageUrl) {
+        result.images.push(imageUrl);
+      }
+    }
+
+    // Handle summary
+    if (line.startsWith("Tóm tắt:")) {
+      result.summary = line.replace("Tóm tắt:", "").trim();
     }
   });
 

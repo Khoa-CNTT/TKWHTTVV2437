@@ -300,9 +300,7 @@ const getListSearchText = (text) => {
 
 const createProperty = (data) => {
   return new Promise(async (resolve, reject) => {
-    console.log({ data });
     try {
-      // Kiểm tra dữ liệu đầu vào cơ bản
       if (!data.name || !data.description || !data.userId || !data.categoryId) {
         return reject({
           status: "ERR",
@@ -317,63 +315,68 @@ const createProperty = (data) => {
         description: data.description,
         idUser: data.userId,
         idCategory: data.categoryId,
-        // status: "active",
         slug: slugify(data.name, {
           lower: true,
           strict: true,
         }),
       });
 
-      // Tạo address
-      const address = await db.Address.create({
-        id: v4(),
-        idProperty: property.id,
-        street: data.street,
-        district: data.district,
-        city: data.city,
-        country: data.country,
-        // slug: slugify(data.city, {
-        //   lower: true, // chuyển thành chữ thường
-        //   strict: true, // bỏ các ký tự đặc biệt
-        // }),
-      });
-
-      // Tạo images
-      const images = await db.ImageProperty.bulkCreate(
-        data.images.map((item) => ({
-          id: item.id || v4(),
+      // Thực hiện các thao tác còn lại song song
+      const [address, images, amenities, highlights] = await Promise.all([
+        // Tạo address
+        db.Address.create({
+          id: v4(),
           idProperty: property.id,
-          image: item.image,
-        }))
-      );
+          street: data.street,
+          district: data.district,
+          city: data.city,
+          country: data.country,
+        }),
 
-      const amenities = await db.AmenityProperty.bulkCreate(
-        data.amenities.map((item) => ({
-          idProperty: property.id,
-          idAmenity: item,
-        }))
-      );
+        // Tạo images
+        db.ImageProperty.bulkCreate(
+          data.images.map((item) => ({
+            id: item.id || v4(),
+            idProperty: property.id,
+            image: item.image,
+          }))
+        ),
 
-      const highlights = await db.HighlightProperty.bulkCreate(
-        data.highlights.map((item) => ({
-          idProperty: property.id,
-          idHighlight: item,
-        }))
-      );
+        // Tạo amenities
+        db.AmenityProperty.bulkCreate(
+          data.amenities.map((item) => ({
+            idProperty: property.id,
+            idAmenity: item,
+          }))
+        ),
 
-      try {
-        await createPropertyFromEmbedding(property.id);
-      } catch (error) {
-        console.error("Failed to save embedding:", error);
-      }
+        // Tạo highlights
+        db.HighlightProperty.bulkCreate(
+          data.highlights.map((item) => ({
+            idProperty: property.id,
+            idHighlight: item,
+          }))
+        ),
+      ]);
 
-      // Trả về kết quả thành công
+      // Trả về kết quả ngay lập tức
       resolve({
         status: "OK",
+        data: {
+          property,
+          address,
+          images,
+          amenities,
+          highlights,
+        },
+      });
+
+      // Thực hiện embedding bất đồng bộ sau khi đã trả về response
+      createPropertyFromEmbedding(property.id).catch((error) => {
+        console.error("Failed to save embedding:", error);
       });
     } catch (error) {
       console.error("Property creation error:", error);
-
       reject({
         status: "ERR",
         message: `Error creating property: ${error.message || error}`,
@@ -399,14 +402,14 @@ const createPropertyFromEmbedding = (id) => {
           city: getProperty.data.dataValues.propertyAddress.city,
           country: getProperty.data.dataValues.propertyAddress.country,
         },
-        images: getProperty.data.dataValues.images.map((img) => ({
+        images: getProperty.data.dataValues?.images?.map((img) => ({
           id: img.id,
           image: img.image,
         })),
-        amenities: getProperty.data.dataValues.amenities.map(
+        amenities: getProperty.data.dataValues?.amenities?.map(
           (am) => am.idAmenity
         ),
-        highlights: getProperty.data.dataValues.highlights.map(
+        highlights: getProperty.data.dataValues?.highlights?.map(
           (hl) => hl.idHighlight
         ),
         link: `http://localhost:3000/detail/${getProperty.data.dataValues.slug}`,
