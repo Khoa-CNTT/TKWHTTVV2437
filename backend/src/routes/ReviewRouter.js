@@ -11,5 +11,6 @@ router.get(
   "/list-review/:propertyId",
   reviewController.getListReviewByProperyId
 );
+router.post("/property", reviewController.createProperty);
 
 module.exports = router;

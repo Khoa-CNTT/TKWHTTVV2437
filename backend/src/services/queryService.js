@@ -45,6 +45,8 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
   if (previousContext && previousContext.matchedItems) {
     const previousHotelIds = previousContext.matchedItems
       .filter((item) => item.metadata.type === "hotel")
+      .filter((item) => item.metadata.type === "reviewPeroperty")
+
       .map((item) => item.metadata.itemId);
     filteredItems = matchedItems.sort((a, b) => {
       const aIsRelevant = previousHotelIds.includes(
@@ -68,6 +70,7 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
   if (filteredItems && filteredItems.length > 0) {
     filteredItems.forEach((item, index) => {
       const { document, metadata } = item;
+      console.log(metadata, "metadata lalalalalal");
       if (!document || !metadata) return;
 
       if (typeof document === "string") {
@@ -81,17 +84,19 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
             parsedDoc.description || "Không có mô tả"
           }\n`;
           response += `   Địa chỉ: ${parsedDoc.address?.join(", ") || "N/A"}\n`;
-          response += `   Đánh giá cặp đôi: ${
-            metadata.rating || "Chưa có đánh giá"
-          }\n`;
           response += `   Tiện ích: ${
             metadata.amenities || "Wifi miễn phí, hồ bơi, bãi đỗ xe"
           }\n`;
+          response += `Http link: ${metadata.link || "Không có đường dẫn"}\n`;
 
           if (parsedDoc.images && parsedDoc.images.length > 0) {
             response += `   Hình ảnh: ${parsedDoc.images.join(", ")}\n`;
           } else {
             response += `   Hình ảnh: Không có hình ảnh\n`;
+          }
+
+          if (parsedDoc.status) {
+            response += `   Trạng thái: ${parsedDoc.status}\n`;
           }
         } else if (metadata.type === "room" || parsedDoc.type === "room") {
           response += `${index + 1}. 🛏️ ${
@@ -109,6 +114,13 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
           } else {
             response += `   Hình ảnh: Không có hình ảnh\n`;
           }
+        } else if (metadata.type === "reviewPeroperty") {
+          response += `${index + 1}. 📝 ${metadata.name || "Đánh giá"} (ID: ${
+            metadata.itemId
+          })\n`;
+          response += `   Đánh giá: ${
+            parsedDoc.averageRating || "Chưa có đánh giá"
+          }\n`;
         }
       } else {
         const parsedDoc = parseDocument(document);
@@ -176,6 +188,18 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
             }\n`;
           } else {
             response += `   Hình ảnh: Không có hình ảnh\n`;
+          }
+
+          if (
+            parsedDoc["Điểm đanh giá"] &&
+            parsedDoc["Điểm đánh giá"].length > 0
+          ) {
+            const rating = parsedDoc["Điểm đánh giá"]
+              .map((line) => line.match(/- \[\d+\] (.*?)(?=\n|$)/)?.[1])
+              .filter((url) => url);
+            response += `   Điểm đánh giá: ${
+              rating.length > 0 ? rating.join(", ") : "Không có đánh giá"
+            }\n`;
           }
         }
       }
@@ -261,16 +285,6 @@ async function saveEmbedding(type, data) {
   // Chuẩn hóa dữ liệu thành mảng để xử lý đồng nhất
   const dataArray = Array.isArray(data) ? data : [data];
 
-  // Kiểm tra từng item trong mảng
-  for (const item of dataArray) {
-    if (!item.id || !item.name) {
-      throw new Error(
-        `Invalid item data: Missing id or name in ${JSON.stringify(item)}`
-      );
-    }
-  }
-
-  // Tạo text để embedding
   const itemTexts = dataArray.map((item) => generateText(item, type));
   console.log("Generated texts for embedding:", itemTexts);
 

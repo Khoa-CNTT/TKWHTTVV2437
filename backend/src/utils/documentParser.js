@@ -31,47 +31,69 @@ function parseStringDocument(text) {
     price: null,
     status: null,
     images: [],
+    averageRating: null,
   };
 
   const lines = text.split("\n");
 
+  console.log(lines, "lines lalalalalal");
+
   lines.forEach((line) => {
-    if (line.startsWith("Khách sạn:")) {
+    // Handle hotel name and ID
+    const hotelMatch = line.match(/🏨\s*(.*?)\s*\(ID:\s*(.*?)\)/);
+    if (hotelMatch) {
       result.type = "hotel";
-      result.name = line.replace("Khách sạn:", "").trim();
-    } else if (line.startsWith("Phòng:")) {
-      result.type = "room";
-      result.name = line.replace("Phòng:", "").trim();
+      result.name = hotelMatch[1].trim();
+      result.id = hotelMatch[2].trim();
     }
 
-    if (line.startsWith("ID khách sạn:")) {
-      result.id = line.replace("ID khách sạn:", "").trim();
-    } else if (line.startsWith("ID phòng:")) {
-      result.id = line.replace("ID phòng:", "").trim();
-    } else if (line.startsWith("Thuộc khách sạn có ID:")) {
-      result.propertyId = line.replace("Thuộc khách sạn có ID:", "").trim();
-    }
-
+    // Handle description
     if (line.startsWith("Mô tả:")) {
       result.description = line.replace("Mô tả:", "").trim();
-    } else if (
-      line.startsWith("- Đường:") ||
-      line.startsWith("- Quận/Huyện:") ||
-      line.startsWith("- Thành phố:") ||
-      line.startsWith("- Quốc gia:")
-    ) {
-      result.address.push(line.trim());
-    } else if (line.startsWith("Số người tối đa:")) {
-      result.maxGuests = line.replace("Số người tối đa:", "").trim();
-    } else if (line.startsWith("Giá:")) {
+    }
+
+    // Handle address
+    if (line.startsWith("Địa chỉ:")) {
+      const address = line.replace("Địa chỉ:", "").trim();
+      if (address !== "N/A") {
+        result.address.push(address);
+      }
+    }
+
+    // Handle amenities
+    if (line.startsWith("Tiện ích:")) {
+      const amenities = line.replace("Tiện ích:", "").trim();
+      if (amenities !== "N/A") {
+        result.amenities = amenities.split(", ").map((item) => item.trim());
+      }
+    }
+
+    // Handle images
+    if (line.startsWith("Hình ảnh:")) {
+      const images = line.replace("Hình ảnh:", "").trim();
+      if (images !== "Không có hình ảnh") {
+        result.images = images.split(", ").map((item) => item.trim());
+      }
+    }
+
+    // Handle price
+    if (line.startsWith("Giá:")) {
       result.price = line.replace("Giá:", "").trim();
-    } else if (line.startsWith("Trạng thái:")) {
+    }
+
+    // Handle status
+    if (line.startsWith("Trạng thái:")) {
       result.status = line.replace("Trạng thái:", "").trim();
     }
 
-    const imageMatch = line.match(/- \[\d+\] (https?:\/\/[^\s]+)/);
-    if (imageMatch && imageMatch[1]) {
-      result.images.push(imageMatch[1]);
+    // Handle rating
+    if (line.startsWith("Điểm đánh giá:")) {
+      result.averageRating = line.replace("Điểm đánh giá:", "").trim();
+    } else if (line.startsWith("Điểm đánh giá của")) {
+      const ratingMatch = line.match(/Điểm đánh giá của:.*?(\d+\.?\d*)/);
+      if (ratingMatch && ratingMatch[1]) {
+        result.averageRating = ratingMatch[1];
+      }
     }
   });
 

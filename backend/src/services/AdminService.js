@@ -1,4 +1,4 @@
-const { Op,fn, col } = require("sequelize");
+const { Op, fn, col } = require("sequelize");
 const { v4 } = require("uuid");
 require("dotenv").config();
 const bcrypt = require("bcrypt");
@@ -138,7 +138,7 @@ const updateUser = async (id, userData) => {
 
 const deleteUser = async (id) => {
   try {
-    const response = await db.User.destroy({ where: { id} });
+    const response = await db.User.destroy({ where: { id } });
     return { status: "OK", msg: "User deleted successfully", data: response };
   } catch (error) {
     throw error;
@@ -352,7 +352,6 @@ const rejectHomestay = async (id) => {
   }
 };
 
-
 const createHomestay = async (data) => {
   try {
     const homestay = await db.Property.create({
@@ -373,14 +372,14 @@ const createHomestay = async (data) => {
 const deleteHomestay = async (id) => {
   try {
     const response = await db.Property.destroy({ where: { id } });
-    return { status: response ? "OK" : "ERR", msg: response ? "Deleted successfully" : "Not found" };
+    return {
+      status: response ? "OK" : "ERR",
+      msg: response ? "Deleted successfully" : "Not found",
+    };
   } catch (error) {
     throw error;
   }
 };
-
-
-
 
 const updateHomestay = async (id, homestayData) => {
   try {
@@ -408,9 +407,8 @@ const listHomestays = async (req, res) => {
         "createdAt",
         "updatedAt",
         "status",
-      ], 
+      ],
       include: [
-       
         {
           model: db.ImageProperty,
           as: "images", // Alias đã định nghĩa trong model
@@ -438,7 +436,7 @@ const listHomestays = async (req, res) => {
     if (!homestays || homestays.length === 0) {
       return res.status(404).json({ msg: "No homestays found" });
     }
-return { status: "OK", data: homestays };   
+    return { status: "OK", data: homestays };
     // res.status(200).json(homestays);
   } catch (error) {
     console.error("Error fetching homestays:", error);
@@ -459,9 +457,8 @@ const getListPropertiesByOwnerId = async (idUser) => {
         "createdAt",
         "updatedAt",
         "status",
-      ], 
+      ],
       include: [
-       
         {
           model: db.ImageProperty,
           as: "images", // Alias đã định nghĩa trong model
@@ -497,7 +494,17 @@ const getListRoomByPropertyId = async (IdProperty) => {
     console.log("Fetching rooms for IdProperty:", IdProperty); // Log để kiểm tra giá trị IdProperty
     const rooms = await db.Room.findAll({
       where: { IdProperty }, // Điều kiện tìm kiếm
-      attributes: ["id", "idProperty", "name","description","maxPerson" , "price","status", "createdAt", "updatedAt"],
+      attributes: [
+        "id",
+        "idProperty",
+        "name",
+        "description",
+        "maxPerson",
+        "price",
+        "status",
+        "createdAt",
+        "updatedAt",
+      ],
       include: [
         {
           model: db.ImageRoom,
@@ -547,35 +554,37 @@ const deleteRoom = async (id) => {
 };
 const listPayments = async () => {
   try {
-      const payments = await db.Payment.findAll({
-        attributes: [
-          'id',
-          'idReservation',
-          'idUser',
-          'paymentDate',
-          'paymentMethod',
-          'paymentStatus',
-          'createdAt',
-          'updatedAt'
-        ],
-        include: [
-          {
-            model: db.User, // Association với User
-            as: 'Users',
-            attributes: ['firstName', 'lastName', 'email'] // Chỉ lấy các trường cần
-          },
-          {
-            model: db.Reservation,
-            include: [{ 
+    const payments = await db.Payment.findAll({
+      attributes: [
+        "id",
+        "idReservation",
+        "idUser",
+        "paymentDate",
+        "paymentMethod",
+        "paymentStatus",
+        "createdAt",
+        "updatedAt",
+      ],
+      include: [
+        {
+          model: db.User, // Association với User
+          as: "Users",
+          attributes: ["firstName", "lastName", "email"], // Chỉ lấy các trường cần
+        },
+        {
+          model: db.Reservation,
+          include: [
+            {
               model: db.Room,
-              as: 'Rooms',
-            }],
-            as: 'Reservations',
-            attributes: ['totalPrice'] 
-          }
-        ]
-      });
-     // Không có include
+              as: "Rooms",
+            },
+          ],
+          as: "Reservations",
+          attributes: ["totalPrice"],
+        },
+      ],
+    });
+    // Không có include
     return { status: "OK", data: payments };
   } catch (error) {
     throw error;
@@ -603,23 +612,22 @@ const listBookings = async () => {
     const bookings = await db.Reservation.findAll({
       // Chỉ định rõ các trường cần lấy
       attributes: [
-        'id',
-        'idUser', 
-        'idRoom',
-        'firstName',
-        'lastName',
-        'email',
-        'phone',
-        'checkIndate',
-        'checkOutdate',
-        'numGuest',
-        'totalPrice',
-        'status',
-        'createdAt'
+        "id",
+        "idUser",
+        "idRoom",
+        "firstName",
+        "lastName",
+        "email",
+        "phone",
+        "checkIndate",
+        "checkOutdate",
+        "numGuest",
+        "totalPrice",
+        "status",
+        "createdAt",
       ],
-    
     });
-    
+
     return { status: "OK", data: bookings };
   } catch (error) {
     console.error("Error in listBookings:", error);
@@ -658,41 +666,42 @@ const cancelBooking = async (id) => {
   }
 };
 const getStatistics = async (filter) => {
-  const dateFormat = {
-    day: '%Y-%m-%d',
-    month: '%Y-%m',
-    year: '%Y',
-  }[filter] || '%Y-%m-%d';
+  const dateFormat =
+    {
+      day: "%Y-%m-%d",
+      month: "%Y-%m",
+      year: "%Y",
+    }[filter] || "%Y-%m-%d";
 
   try {
     // Sửa thành db.User thay vì User
     const userStats = await db.User.findAll({
       attributes: [
-        [fn('DATE_FORMAT', col('createdAt'), dateFormat), 'date'],
-        [fn('COUNT', col('id')), 'count']
+        [fn("DATE_FORMAT", col("createdAt"), dateFormat), "date"],
+        [fn("COUNT", col("id")), "count"],
       ],
-      where: { role: '3' }, // Giả sử role 3 là user thường
-      group: ['date'],
+      where: { role: "3" }, // Giả sử role 3 là user thường
+      group: ["date"],
       raw: true,
     });
 
     const ownerStats = await db.User.findAll({
       attributes: [
-        [fn('DATE_FORMAT', col('createdAt'), dateFormat), 'date'],
-        [fn('COUNT', col('id')), 'count']
+        [fn("DATE_FORMAT", col("createdAt"), dateFormat), "date"],
+        [fn("COUNT", col("id")), "count"],
       ],
-      where: { role: '2' }, // Giả sử role 2 là owner
-      group: ['date'],
+      where: { role: "2" }, // Giả sử role 2 là owner
+      group: ["date"],
       raw: true,
     });
 
     // Sửa thành db.Reservation
     const reservationStats = await db.Reservation.findAll({
       attributes: [
-        [fn('DATE_FORMAT', col('createdAt'), dateFormat), 'date'],
-        [fn('COUNT', col('id')), 'count']
+        [fn("DATE_FORMAT", col("createdAt"), dateFormat), "date"],
+        [fn("COUNT", col("id")), "count"],
       ],
-      group: ['date'],
+      group: ["date"],
       raw: true,
     });
 
@@ -701,29 +710,28 @@ const getStatistics = async (filter) => {
     const mergeData = (data, key) => {
       data.forEach(({ date, count }) => {
         if (!resultMap[date]) {
-          resultMap[date] = { 
-            date, 
-            userCount: 0, 
-            ownerCount: 0, 
-            reservationCount: 0 
+          resultMap[date] = {
+            date,
+            userCount: 0,
+            ownerCount: 0,
+            reservationCount: 0,
           };
         }
         resultMap[date][key] = parseInt(count, 10);
       });
     };
 
-    mergeData(userStats, 'userCount');
-    mergeData(ownerStats, 'ownerCount');
-    mergeData(reservationStats, 'reservationCount');
+    mergeData(userStats, "userCount");
+    mergeData(ownerStats, "ownerCount");
+    mergeData(reservationStats, "reservationCount");
 
-    const result = Object.values(resultMap).sort((a, b) => 
-      new Date(a.date) - new Date(b.date)
+    const result = Object.values(resultMap).sort(
+      (a, b) => new Date(a.date) - new Date(b.date)
     );
 
     return result;
-
   } catch (error) {
-    console.error('Error in getStatistics:', error);
+    console.error("Error in getStatistics:", error);
     throw error;
   }
 };
