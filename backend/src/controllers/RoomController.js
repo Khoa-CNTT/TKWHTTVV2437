@@ -44,8 +44,8 @@ const createRoom = async (req, res) => {
     const response = await roomService.createRoom(req.body);
     return res.status(200).json(response);
   } catch (error) {
-    return res.status(404).json({
-      msg: "Error in controller : " + error,
+    return res.status(500).json({
+      msg: "Error in controller: " + (error.message || "Unknown error"),
     });
   }
 };
