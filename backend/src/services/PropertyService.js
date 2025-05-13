@@ -430,63 +430,80 @@ const createPropertyFromEmbedding = (id) => {
 const updateProperty = (propertyId, data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      // Update the property details
-      const property = await db.Property.update(
-        {
-          name: data.name,
-          description: data.description,
-          idUser: data.idUser,
-          idCategory: data.categoryId,
-          slug: slugify(data.name, {
-            lower: true, // Convert to lowercase
-            strict: true, // Remove special characters
-          }),
-        },
-        { where: { id: propertyId } }
-      );
+      // Prepare all update operations to run in parallel
+      const updateOperations = [
+        // Update property details
+        db.Property.update(
+          {
+            name: data.name,
+            description: data.description,
+            idUser: data.idUser,
+            idCategory: data.categoryId,
+            slug: slugify(data.name, {
+              lower: true,
+              strict: true,
+            }),
+          },
+          { where: { id: propertyId } }
+        ),
 
-      // Update the address
-      const address = await db.Address.update(
-        {
-          street: data.street,
-          district: data.district,
-          city: data.city,
-          country: data.country,
-          slug: slugify(data.city, {
-            lower: true, // chuyển thành chữ thường
-            strict: true, // bỏ các ký tự đặc biệt
-          }),
-        },
-        { where: { idProperty: propertyId } }
-      );
+        // Update address
+        db.Address.update(
+          {
+            street: data.street,
+            district: data.district,
+            city: data.city,
+            country: data.country,
+            slug: slugify(data.city, {
+              lower: true,
+              strict: true,
+            }),
+          },
+          { where: { idProperty: propertyId } }
+        ),
 
-      // Update images: Delete old ones and add new ones
-      await db.ImageProperty.destroy({ where: { idProperty: propertyId } });
-      const images = await db.ImageProperty.bulkCreate(
-        data.images.map((item) => ({
-          id: item.id,
-          idProperty: propertyId,
-          image: item.image,
-        }))
-      );
+        // Handle images update
+        (async () => {
+          await db.ImageProperty.destroy({ where: { idProperty: propertyId } });
+          return db.ImageProperty.bulkCreate(
+            data.images.map((item) => ({
+              id: item.id,
+              idProperty: propertyId,
+              image: item.image,
+            }))
+          );
+        })(),
 
-      // Update amenities: Delete old ones and add new ones
-      await db.AmenityProperty.destroy({ where: { idProperty: propertyId } });
-      const amenities = await db.AmenityProperty.bulkCreate(
-        data.amenities.map((item) => ({
-          idProperty: propertyId,
-          idAmenity: item,
-        }))
-      );
+        // Handle amenities update
+        (async () => {
+          await db.AmenityProperty.destroy({
+            where: { idProperty: propertyId },
+          });
+          return db.AmenityProperty.bulkCreate(
+            data.amenities.map((item) => ({
+              idProperty: propertyId,
+              idAmenity: item,
+            }))
+          );
+        })(),
 
-      // Update highlights: Delete old ones and add new ones
-      await db.HighlightProperty.destroy({ where: { idProperty: propertyId } });
-      const highlights = await db.HighlightProperty.bulkCreate(
-        data.highlights.map((item) => ({
-          idProperty: propertyId,
-          idHighlight: item,
-        }))
-      );
+        // Handle highlights update
+        (async () => {
+          await db.HighlightProperty.destroy({
+            where: { idProperty: propertyId },
+          });
+          return db.HighlightProperty.bulkCreate(
+            data.highlights.map((item) => ({
+              idProperty: propertyId,
+              idHighlight: item,
+            }))
+          );
+        })(),
+      ];
+
+      // Execute all updates in parallel
+      const [property, address, images, amenities, highlights] =
+        await Promise.all(updateOperations);
 
       const updatedData = {
         property,
@@ -496,20 +513,19 @@ const updateProperty = (propertyId, data) => {
         highlights,
       };
 
-      try {
-        await deleteEmbeddingProperty(propertyId);
-
-        await createPropertyFromEmbedding(propertyId);
-      } catch (error) {
+      // Handle embedding updates in parallel with the response
+      Promise.all([
+        deleteEmbeddingProperty(propertyId),
+        createPropertyFromEmbedding(propertyId),
+      ]).catch((error) => {
         console.error("Failed to save embedding:", error);
-      }
+      });
 
       resolve({
         status: "OK",
         data: updatedData,
       });
     } catch (error) {
-      // Handle errors and provide detailed error messages
       reject({
         status: "ERR",
         message: `Error updating property: ${error.message || error}`,
