@@ -18,7 +18,9 @@ import validate from "@/utils/validateInput";
 import FailedCheckout from "@/components/checkout/FailedCheckout";
 import apiPayment from "@/api/payment";
 import { IInfoPayment } from "../types/accountPayment";
+import apiReservation from "@/api/reservation";
 interface IDataEnter {
+  resId: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -55,16 +57,17 @@ const CheckoutContent = () => {
   const [step, setStep] = useState(1);
   const { user } = useAuth();
 
-  const { propertyId, roomId, startDate, endDate } = useCheckoutContext(); // Lấy hàm setpropertyId từ context
+  const { propertyId, roomId, startDate, endDate, reservationId, codeId } =
+    useCheckoutContext(); // Lấy hàm setpropertyId từ context
 
   const [property, setProperty] = useState<IProperty | null>(null);
   const [room, setRoom] = useState<IRoom | null>(null);
   const [infoPayment, setInfoPayment] = useState<IInfoPayment | null>(null);
   const [invalidFields, setInvalidFields] = useState<IInvalidField[]>([]);
-  const [code, setCode] = useState<string>(
-    Math.floor(10000 + Math.random() * 90000).toString()
-  );
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const [code, setCode] = useState<string>(codeId);
   const [dataEnter, setDataEnter] = useState<IDataEnter>({
+    resId: reservationId || "",
     firstName: user?.firstName || "",
     lastName: user?.lastName || "",
     email: user?.email || "",
@@ -79,6 +82,7 @@ const CheckoutContent = () => {
 
   useEffect(() => {
     setDataEnter({
+      resId: reservationId,
       firstName: user?.firstName || "",
       lastName: user?.lastName || "",
       email: user?.email || "",
@@ -94,7 +98,7 @@ const CheckoutContent = () => {
       numberAccount: "",
       nameBank: "",
     });
-  }, [user, room, startDate, endDate]);
+  }, [user, room, startDate, endDate, reservationId]);
 
   useEffect(() => {
     setShow(isOpen);
@@ -122,6 +126,60 @@ const CheckoutContent = () => {
   const handleStep1 = () => {
     setStep(1);
   };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60)
+      .toString()
+      .padStart(2, "0");
+    const secs = (seconds % 60).toString().padStart(2, "0");
+    return `${mins}:${secs}`;
+  };
+
+  useEffect(() => {
+    const handleResTimeOfLock = async () => {
+      const resTimeOfLock =
+        await apiReservation.getTimeOfResLockbyId(reservationId);
+
+      const lockedUntil = new Date(resTimeOfLock?.data?.locked_until).getTime();
+
+      const now = Date.now();
+      const secondsLeft = Math.floor((lockedUntil - now) / 1000);
+      if (secondsLeft > 0) {
+        setTimeLeft(secondsLeft);
+      } else {
+        setTimeLeft(0);
+        console.log("hết giờ");
+      }
+    };
+    if (reservationId) {
+      handleResTimeOfLock();
+    }
+  }, [reservationId]);
+  useEffect(() => {
+    setCode(codeId);
+  }, [codeId]);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (timeLeft !== null && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev === null) return null;
+          if (prev <= 1) {
+            clearInterval(interval);
+            console.log("Hết giờ");
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [timeLeft]);
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -171,7 +229,6 @@ const CheckoutContent = () => {
     return dateObj.toISOString();
   };
 
-  console.log("property ", infoPayment);
   return (
     <div className="w-[1150px] mx-auto min-h-screen pt-10">
       {show ? (
@@ -215,6 +272,19 @@ const CheckoutContent = () => {
             )}
 
             <div className="w-[40%]">
+              <div className="mb-4 p-4 rounded-xl border border-red-600 flex justify-center  text-red-600 flex-col items-center">
+                {timeLeft !== 0 ? (
+                  <p className="text-[-18] font-semibold">
+                    Thời gian giữ phòng: {timeLeft && formatTime(timeLeft)} phút
+                  </p>
+                ) : (
+                  <p className="text-[-18] font-semibold">Hết giờ</p>
+                )}
+
+                <p className="text-[-14] italic">
+                  Phòng sẽ hủy sau khi hết thời gian
+                </p>
+              </div>
               <InforRoomCheckout property={property} room={room} code={code} />
             </div>
           </div>

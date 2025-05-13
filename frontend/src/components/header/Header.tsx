@@ -158,7 +158,7 @@ const Header = () => {
               className="text-gray-500 text-[-14] font-bold hover:text-primary "
               onClick={handleToggleLoginModal}
             >
-              Sign in
+              Đăng nhập
             </button>
 
             {/* Modal đăng nhập */}

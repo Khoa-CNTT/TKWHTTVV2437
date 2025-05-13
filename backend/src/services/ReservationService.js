@@ -10,10 +10,33 @@ const lockBooking = (body) => {
   return new Promise(async (resolve, reject) => {
     let t;
     try {
-      const { roomId, properyId, userId, startDay, endDay, total } = body;
-      const dates = getDatesInRange(startDay, endDay);
-
+      const { roomId, propertyId, userId, startDay, endDay, code } = body;
       t = await db.sequelize.transaction();
+      const existingReservation = await db.Reservation.findOne({
+        where: {
+          idRoom: roomId,
+          idProperty: propertyId,
+          idUser: userId,
+          checkIndate: startDay,
+          checkOutdate: endDay,
+          statusLock: "pending",
+          locked_until: {
+            [Op.gt]: new Date(), // Còn hiệu lực
+          },
+        },
+        transaction: t,
+      });
+
+      if (existingReservation) {
+        await t.rollback();
+        resolve({
+          status: "OK",
+          msg: "Bạn đã giữ phòng này rồi, vui lòng thanh toán.",
+          data: existingReservation,
+        });
+      }
+
+      const dates = getDatesInRange(startDay, endDay);
 
       const room = await db.Room.findByPk(roomId, { transaction: t });
 
@@ -54,7 +77,7 @@ const lockBooking = (body) => {
             blocked_quantity: 0,
             date: date.toISOString().slice(0, 10),
             idRoom: roomId,
-            idProperty: properyId,
+            idProperty: propertyId,
           },
           transaction: t,
           lock: t.LOCK.UPDATE,
@@ -71,9 +94,10 @@ const lockBooking = (body) => {
           id: v4(),
           idUser: userId,
           idRoom: roomId,
+          idProperty: propertyId,
           checkIndate: startDay,
           checkOutdate: endDay,
-          totalPrice: total,
+          code: code,
           statusLock: "pending",
           locked_until: new Date(Date.now() + 15 * 60 * 1000),
         },
@@ -153,29 +177,25 @@ const removeExpiredBookings = () => {
   });
 };
 
-const createReservation = (data) => {
+const createReservation = (body) => {
   return new Promise(async (resolve, reject) => {
     try {
       const {
         resId,
-        userId,
         email,
         phone,
         firstName,
         lastName,
         startDay,
         endDay,
-        roomId,
         imageBanking,
         total,
         message = null,
         nameAccount,
         numberAccount,
         nameBank,
-        code,
-        propertyId,
-      } = data;
-      console.log("data", data);
+      } = body;
+      console.log("data", body);
 
       const checkIn = convertToVietnameseDate(startDay);
       const checkOut = convertToVietnameseDate(endDay);
@@ -185,7 +205,7 @@ const createReservation = (data) => {
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>HRTRAVEL - Xác nhận thanh toán</title>
+    <title>Love Trip - Thanh toán đang xử lí</title>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -272,7 +292,7 @@ const createReservation = (data) => {
   </head>
   <body>
     <div class="email-container">
-      <div class="top-bar">HRTRAVEL</div>
+      <div class="top-bar">Love Trip</div>
 
       <div class="header-text">Thanh toán đang chờ xử lí!</div>
 
@@ -293,23 +313,22 @@ const createReservation = (data) => {
           </tr>
         </table>
 
-        <p>Cảm ơn bạn đã lựa chọn HRTRAVEL.<br />Nếu có bất kỳ câu hỏi nào, vui lòng liên hệ với đội ngũ hỗ trợ của chúng tôi.</p>
+        <p>Cảm ơn bạn đã lựa chọn Love Trip.<br />Nếu có bất kỳ câu hỏi nào, vui lòng liên hệ với đội ngũ hỗ trợ của chúng tôi.</p>
       </div>
 
       <div class="footer">
-        © 2025 HRTRAVEL. Mọi quyền được bảo lưu.
+        © 2025 Love Trip. Mọi quyền được bảo lưu.
       </div>
     </div>
   </body>
 </html>
-
 `;
 
       const booking = await db.Reservation.findByPk(resId);
       const now = new Date();
       if (booking.statusLock !== "pending" || now > booking.locked_until) {
         resolve({
-          status: "OK",
+          status: "ERR",
           msg: "Đã hết thời gian thanh toán phòng.",
         });
       }
@@ -317,7 +336,7 @@ const createReservation = (data) => {
       await sendMail({
         email: email,
         text: "Cảm ơn",
-        subject: "Xác nhận thanh toán",
+        subject: "Thanh toán đang chờ xử lí",
         html: html,
       });
 
@@ -362,7 +381,7 @@ const createReservation = (data) => {
           nameAccount,
           numberAccount,
           nameBank,
-          code,
+          totalPrice: total,
           statusUser: "created",
           status: "waiting",
           statusLock: "confirmed",
@@ -564,7 +583,7 @@ const approveReservation = ({
   <div class="container">
     <div class="brand">
       <div class="brand-left">
-        <h1>HRTravel</h1>
+        <h1>Love Trip</h1>
       </div>
       <div class="brand-right">
         <p><strong>Mã xác nhận:</strong> <span>${payload?.code}</span></p>
@@ -600,6 +619,10 @@ const approveReservation = ({
     </div>
 
     <table class="details-table">
+    <tr>
+        <td><strong>Mã xác nhận</strong></td>
+        <td>${payload?.code}</td>
+      </tr>
       <tr>
         <td><strong>Tổng thanh toán</strong></td>
         <td>${payload?.totalPrice}</td>
@@ -648,6 +671,7 @@ const approveReservation = ({
 
     <div class="footer">
       <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
+      <p>© 2025 Love Trip. Mọi quyền được bảo lưu.</p>
     </div>
   </div>
 </body>
@@ -658,7 +682,7 @@ const approveReservation = ({
         (status === "refund" && returnImgBanking)
       ) {
         html = `
-        <!DOCTYPE html>
+         <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
@@ -755,7 +779,7 @@ const approveReservation = ({
   <div class="container">
     <div class="brand">
       <div class="brand-left">
-        <h1>HRTravel</h1>
+        <h1>Love Trip</h1>
       </div>
       <div class="brand-right">
         <p><strong>Mã xác nhận:</strong> <span>${payload?.code}</span></p>
@@ -799,6 +823,10 @@ const approveReservation = ({
     </div>
 
     <table class="details-table">
+    <tr>
+        <td><strong>Mã xác nhận</strong></td>
+        <td>${payload?.code}</td>
+      </tr>
       <tr>
         <td><strong>Tổng thanh toán</strong></td>
         <td>${payload?.totalPrice}</td>
@@ -847,6 +875,7 @@ const approveReservation = ({
 
     <div class="footer">
       <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
+      <p>© 2025 Love Trip. Mọi quyền được bảo lưu.</p>
     </div>
   </div>
 </body>
@@ -954,7 +983,7 @@ const approveReservation = ({
   <div class="container">
     <div class="brand">
       <div class="brand-left">
-        <h1>HRTravel</h1>
+        <h1>Love Trip</h1>
       </div>
       <div class="brand-right">
         <p><strong>Mã xác nhận:</strong> <span>${payload?.code}</span></p>
@@ -991,6 +1020,10 @@ const approveReservation = ({
     </div>
 
     <table class="details-table">
+    <tr>
+        <td><strong>Mã xác nhận</strong></td>
+        <td>${payload?.code}</td>
+      </tr>
       <tr>
         <td><strong>Tổng thanh toán</strong></td>
         <td>${payload?.totalPrice}</td>
@@ -1039,6 +1072,7 @@ const approveReservation = ({
 
     <div class="footer">
       <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
+      <p>© 2025 Love Trip. Mọi quyền được bảo lưu.</p>
     </div>
   </div>
 </body>
@@ -1213,6 +1247,26 @@ const detailReservationOfUser = (idRes) => {
         ],
         order,
         distinct: true,
+      });
+
+      resolve({
+        status: response ? "OK" : "ERR",
+        data: response,
+      });
+    } catch (error) {
+      reject("error " + error);
+    }
+  });
+};
+
+const getTimeOfResLockbyId = (idRes) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let order = [["createdAt", "DESC"]];
+
+      const response = await db.Reservation.findOne({
+        where: { id: idRes },
+        attributes: ["statusLock", "locked_until"],
       });
 
       resolve({
@@ -1443,4 +1497,5 @@ module.exports = {
   updateInfoReservation,
   getDataBarChart,
   updateStatusUserReservation,
+  getTimeOfResLockbyId,
 };
