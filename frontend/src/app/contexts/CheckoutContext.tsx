@@ -16,6 +16,10 @@ interface CheckoutType {
   setEndDate: (endDate: Dayjs | null) => void;
   roomId: string;
   setRoomId: (price: string) => void;
+  reservationId: string;
+  setReservationId: (reservationId: string) => void;
+  codeId: string;
+  setCodeId: (codeId: string) => void;
 }
 
 // Tạo context với giá trị mặc định
@@ -29,12 +33,14 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
     dayjs(new Date().setDate(new Date().getDate() + 2))
   );
   const [roomId, setRoomId] = useState<string>("");
-
+  const [reservationId, setReservationId] = useState<string>("");
+  const [codeId, setCodeId] = useState<string>("");
   // Use useEffect to read from localStorage after component mounts (client-side)
   useEffect(() => {
     setPropertyId(localStorage.getItem("propertyId") || "");
     setRoomId(localStorage.getItem("roomId") || "");
-
+    setReservationId(localStorage.getItem("reservationId") || "");
+    setCodeId(localStorage.getItem("code") || "");
     const storedStartDate = localStorage.getItem("startDate");
     if (storedStartDate) {
       setStartDate(dayjs(storedStartDate));
@@ -56,6 +62,13 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     localStorage.setItem("roomId", roomId);
   }, [roomId]);
+
+  useEffect(() => {
+    localStorage.setItem("reservationId", reservationId);
+  }, [reservationId]);
+  useEffect(() => {
+    localStorage.setItem("code", codeId);
+  }, [codeId]);
 
   useEffect(() => {
     if (startDate) {
@@ -80,6 +93,10 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
         setEndDate,
         roomId,
         setRoomId,
+        reservationId,
+        setReservationId,
+        codeId,
+        setCodeId,
       }}
     >
       {children}

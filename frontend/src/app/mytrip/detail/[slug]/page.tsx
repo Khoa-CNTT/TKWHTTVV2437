@@ -385,7 +385,7 @@ const DetailPage = async (props: IProps) => {
             </div>
             <div className="flex flex-col items-end ">
               <h1 className="text-2xl">Chúc bạn có một chuyến đi vui vẻ</h1>
-              <p className="">Đội ngũ nhân viên HRtravel</p>
+              <p className="">Đội ngũ nhân viên Love Trip</p>
             </div>
           </div>
         </div>

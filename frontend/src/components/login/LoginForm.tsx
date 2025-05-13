@@ -47,7 +47,7 @@ const LoginForm = () => {
       id: 1,
       title: "Đăng nhập hoặc tạo tài khoản",
       label:
-        "Bạn có thể đăng nhập tài khoản Booking.com của mình để truy cập các dịch vụ của chúng tôi.",
+        "Bạn hãy đăng nhập để sử dụng dịch vụ của chúng tôi một cách trọn vẹn.",
     },
     {
       id: 2,
@@ -83,14 +83,16 @@ const LoginForm = () => {
   const handleSendOtpToEmail = async () => {
     const invalids = validate({ email: email }, setInvalidFields);
     if (invalids === 0) {
-      const respone = await apiUser.sendOtpToEmail({ email });
+      const respone = await apiUser.checkMail({ email });
       console.log("respone ", respone);
       if (respone.status === "OK") {
         setIsExistEmail(respone.isExist);
-        console.log("OTP sent successfully:", respone.msg);
-        setIsCounting(true);
-        setCountdown(30);
-        setStep(1);
+        if (respone.isExist === true) {
+          setStep(2);
+        } else {
+          await handdleOnSendAgainOTP();
+          setStep(1);
+        }
       } else {
         console.error("Error:", respone.msg);
       }
@@ -167,7 +169,8 @@ const LoginForm = () => {
     setStep(2);
   };
 
-  const handleUseOtp = () => {
+  const handleUseOtp = async () => {
+    await handdleOnSendAgainOTP();
     setStep(1);
   };
 
@@ -214,7 +217,7 @@ const LoginForm = () => {
           <InputForm
             titleHeader={itemsLabelForm[step].title}
             labelHeader={itemsLabelForm[step].label}
-            labelBtn="Countinue"
+            labelBtn="Tiếp tục"
             labelInput="Email"
             typeInput="email"
             idInput="email"
@@ -233,8 +236,8 @@ const LoginForm = () => {
           <InputForm
             titleHeader={itemsLabelForm[step].title}
             labelHeader={itemsLabelForm[step].label}
-            labelBtn="Verify OTP"
-            labelInput="6-digit code"
+            labelBtn="Xác thực OTP"
+            labelInput="6 chữ số"
             typeInput="text"
             idInput="otp"
             value={otp}
@@ -246,9 +249,7 @@ const LoginForm = () => {
 
           <div className="mt-5 relative">
             <ButtonLogin
-              text={
-                isCounting ? `Send again OTP ${countdown}` : `Send again OTP`
-              }
+              text={isCounting ? `Gởi lại OTP ${countdown}` : `Gởi lại`}
               inForm={false}
               disable={isCounting}
               onClick={handdleOnSendAgainOTP}
@@ -257,7 +258,7 @@ const LoginForm = () => {
           {isExistEmail && (
             <div className="mt-5">
               <ButtonLogin
-                text="Use my password"
+                text="Sử dụng mật khẩu"
                 inForm={false}
                 onClick={handleUsePassword}
               />
@@ -271,8 +272,8 @@ const LoginForm = () => {
           <InputForm
             titleHeader={itemsLabelForm[step].title}
             labelHeader={itemsLabelForm[step].label}
-            labelBtn="Sign in"
-            labelInput="Password"
+            labelBtn="Đăng nhập"
+            labelInput="Mật khẩu"
             typeInput="password"
             idInput="password"
             value={password}
@@ -283,9 +284,12 @@ const LoginForm = () => {
           />
           <div className="mt-5">
             <ButtonLogin
-              text="Enter secure code instead"
+              text={
+                isCounting ? `Sử dụng mã OTP ${countdown}` : `Sử dụng mã OTP`
+              }
               inForm={false}
               onClick={handleUseOtp}
+              disable={isCounting}
             />
           </div>
         </>
@@ -302,7 +306,7 @@ const LoginForm = () => {
               <InputText
                 value={dataRegister.firstName}
                 type="text"
-                label="First Name"
+                label="Tên"
                 id="firstName"
                 onChange={(value) =>
                   handleOnChangeDataRegister("firstName", value)
@@ -314,7 +318,7 @@ const LoginForm = () => {
               <InputText
                 value={dataRegister.lastName}
                 type="text"
-                label="Last Name"
+                label="Họ"
                 id="lastName"
                 onChange={(value) =>
                   handleOnChangeDataRegister("lastName", value)
@@ -337,7 +341,7 @@ const LoginForm = () => {
             <InputText
               value={dataRegister.password}
               type="password"
-              label="Password"
+              label="Mật khẩu"
               id="password"
               onChange={(value) =>
                 handleOnChangeDataRegister("password", value)
@@ -348,7 +352,7 @@ const LoginForm = () => {
             <InputText
               value={dataRegister.confirmPassword}
               type="password"
-              label="Confirm Password"
+              label="Xác nhận mật khẩu"
               id="confirmPassword"
               onChange={(value) =>
                 handleOnChangeDataRegister("confirmPassword", value)
@@ -358,7 +362,7 @@ const LoginForm = () => {
             />
 
             <div className="mt-5">
-              <ButtonLogin text="Countinue" onClick={handleRegister} />
+              <ButtonLogin text="Tiếp tục" onClick={handleRegister} />
             </div>
           </div>
         </div>

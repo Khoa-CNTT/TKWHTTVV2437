@@ -6,28 +6,196 @@ import sendMail from "../utils/sendMail";
 import convertToVietnameseDate from "../utils/convertToVietNameseDate";
 import getDatesInRange from "../utils/getDatesInRange";
 
-const createReservation = (data) => {
+const lockBooking = (body) => {
+  return new Promise(async (resolve, reject) => {
+    let t;
+    try {
+      const { roomId, propertyId, userId, startDay, endDay, code } = body;
+      t = await db.sequelize.transaction();
+      const existingReservation = await db.Reservation.findOne({
+        where: {
+          idRoom: roomId,
+          idProperty: propertyId,
+          idUser: userId,
+          checkIndate: startDay,
+          checkOutdate: endDay,
+          statusLock: "pending",
+          locked_until: {
+            [Op.gt]: new Date(), // Còn hiệu lực
+          },
+        },
+        transaction: t,
+      });
+
+      if (existingReservation) {
+        await t.rollback();
+        resolve({
+          status: "OK",
+          msg: "Bạn đã giữ phòng này rồi, vui lòng thanh toán.",
+          data: existingReservation,
+        });
+      }
+
+      const dates = getDatesInRange(startDay, endDay);
+
+      const room = await db.Room.findByPk(roomId, { transaction: t });
+
+      if (!room) {
+        await t.rollback();
+        resolve({
+          status: "OK",
+          msg: "Không tìm thấy phòng",
+        });
+      }
+
+      for (const date of dates) {
+        const availability = await db.RoomAvailability.findOne({
+          where: {
+            idRoom: roomId,
+            date: date.toISOString().slice(0, 10),
+          },
+          transaction: t,
+        });
+
+        if ((availability?.blocked_quantity || 0) >= room.quantity) {
+          await t.rollback();
+          resolve({
+            status: "OK",
+            msg: "Hết phòng",
+          });
+        }
+      }
+
+      for (const date of dates) {
+        const [availability, created] = await db.RoomAvailability.findOrCreate({
+          where: {
+            idRoom: roomId,
+            date: date.toISOString().slice(0, 10),
+          },
+          defaults: {
+            id: v4(),
+            blocked_quantity: 0,
+            date: date.toISOString().slice(0, 10),
+            idRoom: roomId,
+            idProperty: propertyId,
+          },
+          transaction: t,
+          lock: t.LOCK.UPDATE,
+        });
+
+        await availability.update(
+          { blocked_quantity: (availability.blocked_quantity || 0) + 1 },
+          { transaction: t }
+        );
+      }
+
+      const booking = await db.Reservation.create(
+        {
+          id: v4(),
+          idUser: userId,
+          idRoom: roomId,
+          idProperty: propertyId,
+          checkIndate: startDay,
+          checkOutdate: endDay,
+          code: code,
+          statusLock: "pending",
+          locked_until: new Date(Date.now() + 15 * 60 * 1000),
+        },
+        {
+          transaction: t,
+        }
+      );
+
+      await t.commit();
+
+      resolve({
+        status: "OK",
+        msg: "Đã giữ phòng, vui lòng thanh toán trong 15 phút.",
+        data: booking,
+      });
+    } catch (error) {
+      if (t && !t.finished) {
+        await t.rollback();
+      }
+      reject("error " + error);
+    }
+  });
+};
+
+const removeExpiredBookings = () => {
+  return new Promise(async (resolve, reject) => {
+    let t;
+    try {
+      t = await db.sequelize.transaction();
+      const expiredBookings = await db.Reservation.findAll({
+        where: {
+          statusLock: "pending",
+          locked_until: { [Op.lt]: new Date() }, // Hết hạn
+        },
+        transaction: t,
+      });
+
+      for (const booking of expiredBookings) {
+        const room = await db.Room.findByPk(booking.idRoom, { transaction: t });
+        const dates = getDatesInRange(
+          booking.checkIndate,
+          booking.checkOutdate
+        );
+
+        for (const date of dates) {
+          const availability = await db.RoomAvailability.findOne({
+            where: {
+              idRoom: booking.idRoom,
+              date: date.toISOString().slice(0, 10),
+            },
+            transaction: t,
+            lock: t.LOCK.UPDATE,
+          });
+
+          if (availability && availability.blocked_quantity > 0) {
+            await availability.update(
+              { blocked_quantity: availability.blocked_quantity - 1 },
+              { transaction: t }
+            );
+          }
+        }
+
+        await booking.update({ statusLock: "expired" }, { transaction: t });
+      }
+
+      await t.commit();
+      resolve({
+        status: "OK",
+        msg: "Đã xóa hết đặt phòng hết hạn thanh toán",
+      });
+    } catch (error) {
+      if (t && !t.finished) {
+        await t.rollback();
+      }
+      reject("error" + error);
+    }
+  });
+};
+
+const createReservation = (body) => {
   return new Promise(async (resolve, reject) => {
     try {
       const {
-        userId,
+        resId,
         email,
         phone,
         firstName,
         lastName,
         startDay,
         endDay,
-        roomId,
         imageBanking,
         total,
         message = null,
         nameAccount,
         numberAccount,
         nameBank,
-        code,
-        propertyId,
-      } = data;
-      console.log("data", data);
+      } = body;
+      console.log("data", body);
 
       const checkIn = convertToVietnameseDate(startDay);
       const checkOut = convertToVietnameseDate(endDay);
@@ -37,7 +205,7 @@ const createReservation = (data) => {
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>HRTRAVEL - Xác nhận thanh toán</title>
+    <title>Love Trip - Thanh toán đang xử lí</title>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -124,38 +292,19 @@ const createReservation = (data) => {
   </head>
   <body>
     <div class="email-container">
-      <div class="top-bar">HRTRAVEL</div>
+      <div class="top-bar">Love Trip</div>
 
-      <div class="header-text">Thanh Toán Đã Được Xác Nhận</div>
+      <div class="header-text">Thanh toán đang chờ xử lí!</div>
 
       <div class="content">
         <p>Xin chào <strong>${firstName} ${lastName}</strong>,</p>
 
-        <p>Chúng tôi đã nhận được thông tin thanh toán của bạn. Phòng đặt của bạn sẽ được xử lý trong vòng <strong>12 giờ</strong> và chúng sẽ giới thông tin xác nhận về email của bạn.</p>
+        <p>Chúng tôi đã nhận được thông tin thanh toán của bạn. Phòng đặt của bạn đang được xử lý trong vòng <strong>12 giờ</strong> và chúng sẽ giới thông tin xác nhận về email của bạn.</p>
 
         <p><strong>Thông tin thanh toán:</strong></p>
 
         <table class="details-table">
-          <tr>
-            <td class="label">Mã xác nhận:</td>
-            <td>${code}</td>
-          </tr>
-          <tr>
-            <td class="label">Check-in:</td>
-            <td>14 giờ - ${checkIn}</td>
-          </tr>
-          <tr>
-            <td class="label">Check-out:</td>
-            <td>12 giờ - ${checkOut}</td>
-          </tr>
-          <tr>
-            <td class="label">Số tiền:</td>
-            <td>${total} VND</td>
-          </tr>
-          <tr>
-            <td class="label">Trạng thái:</td>
-            <td><span class="status-success">Đã thanh toán</span></td>
-          </tr>
+          
           <tr>
             <td class="label">Chứng từ:</td>
             <td>
@@ -164,80 +313,88 @@ const createReservation = (data) => {
           </tr>
         </table>
 
-        <p>Cảm ơn bạn đã lựa chọn HRTRAVEL.<br />Nếu có bất kỳ câu hỏi nào, vui lòng liên hệ với đội ngũ hỗ trợ của chúng tôi.</p>
+        <p>Cảm ơn bạn đã lựa chọn Love Trip.<br />Nếu có bất kỳ câu hỏi nào, vui lòng liên hệ với đội ngũ hỗ trợ của chúng tôi.</p>
       </div>
 
       <div class="footer">
-        © 2025 HRTRAVEL. Mọi quyền được bảo lưu.
+        © 2025 Love Trip. Mọi quyền được bảo lưu.
       </div>
     </div>
   </body>
 </html>
-
 `;
+
+      const booking = await db.Reservation.findByPk(resId);
+      const now = new Date();
+      if (booking.statusLock !== "pending" || now > booking.locked_until) {
+        resolve({
+          status: "ERR",
+          msg: "Đã hết thời gian thanh toán phòng.",
+        });
+      }
 
       await sendMail({
         email: email,
         text: "Cảm ơn",
-        subject: "Xác nhận thanh toán",
+        subject: "Thanh toán đang chờ xử lí",
         html: html,
       });
 
-      const dates = getDatesInRange(startDay, endDay);
+      // const dates = getDatesInRange(startDay, endDay);
 
-      for (const date of dates) {
-        const existing = await db.RoomAvailability.findOne({
-          where: {
-            idRoom: roomId,
-            date: date.toISOString().slice(0, 10),
-          },
-        });
+      // for (const date of dates) {
+      //   const existing = await db.RoomAvailability.findOne({
+      //     where: {
+      //       idRoom: roomId,
+      //       date: date.toISOString().slice(0, 10),
+      //     },
+      //   });
 
-        if (existing) {
-          await db.RoomAvailability.update(
-            {
-              blocked_quantity: existing.blocked_quantity + 1,
-            },
-            {
-              where: { id: existing.id },
-            }
-          );
-        } else {
-          await db.RoomAvailability.create({
-            idRoom: roomId,
-            date: date.toISOString().slice(0, 10),
-            blocked_quantity: 1,
-            idProperty: propertyId,
-            id: v4(),
-          });
+      //   if (existing) {
+      //     await db.RoomAvailability.update(
+      //       {
+      //         blocked_quantity: existing.blocked_quantity + 1,
+      //       },
+      //       {
+      //         where: { id: existing.id },
+      //       }
+      //     );
+      //   } else {
+      //     await db.RoomAvailability.create({
+      //       idRoom: roomId,
+      //       date: date.toISOString().slice(0, 10),
+      //       blocked_quantity: 1,
+      //       idProperty: propertyId,
+      //       id: v4(),
+      //     });
+      //   }
+      // }
+
+      const response = await db.Reservation.update(
+        {
+          firstName,
+          lastName,
+          email,
+          phone,
+          imageBanking,
+          message,
+          nameAccount,
+          numberAccount,
+          nameBank,
+          totalPrice: total,
+          statusUser: "created",
+          status: "waiting",
+          statusLock: "confirmed",
+        },
+        {
+          where: { id: resId }, // Chỉ rõ bản ghi cần update
         }
-      }
-
-      const response = await db.Reservation.create({
-        idUser: userId,
-        idRoom: roomId,
-        firstName,
-        lastName,
-        email,
-        phone,
-        imageBanking,
-        message,
-        nameAccount,
-        numberAccount,
-        nameBank,
-        code,
-        statusUser: "created",
-        checkIndate: startDay,
-        checkOutdate: endDay,
-        totalPrice: total,
-        status: "waiting",
-        id: v4(),
-      });
-
+      );
+      const data = await db.Reservation.findByPk(resId);
       resolve({
         status: "OK",
         message: "Create success",
-        data: response,
+        data: data,
       });
     } catch (error) {
       reject("error " + error);
@@ -267,7 +424,10 @@ const listReservationApprove = ({ filter }) => {
       }
 
       const response = await db.Reservation.findAndCountAll({
-        where: { status: "waiting" },
+        where: {
+          status: "waiting",
+          statusLock: "confirmed",
+        },
         include: [
           {
             model: db.Room,
@@ -423,7 +583,7 @@ const approveReservation = ({
   <div class="container">
     <div class="brand">
       <div class="brand-left">
-        <h1>HRTravel</h1>
+        <h1>Love Trip</h1>
       </div>
       <div class="brand-right">
         <p><strong>Mã xác nhận:</strong> <span>${payload?.code}</span></p>
@@ -459,6 +619,10 @@ const approveReservation = ({
     </div>
 
     <table class="details-table">
+    <tr>
+        <td><strong>Mã xác nhận</strong></td>
+        <td>${payload?.code}</td>
+      </tr>
       <tr>
         <td><strong>Tổng thanh toán</strong></td>
         <td>${payload?.totalPrice}</td>
@@ -507,6 +671,7 @@ const approveReservation = ({
 
     <div class="footer">
       <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
+      <p>© 2025 Love Trip. Mọi quyền được bảo lưu.</p>
     </div>
   </div>
 </body>
@@ -517,7 +682,7 @@ const approveReservation = ({
         (status === "refund" && returnImgBanking)
       ) {
         html = `
-        <!DOCTYPE html>
+         <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
@@ -614,7 +779,7 @@ const approveReservation = ({
   <div class="container">
     <div class="brand">
       <div class="brand-left">
-        <h1>HRTravel</h1>
+        <h1>Love Trip</h1>
       </div>
       <div class="brand-right">
         <p><strong>Mã xác nhận:</strong> <span>${payload?.code}</span></p>
@@ -658,6 +823,10 @@ const approveReservation = ({
     </div>
 
     <table class="details-table">
+    <tr>
+        <td><strong>Mã xác nhận</strong></td>
+        <td>${payload?.code}</td>
+      </tr>
       <tr>
         <td><strong>Tổng thanh toán</strong></td>
         <td>${payload?.totalPrice}</td>
@@ -706,6 +875,7 @@ const approveReservation = ({
 
     <div class="footer">
       <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
+      <p>© 2025 Love Trip. Mọi quyền được bảo lưu.</p>
     </div>
   </div>
 </body>
@@ -813,7 +983,7 @@ const approveReservation = ({
   <div class="container">
     <div class="brand">
       <div class="brand-left">
-        <h1>HRTravel</h1>
+        <h1>Love Trip</h1>
       </div>
       <div class="brand-right">
         <p><strong>Mã xác nhận:</strong> <span>${payload?.code}</span></p>
@@ -850,6 +1020,10 @@ const approveReservation = ({
     </div>
 
     <table class="details-table">
+    <tr>
+        <td><strong>Mã xác nhận</strong></td>
+        <td>${payload?.code}</td>
+      </tr>
       <tr>
         <td><strong>Tổng thanh toán</strong></td>
         <td>${payload?.totalPrice}</td>
@@ -898,6 +1072,7 @@ const approveReservation = ({
 
     <div class="footer">
       <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
+      <p>© 2025 Love Trip. Mọi quyền được bảo lưu.</p>
     </div>
   </div>
 </body>
@@ -968,7 +1143,10 @@ const listReservationOfUser = (idUser) => {
       let order = [["createdAt", "DESC"]];
 
       const response = await db.Reservation.findAndCountAll({
-        where: { idUser: idUser },
+        where: {
+          idUser: idUser,
+          statusLock: "confirmed",
+        },
         include: [
           {
             model: db.Room,
@@ -1069,6 +1247,26 @@ const detailReservationOfUser = (idRes) => {
         ],
         order,
         distinct: true,
+      });
+
+      resolve({
+        status: response ? "OK" : "ERR",
+        data: response,
+      });
+    } catch (error) {
+      reject("error " + error);
+    }
+  });
+};
+
+const getTimeOfResLockbyId = (idRes) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let order = [["createdAt", "DESC"]];
+
+      const response = await db.Reservation.findOne({
+        where: { id: idRes },
+        attributes: ["statusLock", "locked_until"],
       });
 
       resolve({
@@ -1288,6 +1486,8 @@ const getDataBarChart = async (propertyId, filter) => {
 };
 
 module.exports = {
+  lockBooking,
+  removeExpiredBookings,
   createReservation,
   listReservationApprove,
   detailReservationApprove,
@@ -1297,4 +1497,5 @@ module.exports = {
   updateInfoReservation,
   getDataBarChart,
   updateStatusUserReservation,
+  getTimeOfResLockbyId,
 };

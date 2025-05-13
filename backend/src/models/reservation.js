@@ -48,6 +48,9 @@ module.exports = (sequelize, DataTypes) => {
       phone: DataTypes.STRING,
       imageBanking: DataTypes.STRING,
       reason: DataTypes.STRING,
+      idProperty: DataTypes.STRING,
+      statusLock: DataTypes.STRING,
+      locked_until: DataTypes.DATE,
     },
     {
       sequelize,
