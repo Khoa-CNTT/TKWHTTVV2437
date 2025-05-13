@@ -8,7 +8,7 @@ async function generateEmbedding(text) {
   }
 
   const embeddingResult = await hf.featureExtraction({
-    model: "sentence-transformers/all-MiniLM-L6-v2",
+    model: "sentence-transformers/all-mpnet-base-v2",
     inputs: text,
   });
   console.log(embeddingResult);

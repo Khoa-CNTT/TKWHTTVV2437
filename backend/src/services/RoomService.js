@@ -1,6 +1,7 @@
 const db = require("../models");
 const { v4 } = require("uuid");
 const { saveEmbedding } = require("./queryService");
+const { deleteCollection } = require("./collectionService");
 
 const getListRoomByPropertyId = (propertyId, filters = {}) => {
   return new Promise(async (resolve, reject) => {
@@ -107,6 +108,11 @@ const getDetailById = (roomId) => {
             as: "summaries",
             through: { attributes: [] },
           },
+          {
+            model: db.Property,
+            as: "property",
+            attributes: ["id", "name"],
+          },
         ],
       });
 
@@ -187,6 +193,8 @@ const embeddingRoom = async (roomId) => {
 
     const dataRooms = {
       id: getRoom.data.dataValues.id,
+      idProperty: getRoom.data.dataValues.idProperty,
+      property: getRoom.data.dataValues.property.name,
       name: getRoom.data.dataValues.name,
       maxPerson: getRoom.data.dataValues.maxPerson,
       price: getRoom.data.dataValues.price,
@@ -277,24 +285,51 @@ const updateRoom = (roomId, data) => {
   });
 };
 
-const updateStatusRoom = (roomId, status) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const room = await db.Room.update(
-        {
-          status: status,
-        },
-        { where: { id: roomId } }
-      );
+const updateStatusRoom = async (roomId, status) => {
+  try {
+    // Update room status
+    const room = await db.Room.update({ status }, { where: { id: roomId } });
 
-      resolve({
-        status: "OK",
-        data: room,
-      });
-    } catch (error) {
-      reject(error);
+    // Update embeddings
+    try {
+      await deleteEmbeddingRooms(roomId);
+      await embeddingRoom(roomId);
+    } catch (embeddingError) {
+      console.error(
+        "⚠️ Failed to update embedding after status change:",
+        embeddingError
+      );
+      // Continue execution even if embedding fails
     }
-  });
+
+    return {
+      status: "OK",
+      data: room,
+    };
+  } catch (error) {
+    throw {
+      status: "ERR",
+      message: `Error updating room status: ${error.message || error}`,
+    };
+  }
+};
+
+const deleteEmbeddingRooms = async (propertyId) => {
+  try {
+    // Add timeout to prevent hanging
+    const timeout = new Promise((_, reject) => {
+      setTimeout(
+        () => reject(new Error("Delete embedding operation timed out")),
+        10000
+      ); // 10 seconds timeout
+    });
+
+    // Race between the actual operation and timeout
+    await Promise.race([deleteCollection(`room_${propertyId}`), timeout]);
+  } catch (error) {
+    console.error(`Error deleting embedding for room ${propertyId}:`, error);
+    throw error;
+  }
 };
 
 const getTopReventRoomByPropertyId = async (propertyId) => {

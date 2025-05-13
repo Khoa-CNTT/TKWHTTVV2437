@@ -5,10 +5,10 @@ function generateText(item, type) {
     text += `ID khách sạn: ${item.id}\n`;
     text += `Mô tả: ${item.description || "Không có mô tả"}\n`;
     text += `Trạng thái: ${item.status || "Không xác định"}\n`;
-    text += `Link: ${item.link}\n`;
+    text += `Link: ${item.link} \n`;
     if (item.address && typeof item.address === "object") {
       const addr = item.address;
-      text += `Địa chỉ:\n`;
+      text += `\n Địa chỉ:\n`;
       text += `- Đường: ${addr.street || "Không có"}\n`;
       text += `- Quận/Huyện: ${addr.district || "Không có"}\n`;
       text += `- Thành phố: ${addr.city || "Không có"}\n`;
@@ -25,15 +25,15 @@ function generateText(item, type) {
         "\n";
     }
     if (item.amenities && item.amenities.length > 0) {
-      text += `Tiện nghi: ${item.amenities.map((a) => a.name).join(", ")}\n`;
+      text += `Tiện nghi: ${item.amenities.map((a) => a?.name).join(", ")}\n`;
     }
   } else if (type === "room") {
     text += `Phòng: ${item.name}\n`;
     text += `ID phòng: ${item.id}\n`;
-    text += `Thuộc khách sạn có ID: ${item.idProperty}\n`;
+    text += `Thuộc khách sạn : ${item.property}\n`;
     text += `Mô tả: ${item.description || "Không có mô tả"}\n`;
     text += `Số người tối đa: ${item.maxPerson || "Không xác định"}\n`;
-    text += `Giá: ${item.price || "Không xác định"} USD\n`;
+    text += `Giá: ${item.price || "Không xác định"} VND\n`;
     text += `Trạng thái: ${item.status || "Không xác định"}\n`;
     if (item.amenities && item.amenities.length > 0)
       text += `Tiện nghi: ${item.amenities.map((a) => a.name).join(", ")}\n`;
