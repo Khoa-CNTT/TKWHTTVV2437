@@ -30,149 +30,99 @@ const BoxChat: React.FC<IProps> = ({ onSetBox }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Specialized URL detection function focused on Cloudinary URLs
+  // Hàm phát hiện và định dạng URL
   const detectAndFormatUrls = (text: string) => {
-    // First, extract and process all Cloudinary URLs (they begin with "https://res.cloudinary.com")
+    // Tách văn bản và URL ra để xử lý riêng
+    let processedText = text;
+    const elements = [];
+
+    // 1. Xử lý URL Cloudinary (ảnh)
     const cloudinaryUrlPattern = /https:\/\/res\.cloudinary\.com\/[^\s"')]+/gi;
     const cloudinaryUrls = [];
-    let cleanedText = text;
-
-    // Extract all Cloudinary URLs
     let match;
+
     while ((match = cloudinaryUrlPattern.exec(text)) !== null) {
-      // Get the full URL without truncation
-      const fullUrl = match[0];
-      cloudinaryUrls.push(fullUrl);
-
-      // Remove the URL from the text to avoid duplication
-      cleanedText = cleanedText.replace(fullUrl, "");
+      cloudinaryUrls.push(match[0]);
+      processedText = processedText.replace(match[0], "");
     }
 
-    // Now process non-Cloudinary URLs
-    const localDetailPageRegex =
-      /(http:\/\/localhost:3000\/detail\/[^\s"'),.]+(?:\?[^\s"'),.]*)?)(?=\s|$|"|'|,|\.|<)/gi;
-    const generalUrlRegex =
-      /(https?:\/\/(?!res\.cloudinary\.com)[^\s"'),.]+)(?=\s|$|"|'|,|\.|<)/gi;
+    // 2. Xử lý URLs localhost (chuyển tiếp)
+    const localhostUrlPattern = /(http:\/\/localhost:[0-9]+\/[^\s"'),.]+)/gi;
+    const localhostUrls = [];
 
-    const detailUrls = Array.from(
-      cleanedText.matchAll(localDetailPageRegex)
-    ).map((match) => match[0]);
-    const otherUrls = Array.from(cleanedText.matchAll(generalUrlRegex)).map(
-      (match) => match[0]
-    );
-
-    // If no URLs found and cleaned text is empty, just return the original text
-    if (
-      cloudinaryUrls.length === 0 &&
-      detailUrls.length === 0 &&
-      otherUrls.length === 0
-    ) {
-      return <span style={{ whiteSpace: "pre-line" }}>{text}</span>;
+    while ((match = localhostUrlPattern.exec(text)) !== null) {
+      localhostUrls.push(match[0]);
+      processedText = processedText.replace(match[0], "");
     }
 
-    // Create the result components
-    const parts = [];
+    // 3. Xử lý các URL khác (hiển thị dạng link)
+    const otherUrlPattern =
+      /(https?:\/\/(?!res\.cloudinary\.com)(?!localhost)[^\s"'),.]+)/gi;
+    const otherUrls = [];
 
-    // First add non-empty text content if there is any
-    if (cleanedText.trim()) {
-      // Process detail URLs
-      let currentText = cleanedText;
+    while ((match = otherUrlPattern.exec(text)) !== null) {
+      otherUrls.push(match[0]);
+      processedText = processedText.replace(match[0], "");
+    }
 
-      detailUrls.forEach((url, index) => {
-        const urlIndex = currentText.indexOf(url);
-        if (urlIndex !== -1) {
-          // Add text before the URL
-          if (urlIndex > 0) {
-            parts.push(
-              <span
-                key={`text-detail-${index}`}
-                style={{ whiteSpace: "pre-line" }}
-              >
-                {currentText.substring(0, urlIndex)}
-              </span>
-            );
-          }
+    // Nếu còn text thì hiển thị
+    if (processedText.trim()) {
+      elements.push(
+        <span key="text" style={{ whiteSpace: "pre-line" }}>
+          {processedText}
+        </span>
+      );
+    }
 
-          // Add the detail link
-          const urlParts = url.split("/");
-          const pageName = urlParts[urlParts.length - 1]
-            .replace(/-/g, " ")
-            .split("?")[0]
-            .replace(/\b\w/g, (char) => char.toUpperCase());
+    // Hiển thị URLs localhost
+    localhostUrls.forEach((url, index) => {
+      const urlParts = url.split("/");
+      const pageName = urlParts[urlParts.length - 1]
+        .replace(/-/g, " ")
+        .split("?")[0]
+        .replace(/\b\w/g, (char) => char.toUpperCase());
 
-          parts.push(
-            <a
-              key={`detail-${index}`}
-              href={url}
-              className="block my-2 text-blue-700 font-medium hover:underline break-all flex items-center gap-2 bg-blue-50 p-2 rounded-md border-l-4 border-blue-500"
-              onClick={(e) => {
-                e.preventDefault();
-                window.location.href = url;
-              }}
-            >
-              <span className="inline-block text-blue-600">📄</span>
-              <span className="inline-block">
-                <span className="font-semibold">Xem chi tiết:</span> {pageName}
-              </span>
-            </a>
-          );
-
-          // Update current text to process
-          currentText = currentText.substring(urlIndex + url.length);
-        }
-      });
-
-      otherUrls.forEach((url, index) => {
-        const urlIndex = currentText.indexOf(url);
-        if (urlIndex !== -1) {
-          // Add text before the URL
-          if (urlIndex > 0) {
-            parts.push(
-              <span
-                key={`text-other-${index}`}
-                style={{ whiteSpace: "pre-line" }}
-              >
-                {currentText.substring(0, urlIndex)}
-              </span>
-            );
-          }
-
-          // Add the general link
-          parts.push(
-            <a
-              key={`general-${index}`}
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block my-1 text-blue-600 hover:underline break-all flex items-center gap-1"
-              onClick={(e) => {
-                e.preventDefault();
-                window.open(url, "_blank", "noopener,noreferrer");
-              }}
-            >
-              <HiExternalLink className="inline-block flex-shrink-0" />
-              <span className="inline-block">{url}</span>
-            </a>
-          );
-
-          // Update current text to process
-          currentText = currentText.substring(urlIndex + url.length);
-        }
-      });
-
-      // Add any remaining text
-      if (currentText.trim()) {
-        parts.push(
-          <span key="remaining-text" style={{ whiteSpace: "pre-line" }}>
-            {currentText}
+      elements.push(
+        <a
+          key={`localhost-${index}`}
+          href={url}
+          className="block my-2 text-blue-700 font-medium hover:underline break-all flex items-center gap-2 bg-blue-50 p-2 rounded-md border-l-4 border-blue-500"
+          onClick={(e) => {
+            e.preventDefault();
+            window.location.href = url;
+          }}
+        >
+          <span className="inline-block text-blue-600">📄</span>
+          <span className="inline-block">
+            <span className="font-semibold">Xem chi tiết:</span> {pageName}
           </span>
-        );
-      }
-    }
+        </a>
+      );
+    });
 
-    // Then add all Cloudinary images at the end
+    // Hiển thị các URL khác
+    otherUrls.forEach((url, index) => {
+      elements.push(
+        <a
+          key={`external-${index}`}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block my-1 text-blue-600 hover:underline break-all flex items-center gap-1"
+          onClick={(e) => {
+            e.preventDefault();
+            window.open(url, "_blank", "noopener,noreferrer");
+          }}
+        >
+          <HiExternalLink className="inline-block flex-shrink-0" />
+          <span className="inline-block">{url}</span>
+        </a>
+      );
+    });
+
+    // Hiển thị ảnh Cloudinary
     if (cloudinaryUrls.length > 0) {
-      parts.push(
+      elements.push(
         <div
           key="image-group"
           className={`my-3 grid gap-2 w-full ${
@@ -197,7 +147,11 @@ const BoxChat: React.FC<IProps> = ({ onSetBox }) => {
       );
     }
 
-    return parts;
+    return elements.length > 0 ? (
+      elements
+    ) : (
+      <span style={{ whiteSpace: "pre-line" }}>{text}</span>
+    );
   };
 
   const handleSendMessage = async () => {
