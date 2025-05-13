@@ -22,6 +22,9 @@ router.get(
   "/detailReservationOfUser",
   reservationController.detailReservationOfUser
 );
+
+router.get("/getTimeOfResLockbyId", reservationController.getTimeOfResLockbyId);
+
 router.get("/bar-chart/:id", reservationController.getDataBarChart);
 
 router.put("/approveReservation", reservationController.approveReservation);

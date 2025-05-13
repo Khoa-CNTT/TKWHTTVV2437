@@ -22,6 +22,9 @@ import apisRoom from "@/apis/room";
 import { IRoom } from "@/app/types/room";
 import apisRoomAvailability from "@/apis/roomAvailability";
 import clsx from "clsx";
+import apiReservation from "@/api/reservation";
+import moment from "moment";
+import Swal from "sweetalert2";
 
 interface IProps {
   propertyId: string;
@@ -44,6 +47,11 @@ const ListRoomContainer: React.FC<IProps> = ({ propertyId }) => {
     setEndDate,
     startDate,
     endDate,
+    roomId,
+    setReservationId,
+    reservationId,
+    codeId,
+    setCodeId,
   } = useCheckoutContext();
   const router = useRouter();
   const [rooms, setRooms] = useState<IRoom[]>([]);
@@ -80,17 +88,62 @@ const ListRoomContainer: React.FC<IProps> = ({ propertyId }) => {
     fetchDataRoomAvailability();
   }, [startDate, endDate]);
 
-  const handleCheckOut = (id: string) => {
+  const handleToISOString = (value: dayjs.Dayjs | null, status: string) => {
+    let isoString;
+    if (status === "startDay") {
+      isoString = value?.format("DD/MM/YYYY") + "14:00";
+    } else {
+      isoString = value?.format("DD/MM/YYYY") + "12:00";
+    }
+
+    const dateObj = moment(isoString, "DD/MM/YYYY HH:mm").toDate();
+    return dateObj.toISOString();
+  };
+
+  const handleCheckOut = async (id: string) => {
     console.log("propertyId", propertyId);
     setRoomId(id); // Gọi hàm setRoomId với giá trị "roomId"
     setPropertyId(propertyId); // Gọi hàm setRoomId với giá trị "roomId"
-    router.push("/checkout"); // Chuyển hướng đến trang checkout
+    const code = Math.floor(10000 + Math.random() * 90000).toString();
+    const booking = await apiReservation.lockBooking({
+      roomId: id,
+      propertyId: propertyId,
+      userId: "93983cb3-b58a-44fe-9bf6-ca506a86b7a3",
+      startDay: handleToISOString(startDate, "startDay"),
+      endDay: handleToISOString(endDate, "endDay"),
+      code: code,
+    });
+    console.log("booking", booking);
+    if (
+      booking?.status === "OK" &&
+      booking?.msg === "Đã giữ phòng, vui lòng thanh toán trong 15 phút."
+    ) {
+      setCodeId(code);
+      setReservationId(booking.data.id);
+      router.push("/checkout"); // Chuyển hướng đến trang checkout
+    } else if (
+      booking?.status === "OK" &&
+      booking?.msg === "Bạn đã giữ phòng này rồi, vui lòng thanh toán."
+    ) {
+      setCodeId(code);
+      setReservationId(booking.data.id);
+      router.push("/checkout");
+    } else {
+      Swal.fire({
+        title: "Đã hết phòng!",
+        icon: "warning",
+      });
+    }
+    // setReservationId("1");
+    // router.push("/checkout");
   };
 
   // Delete localStorage when component unmounts
   useEffect(() => {
     setPropertyId("");
     setRoomId("");
+    setReservationId("");
+    setCodeId("");
     setStartDate(dayjs(new Date()));
     setEndDate(dayjs(new Date().setDate(new Date().getDate() + 2)));
   }, []);

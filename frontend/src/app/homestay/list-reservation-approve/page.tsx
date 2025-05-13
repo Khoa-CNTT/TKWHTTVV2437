@@ -203,7 +203,7 @@ const ListReservationApprovePage = () => {
                         {item?.statusUser === "created" ? "Đặt" : "Hủy"}
                       </td>
                       <td className="px-4 py-5">
-                        {dayjs(item?.createdAt)?.format("DD/MM/YYYY")}
+                        {dayjs(item?.createdAt)?.format("DD/MM/YYYY HH:mm")}
                       </td>
                       <td className="px-4 py-5 ">
                         <button

@@ -104,6 +104,18 @@ const detailReservationOfUser = async (req, res) => {
   }
 };
 
+const getTimeOfResLockbyId = async (req, res) => {
+  try {
+    const { idRes } = req.query;
+    const response = await ReservationService.getTimeOfResLockbyId(idRes);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
 const updateInfoReservation = async (req, res) => {
   try {
     const response = await ReservationService.updateInfoReservation(req.body);
@@ -138,4 +150,5 @@ module.exports = {
   updateInfoReservation,
   getDataBarChart,
   updateStatusUserReservation,
+  getTimeOfResLockbyId,
 };

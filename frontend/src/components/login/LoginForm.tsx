@@ -47,7 +47,7 @@ const LoginForm = () => {
       id: 1,
       title: "Đăng nhập hoặc tạo tài khoản",
       label:
-        "Bạn có thể đăng nhập tài khoản Booking.com của mình để truy cập các dịch vụ của chúng tôi.",
+        "Bạn hãy đăng nhập để sử dụng dịch vụ của chúng tôi một cách trọn vẹn.",
     },
     {
       id: 2,

@@ -70,8 +70,8 @@ const InfoUser = () => {
               </div>
             </div>
             <p className="text-[-14] text-[text]">
-              Hãy đảm bảo thông tin này trùng khớp với ID du lịch của bạn, như
-              hộ chiếu hoặc giấy phép lái xe
+              Hảy đảm bảo thông tin này trùng khớp với thông tin của bạn như hộ
+              chiếu hoặc giấy phép lái xe
             </p>
           </div>
 
@@ -103,7 +103,7 @@ const InfoUser = () => {
             </div>
             <p className="text-[-14] text-[text]">
               Nhận thông báo về hoạt động tài khoản và cập nhật chuyến đi bằng
-              cách chia sẻ thông tin này.
+              cách chia sẻ thông tin này
             </p>
           </div>
 

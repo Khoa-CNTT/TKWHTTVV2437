@@ -16,6 +16,7 @@ const PaymentRouter = require("./PaymentRoute");
 const AdOrderRouter = require("./AdOrderRouter");
 const CommissionPaymentRouter = require("./CommissionPaymentRouter");
 const AIServiceRouter = require("./AIRouter");
+const RegisterPartnerRouter = require("./RegisterPartnerRouter");
 
 const RoomAvailabilityRouter = require("./RoomAvailibityRouter");
 const AccountPaymentRouter = require("./AccountPaymentRouter");
@@ -39,7 +40,7 @@ const initRoutes = (app) => {
   app.use("/api/payment", PaymentRouter);
   app.use("/api/ad-order", AdOrderRouter);
   app.use("/api/commission", CommissionPaymentRouter);
-
+  app.use("/api/partner", RegisterPartnerRouter);
   app.use("/api/room", RoomRouter);
   app.use("/api/reservation", ReservationRouter);
   app.use("/api/account-payment", AccountPaymentRouter);

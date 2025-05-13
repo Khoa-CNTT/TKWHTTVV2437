@@ -29,7 +29,18 @@ const port = process.env.PORT || 8888;
 const listener = app.listen(port, () => {
   console.log(`Server is running on the port: ${listener.address().port}`);
 
-  cron.schedule("* * * * *", () => {
-    ReservationService.removeExpiredBookings();
-  });
+  cron.schedule(
+    "*/5 * * * *",
+    async () => {
+      try {
+        console.log("Cron job triggered at", new Date().toISOString());
+        await ReservationService.removeExpiredBookings();
+      } catch (error) {
+        console.error("Cron job failed:", error);
+      }
+    },
+    {
+      timezone: "UTC",
+    }
+  );
 });
