@@ -56,17 +56,29 @@ const Header = () => {
   const handleLogout = () => {
     setIsLoginModalOpen(false);
     localStorage.removeItem("access_token");
-    window.location.reload();
+
+    window.location.href = "/";
   };
 
   const handleNavagateAccount = () => {
     router.push("/account");
+    setIsLoginModalOpen(false);
   };
 
   const handleMytrip = () => {
     router.push("/mytrip");
+    setIsLoginModalOpen(false);
+  };
+  const handleBecomePartner = () => {
+    router.push("/become-partner");
+    setIsLoginModalOpen(false);
   };
   const menu = [
+    {
+      title: "Trở thành người kinh doanh",
+      icon: <CiUser />,
+      handle: handleBecomePartner,
+    },
     {
       title: "Thông tin cá nhân",
       icon: <CiUser />,

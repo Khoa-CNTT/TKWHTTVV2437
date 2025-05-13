@@ -41,7 +41,7 @@ const SecurityUser = () => {
       <div className="flex flex-col gap-10 w-full">
         <div className="">
           <h1 className="text-[text] text-[28px] font-semibold">
-            Bảo mật và cài đặt
+            Bảo mật và cài đặt{" "}
           </h1>
         </div>
 
@@ -82,9 +82,17 @@ const SecurityUser = () => {
               tài khoản.
             </p>
 
-            <button className="w-fit text-left text-primary hover:underline">
-              Xóa tài khoản của bạn
-            </button>
+            <div className="relative group w-fit">
+              <button className="text-left text-primary hover:underline">
+                Xóa tài khoản của bạn
+              </button>
+
+              {user?.role === "6" && (
+                <div className="absolute left-0 top-full mt-1 hidden w-max rounded-md bg-gray-800 text-white text-sm px-2 py-1 group-hover:block z-10">
+                  Người kinh doanh không thể xóa tài khoản
+                </div>
+              )}
+            </div>
             <p className="text-[-14] text-gray-600 font-semibold">
               Xóa vĩnh viễn tài khoản và dữ liệu của bạn khỏi HRTrabel
             </p>

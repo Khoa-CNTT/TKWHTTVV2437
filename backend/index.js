@@ -30,7 +30,7 @@ const listener = app.listen(port, () => {
   console.log(`Server is running on the port: ${listener.address().port}`);
 
   cron.schedule(
-    "* * * * *",
+    "*/5 * * * *",
     async () => {
       try {
         console.log("Cron job triggered at", new Date().toISOString());
