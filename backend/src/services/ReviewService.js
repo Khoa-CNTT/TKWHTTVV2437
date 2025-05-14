@@ -145,6 +145,15 @@ const createReview = (data) => {
         reviewDate: new Date(),
       });
 
+      try {
+        await embeddingReview(newReview.idProperty); // Gọi hàm embeddingRoom với idProperty
+      } catch (err) {
+        console.error(
+          "❌ Failed to perform embeddingRoom:",
+          err.message || err
+        );
+      }
+
       resolve({
         status: result ? "OK" : "ERR",
         data: result || [],
