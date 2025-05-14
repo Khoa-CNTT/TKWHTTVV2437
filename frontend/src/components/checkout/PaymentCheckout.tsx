@@ -9,6 +9,7 @@ import { FaCheckCircle } from "react-icons/fa";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { TiArrowBack } from "react-icons/ti";
 interface IDataEnter {
+  resId: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -101,6 +102,7 @@ const PaymentCheckout = ({
       setInvalidFields
     );
     if (valid === 0) {
+      // console.log("data ", data);
       const respon = await apiReservation.createReservation(data);
 
       if (respon?.status === "OK") {

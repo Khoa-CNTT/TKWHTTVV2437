@@ -1,6 +1,10 @@
+const { v4 } = require("uuid");
 const db = require("../models");
 const { fn, col } = require("sequelize");
 const { v4: uuidv4 } = require("uuid");
+const { saveEmbedding } = require("./queryService");
+const { getDetailProperyById } = require("./PropertyService");
+const { deleteCollection } = require("./collectionService");
 
 const getRatingByPropertyId = (propertyId) => {
   return new Promise(async (resolve, reject) => {
@@ -26,6 +30,62 @@ const getRatingByPropertyId = (propertyId) => {
       reject(error);
     }
   });
+};
+
+const createPropertyReview = (reviewData) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { idUser, idProperty, rating, text } = reviewData;
+
+      // Tạo một review mới
+      const newReview = await db.Review.create({
+        id: v4(),
+        idUser,
+        idProperty,
+        rating,
+        text,
+        reviewDate: new Date(), // Ngày đánh giá
+      });
+
+      try {
+        await embeddingReview(newReview.idProperty); // Gọi hàm embeddingRoom với idProperty
+      } catch (err) {
+        console.error(
+          "❌ Failed to perform embeddingRoom:",
+          err.message || err
+        );
+      }
+
+      resolve({
+        status: "OK",
+        data: newReview,
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const embeddingReview = async (id) => {
+  try {
+    const getProperty = await getDetailProperyById(id);
+    const getReview = await getRatingByPropertyId(id);
+    const dataReview = {
+      id: getProperty.data.dataValues.name,
+      propertyId: getProperty.data.dataValues.id,
+      name: getProperty.data.dataValues.name,
+      averageRating: getReview.data.dataValues.averageRating,
+    };
+
+    await deleteCollection(
+      `reviewPeroperty_${getProperty.data.dataValues.name}`
+    );
+
+    const embeddingResult = await saveEmbedding("reviewPeroperty", dataReview);
+    console.log("✅ Embedding result:", getReview);
+  } catch (err) {
+    console.error("❌ Failed to perform embeddingRoom:", err.message || err);
+  }
 };
 
 const getListReviewByProperyId = (propertyId, filter) => {
@@ -143,6 +203,7 @@ const getReviewByUserId = (filter) => {
 };
 
 module.exports = {
+  createPropertyReview,
   getRatingByPropertyId,
   getListReviewByProperyId,
   createReview,

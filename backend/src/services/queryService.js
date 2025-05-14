@@ -45,6 +45,8 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
   if (previousContext && previousContext.matchedItems) {
     const previousHotelIds = previousContext.matchedItems
       .filter((item) => item.metadata.type === "hotel")
+      .filter((item) => item.metadata.type === "reviewPeroperty")
+
       .map((item) => item.metadata.itemId);
     filteredItems = matchedItems.sort((a, b) => {
       const aIsRelevant = previousHotelIds.includes(
@@ -68,10 +70,13 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
   if (filteredItems && filteredItems.length > 0) {
     filteredItems.forEach((item, index) => {
       const { document, metadata } = item;
+      console.log(metadata, "metadata lalalalalal");
       if (!document || !metadata) return;
 
       if (typeof document === "string") {
         const parsedDoc = parseStringDocument(document);
+
+        console.log(parsedDoc, "parsedDoc lalalalalal");
 
         if (metadata.type === "hotel" || parsedDoc.type === "hotel") {
           response += `${index + 1}. 🏨 ${
@@ -80,12 +85,24 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
           response += `   Mô tả: ${
             parsedDoc.description || "Không có mô tả"
           }\n`;
-          response += `   Địa chỉ: ${parsedDoc.address?.join(", ") || "N/A"}\n`;
-          response += `   Đánh giá cặp đôi: ${
-            metadata.rating || "Chưa có đánh giá"
-          }\n`;
+          response += `   Địa chỉ:\n`;
+          if (parsedDoc.address && typeof parsedDoc.address === "object") {
+            if (parsedDoc.address.street)
+              response += `   - Đường: ${parsedDoc.address.street}\n`;
+            if (parsedDoc.address.district)
+              response += `   - Quận/Huyện: ${parsedDoc.address.district}\n`;
+            if (parsedDoc.address.city)
+              response += `   - Thành phố: ${parsedDoc.address.city}\n`;
+            if (parsedDoc.address.country)
+              response += `   - Quốc gia: ${parsedDoc.address.country}\n`;
+          } else {
+            response += `   N/A\n`;
+          }
           response += `   Tiện ích: ${
             metadata.amenities || "Wifi miễn phí, hồ bơi, bãi đỗ xe"
+          }\n`;
+          response += `   Link: ${
+            parsedDoc.link || metadata.link || "Không có đường dẫn"
           }\n`;
 
           if (parsedDoc.images && parsedDoc.images.length > 0) {
@@ -93,11 +110,16 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
           } else {
             response += `   Hình ảnh: Không có hình ảnh\n`;
           }
+
+          if (parsedDoc.status) {
+            response += `   Trạng thái: ${parsedDoc.status}\n`;
+          }
         } else if (metadata.type === "room" || parsedDoc.type === "room") {
           response += `${index + 1}. 🛏️ ${
             metadata.name || parsedDoc.name || "Phòng"
           } (Khách sạn ID: ${metadata.propertyId || parsedDoc.propertyId})\n`;
           response += `   Giá: ${parsedDoc.price || "N/A"}\n`;
+          response += `   Thuộc khách sạn: ${parsedDoc.property || "N/A"}\n`;
           response += `   Số người tối đa: ${parsedDoc.maxGuests || "N/A"}\n`;
           response += `   Trạng thái: ${parsedDoc.status || "N/A"}\n`;
           response += `   Tiện nghi: ${
@@ -109,6 +131,13 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
           } else {
             response += `   Hình ảnh: Không có hình ảnh\n`;
           }
+        } else if (metadata.type === "reviewPeroperty") {
+          response += `${index + 1}. 📝 ${metadata.name || "Đánh giá"} (ID: ${
+            metadata.itemId
+          })\n`;
+          response += `   Đánh giá: ${
+            parsedDoc.averageRating || "Chưa có đánh giá"
+          }\n`;
         }
       } else {
         const parsedDoc = parseDocument(document);
@@ -123,9 +152,22 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
               ? description[1].trim().substring(0, 150) + "..."
               : "N/A"
           }\n`;
-          response += `   Địa chỉ: ${
-            parsedDoc["Địa chỉ"] ? parsedDoc["Địa chỉ"].join(", ") : "N/A"
-          }\n`;
+          response += `   Địa chỉ:\n`;
+          if (
+            parsedDoc["Địa chỉ"] &&
+            typeof parsedDoc["Địa chỉ"] === "object"
+          ) {
+            if (parsedDoc["Địa chỉ"].street)
+              response += `   - Đường: ${parsedDoc["Địa chỉ"].street}\n`;
+            if (parsedDoc["Địa chỉ"].district)
+              response += `   - Quận/Huyện: ${parsedDoc["Địa chỉ"].district}\n`;
+            if (parsedDoc["Địa chỉ"].city)
+              response += `   - Thành phố: ${parsedDoc["Địa chỉ"].city}\n`;
+            if (parsedDoc["Địa chỉ"].country)
+              response += `   - Quốc gia: ${parsedDoc["Địa chỉ"].country}\n`;
+          } else {
+            response += `   N/A\n`;
+          }
           response += `   Đánh giá cặp đôi: ${
             metadata.rating || "Chưa có đánh giá"
           }\n`;
@@ -176,6 +218,18 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
             }\n`;
           } else {
             response += `   Hình ảnh: Không có hình ảnh\n`;
+          }
+
+          if (
+            parsedDoc["Điểm đanh giá"] &&
+            parsedDoc["Điểm đánh giá"].length > 0
+          ) {
+            const rating = parsedDoc["Điểm đánh giá"]
+              .map((line) => line.match(/- \[\d+\] (.*?)(?=\n|$)/)?.[1])
+              .filter((url) => url);
+            response += `   Điểm đánh giá: ${
+              rating.length > 0 ? rating.join(", ") : "Không có đánh giá"
+            }\n`;
           }
         }
       }
@@ -261,16 +315,6 @@ async function saveEmbedding(type, data) {
   // Chuẩn hóa dữ liệu thành mảng để xử lý đồng nhất
   const dataArray = Array.isArray(data) ? data : [data];
 
-  // Kiểm tra từng item trong mảng
-  for (const item of dataArray) {
-    if (!item.id || !item.name) {
-      throw new Error(
-        `Invalid item data: Missing id or name in ${JSON.stringify(item)}`
-      );
-    }
-  }
-
-  // Tạo text để embedding
   const itemTexts = dataArray.map((item) => generateText(item, type));
   console.log("Generated texts for embedding:", itemTexts);
 

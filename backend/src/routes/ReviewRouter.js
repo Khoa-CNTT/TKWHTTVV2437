@@ -11,6 +11,7 @@ router.get(
   "/list-review/:propertyId",
   reviewController.getListReviewByProperyId
 );
+router.post("/property", reviewController.createProperty);
 
 router.post("/create-review", reviewController.createReview);
 

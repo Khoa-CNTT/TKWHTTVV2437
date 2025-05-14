@@ -1,6 +1,8 @@
 import http from "@/libs/http";
 
 const apiUser = {
+  checkMail: (data: { email: string }) => http.post(`user/checkMail`, data),
+
   sendOtpToEmail: (data: { email: string; status?: string }) =>
     http.post(`user/sendMailOTP`, data),
 

@@ -14,6 +14,7 @@ const {
 const {
   getOrCreateCollection,
   deleteAllCollections,
+  deleteAllDocuments,
 } = require("../services/collectionService");
 
 class QueryController {
@@ -52,7 +53,6 @@ class QueryController {
       // Phát hiện intent
       const intents = detectIntent(text);
 
-      console.log("Detected intents:", intents);
       let matchedItems = [];
       try {
         matchedItems = await queryDatabase(text, limit, intents);
@@ -70,10 +70,12 @@ class QueryController {
         relatedRooms: matchedItems
           .filter((e) => e.metadata.type === "room")
           .slice(0, 5),
-        relatedServices: matchedItems
-          .filter((e) => e.metadata.type === "service")
+        reviewPeroperty: matchedItems
+          .filter((e) => e.metadata.type === "reviewPeroperty")
           .slice(0, 5),
       };
+
+      console.log("Query result:", queryResult);
 
       const initialResult = {
         // query: text,
@@ -91,6 +93,8 @@ class QueryController {
         previousQuery
       );
 
+      console.log("Response text:", responseText);
+
       // Tạo prompt với tất cả intents
       let prompt = `Bạn là một trợ lý du lịch thân thiện. Dựa trên câu hỏi hiện tại: "${text}", và thông tin từ cơ sở dữ liệu (lọc theo các loại: ${intents.join(
         ", "
@@ -101,9 +105,8 @@ class QueryController {
         prompt += `Ngữ cảnh từ câu hỏi trước:\n- Câu hỏi: "${previousQuery.query}"\n- Câu trả lời: "${previousQuery.response}"\n\n`;
       }
 
-      prompt += `Vui lòng trả lời bằng tiếng Việt, ngắn gọn (tối đa 2-3 câu), đúng trọng tâm và tự nhiên. Nếu có thông tin, hãy phản hồi các thuộc tính liên quan như địa điểm, tiện nghi, giá, v.v. Nếu không có kết quả phù hợp, hãy đưa ra một gợi ý tích cực và lịch sự.Tránh sử dụng các cụm như "không có thông tin" hay "không tìm thấy".\n\nCâu trả lời:`;
+      prompt += `Vui lòng trả lời bằng tiếng Việt, ngắn gọn (tối đa 2-3 câu), đúng trọng tâm và tự nhiên.Nếu có trạng thái của khách sạn, hãy đưa ra thông tin về trạng thái đó. Nếu có thông tin, hãy phản hồi các thuộc tính liên quan như địa điểm, tiện nghi, giá, v.v.Đưa ra các url như hình ảnh , hoặc đường dẫn đến trang web nếu có . Nếu không có kết quả phù hợp, hãy đưa ra một gợi ý tích cực và lịch sự.Tránh sử dụng các cụm như "không có thông tin" hay "không tìm thấy" . \n\nCâu trả lời:`;
 
-      console.log("Prompt for AI:", prompt);
       const [groqResult, deepSeekResult] = await Promise.all([
         callDeepSeekWithTimeout(prompt, 3000).catch((err) => ({
           response: null,
@@ -296,6 +299,18 @@ class QueryController {
       res
         .status(500)
         .json({ error: "Error deleting collections", details: error.message });
+    }
+  }
+
+  async deleteAllDocuments(req, res) {
+    try {
+      const result = await deleteAllDocuments();
+      res.status(200).json(result);
+    } catch (error) {
+      console.error("Error deleting documents:", error);
+      res
+        .status(500)
+        .json({ error: "Error deleting documents", details: error.message });
     }
   }
 

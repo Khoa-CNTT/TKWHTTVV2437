@@ -1,5 +1,7 @@
 const db = require("../models");
 const { v4 } = require("uuid");
+const { saveEmbedding } = require("./queryService");
+const { deleteCollection } = require("./collectionService");
 
 const getListRoomByPropertyId = (propertyId, filters = {}) => {
   return new Promise(async (resolve, reject) => {
@@ -106,6 +108,11 @@ const getDetailById = (roomId) => {
             as: "summaries",
             through: { attributes: [] },
           },
+          {
+            model: db.Property,
+            as: "property",
+            attributes: ["id", "name"],
+          },
         ],
       });
 
@@ -119,46 +126,12 @@ const getDetailById = (roomId) => {
   });
 };
 
-// const createRoom = (data, propertdId) => {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       const property = await db.Property.findOne({
-//         where: { id: propertdId },
-//       });
-//       // Kiểm tra xem phòng đã tồn tại chưa
-//       const existingRoom = await db.Room.findOne({
-//         where: { name: data.name, idProperty: data.idProperty },
-//       });
-//       const room = await db.Room.create({
-//         name: data.name,
-//         price: data.price,
-//         maxPerson: data.maxPerson,
-//         idProperty: data.idProperty,
-//       });
-
-//       const data_embeddings = {
-//         propertyName: property.name,
-//         name: room.name,
-//         price: room.price,
-//         maxPerson: room.maxPerson,
-//         amenities: room.amenities,
-//       };
-//       const embedding = await generateEmbeddings("rooms", data_embeddings);
-//       resolve({
-//         status: room ? "OK" : "ERR",
-//         data: room || null,
-//       });
-//     } catch (error) {
-//       reject(error);
-//     }
-//   });
-// };
-
 const createRoom = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
+      // Tạo Room với id tự sinh
       const room = await db.Room.create({
-        id: v4(),
+        id: v4(), // bạn có thể bỏ dòng này nếu Sequelize tự sinh
         name: data.name,
         idProperty: data.propertyId,
         maxPerson: data.maxPerson,
@@ -168,47 +141,87 @@ const createRoom = (data) => {
         code: data.code,
       });
 
+      const roomId = room.id;
+
       const images = await db.ImageRoom.bulkCreate(
         data.images.map((item) => ({
-          id: item.id,
-          idRoom: room.id,
+          id: v4(),
+          idRoom: roomId,
           image: item.image,
         }))
       );
 
       const amenities = await db.AmenityRoom.bulkCreate(
         data.amenities.map((item) => ({
-          idRoom: room.id,
+          idRoom: roomId,
           idAmenity: item,
         }))
       );
 
       const summaries = await db.SummaryRoom.bulkCreate(
         data.summaries.map((item) => ({
-          idRoom: room.id,
+          idRoom: roomId,
           idSummary: item,
         }))
       );
 
-      const newdata = [
-        { room: room },
-        { amenities: amenities },
-        { images: images },
-        { summaries: summaries },
-      ];
+      // Gọi embedding sau khi tạo
+      try {
+        await embeddingRoom(roomId); // chỉ cần truyền id, bên trong tự fetch đầy đủ
+      } catch (embeddingError) {
+        console.error("⚠️ Failed to save embedding:", embeddingError);
+      }
 
       resolve({
         status: "OK",
-        data: newdata,
+        data: room,
       });
     } catch (error) {
-      // Ném lỗi có thông tin chi tiết về lỗi
       reject({
         status: "ERR",
-        message: `Error creating property: ${error.message || error}`, // Cung cấp thông tin lỗi chi tiết hơn
+        message: `Error creating room: ${error.message || error}`,
       });
     }
   });
+};
+
+const embeddingRoom = async (roomId) => {
+  try {
+    console.log("🔍 Embedding room with ID:", roomId);
+    const getRoom = await getDetailById(roomId); // bạn cần định nghĩa hàm này
+    console.log("🔍 Room details:", getRoom.data.dataValues);
+
+    const dataRooms = {
+      id: getRoom.data.dataValues.id,
+      idProperty: getRoom.data.dataValues.idProperty,
+      property: getRoom.data.dataValues.property.name,
+      name: getRoom.data.dataValues.name,
+      maxPerson: getRoom.data.dataValues.maxPerson,
+      price: getRoom.data.dataValues.price,
+      status: getRoom.data.dataValues.status,
+      quantity: getRoom.data.dataValues.quantity,
+      amenities: getRoom.data.dataValues.amenities.map((item) => ({
+        id: item.id,
+        name: item.name,
+        icon: item.icon,
+      })),
+      images: getRoom.data.dataValues.images.map((item) => ({
+        id: item.id,
+        image: item.image,
+      })),
+      summaries: getRoom.data.dataValues.summaries.map((item) => ({
+        id: item.id,
+        name: item.name,
+        icon: item.icon,
+      })),
+    };
+    console.log("🔍 Data to be embedded:", dataRooms);
+
+    const embeddingResult = await saveEmbedding("room", dataRooms);
+    console.log("✅ Embedding result:", embeddingResult);
+  } catch (err) {
+    console.error("❌ Failed to perform embeddingRoom:", err.message || err);
+  }
 };
 
 const updateRoom = (roomId, data) => {
@@ -272,24 +285,51 @@ const updateRoom = (roomId, data) => {
   });
 };
 
-const updateStatusRoom = (roomId, status) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const room = await db.Room.update(
-        {
-          status: status,
-        },
-        { where: { id: roomId } }
-      );
+const updateStatusRoom = async (roomId, status) => {
+  try {
+    // Update room status
+    const room = await db.Room.update({ status }, { where: { id: roomId } });
 
-      resolve({
-        status: "OK",
-        data: room,
-      });
-    } catch (error) {
-      reject(error);
+    // Update embeddings
+    try {
+      await deleteEmbeddingRooms(roomId);
+      await embeddingRoom(roomId);
+    } catch (embeddingError) {
+      console.error(
+        "⚠️ Failed to update embedding after status change:",
+        embeddingError
+      );
+      // Continue execution even if embedding fails
     }
-  });
+
+    return {
+      status: "OK",
+      data: room,
+    };
+  } catch (error) {
+    throw {
+      status: "ERR",
+      message: `Error updating room status: ${error.message || error}`,
+    };
+  }
+};
+
+const deleteEmbeddingRooms = async (propertyId) => {
+  try {
+    // Add timeout to prevent hanging
+    const timeout = new Promise((_, reject) => {
+      setTimeout(
+        () => reject(new Error("Delete embedding operation timed out")),
+        10000
+      ); // 10 seconds timeout
+    });
+
+    // Race between the actual operation and timeout
+    await Promise.race([deleteCollection(`room_${propertyId}`), timeout]);
+  } catch (error) {
+    console.error(`Error deleting embedding for room ${propertyId}:`, error);
+    throw error;
+  }
 };
 
 const getTopReventRoomByPropertyId = async (propertyId) => {

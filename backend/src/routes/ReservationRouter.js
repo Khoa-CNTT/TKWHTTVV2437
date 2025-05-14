@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const reservationController = require("../controllers/ReservationController");
 
+router.post("/lockBooking", reservationController.lockBooking);
 router.post("/createReservation", reservationController.createReservation);
 router.get(
   "/listReservationApprove",
@@ -21,6 +22,9 @@ router.get(
   "/detailReservationOfUser",
   reservationController.detailReservationOfUser
 );
+
+router.get("/getTimeOfResLockbyId", reservationController.getTimeOfResLockbyId);
+
 router.get("/bar-chart/:id", reservationController.getDataBarChart);
 
 router.put("/approveReservation", reservationController.approveReservation);

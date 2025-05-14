@@ -15,6 +15,7 @@ function detectIntent(text) {
       "di chuyển",
       "đi đến",
       "địa chỉ",
+      
     ],
     room: [
       "phòng",
@@ -27,15 +28,13 @@ function detectIntent(text) {
       "phòng đôi",
       "phòng đơn",
     ],
-    service: [
-      "dịch vụ",
-      "tiện ích",
-      "tiện nghi",
-      "spa",
-      "bể bơi",
-      "wifi",
-      "ăn sáng",
-      "gym",
+    reviewPeroperty: [
+      "khách sạn",
+      "đánh giá",
+      "review",
+      "nhận xét",
+      "đánh giá khách sạn",
+      "nhận xét khách sạn",
     ],
   };
 

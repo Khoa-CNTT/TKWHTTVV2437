@@ -3,11 +3,12 @@ import ButtonSidebar from "./ButtonSidebar";
 import { FaRegUser } from "react-icons/fa";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaQuestionCircle } from "react-icons/fa";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/app/contexts/AuthContext";
 
 const Sidebar = () => {
   const { user } = useAuth();
+  const router = useRouter();
 
   const pathname = usePathname(); // ✅ Đây là URL hiện tại
   const menuSidebar = [
@@ -23,14 +24,12 @@ const Sidebar = () => {
       icon: <IoSettingsOutline />,
       path: "/security",
     },
-    {
-      title: "Trợ giúp và phản hồi",
-      label: "Giúp đỡ khách hàng.",
-      icon: <FaQuestionCircle />,
-      path: "/support",
-    },
   ];
-  console.log(user);
+
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    window.location.href = "/";
+  };
 
   return (
     <div className="w-1/4">
@@ -60,6 +59,14 @@ const Sidebar = () => {
               </div>
             );
           })}
+        </div>
+        <div className="flex justify-center">
+          <button
+            className="text-primary font-semibold hover:underline mt-8 "
+            onClick={handleLogout}
+          >
+            Đăng xuất
+          </button>
         </div>
       </div>
     </div>

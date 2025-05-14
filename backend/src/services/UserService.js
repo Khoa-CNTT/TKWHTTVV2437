@@ -269,6 +269,32 @@ const sendMailOTP = (email, status) => {
   });
 };
 
+const checkMail = (email) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const checkUser = await db.User.findOne({
+        where: { email },
+        raw: true,
+      });
+
+      if (checkUser === null) {
+        resolve({
+          status: "OK",
+          msg: "Account is not exist",
+          isExist: false,
+        });
+      }
+      resolve({
+        status: "OK",
+        msg: "Account is exist",
+        isExist: true,
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 const verifyOTP = (email, OTP) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -489,4 +515,5 @@ module.exports = {
   verifyOTPLogin,
   getTotalUserForAdminDashboard,
   getDataLineChartUserAdmin,
+  checkMail,
 };

@@ -5,6 +5,7 @@ import Textarea from "@mui/joy/Textarea";
 import { IProperty } from "@/app/types/property";
 
 interface IDataEnter {
+  resId: string;
   firstName: string;
   lastName: string;
   email: string;

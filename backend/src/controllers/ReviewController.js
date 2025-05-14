@@ -62,6 +62,7 @@ const getReviewByUserId = async (req, res) => {
 };
 
 module.exports = {
+  createProperty,
   getRatingByPropertyId,
   getListReviewByProperyId,
   createReview,

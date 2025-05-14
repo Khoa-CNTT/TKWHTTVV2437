@@ -17,6 +17,7 @@ interface IInputText {
   onChange?: (value: string) => void;
   invalidFields?: IInvalidField[];
   setInvalidFields?: React.Dispatch<React.SetStateAction<IInvalidField[]>>;
+  disable?: boolean;
 }
 
 const InputText = (props: IInputText) => {
@@ -30,6 +31,7 @@ const InputText = (props: IInputText) => {
     value,
     invalidFields,
     setInvalidFields,
+    disable,
   } = props;
 
   const [lock, setLock] = useState(true);
@@ -47,6 +49,7 @@ const InputText = (props: IInputText) => {
   return (
     <div className="relative">
       <input
+        disabled={disable === true ? true : false}
         type={lock ? type : "text"}
         value={value}
         id={id}

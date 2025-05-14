@@ -9,6 +9,7 @@ import {
   FaMoneyBill,
   FaCheckCircle,
   FaWpforms,
+  FaClipboardList,
 } from "react-icons/fa";
 import { RiAdvertisementFill } from "react-icons/ri";
 import { FaPersonBreastfeeding } from "react-icons/fa6";
@@ -46,9 +47,14 @@ const SidebarAdmin = () => {
     //   path: "/admin/bookings",
     // },
     {
-      title: "Reservation",
+      title: "Danh sách đơn đặt phòng",
       icon: <FaWpforms />,
       path: "/admin/Reservation",
+    },
+    {
+      title: "Danh sách đăng kí dịch vụ",
+      icon: <FaClipboardList />,
+      path: "/admin/ListRegisterPartner",
     },
     // {
     //   title: "Verification",
