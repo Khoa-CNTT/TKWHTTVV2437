@@ -35,7 +35,7 @@ const ListMyTrip = () => {
           {listReser?.map((item: IReservationObject, index: number) => {
             return (
               <div key={index}>
-                <BookingCard data={item} />
+                <BookingCard data={item} userId={user?.id || ""} />
               </div>
             );
           })}

@@ -212,6 +212,18 @@ const nextConfig = {
       ],
     };
   },
+  // Thêm cấu hình này
+  compiler: {
+    styledComponents: true,
+  },
+  // Thêm cấu hình này
+  webpack: (config) => {
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+    };
+    return config;
+  },
 };
 
 module.exports = nextConfig;

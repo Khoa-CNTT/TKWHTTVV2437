@@ -1,9 +1,6 @@
-import Image from "next/image";
-import no_result from "@/assets/images/no_result.webp";
-
 const MessageNotFound = () => {
   return (
-    <div className="absolute left-0 right-0 mt-20">
+    <div className="absolute left-0 right-0 mt-20 z-10">
       <p className="text-center text-red-500 font-bold">
         Không có thông tin nào!
       </p>

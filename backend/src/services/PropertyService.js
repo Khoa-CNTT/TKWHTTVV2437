@@ -208,6 +208,8 @@ const getListProperty = (filter, limit = 12) => {
             END`),
             "DESC",
           ],
+          ["approved", "DESC"],
+          ["reject", "ASC"],
         ],
         limit,
         offset,
@@ -223,6 +225,113 @@ const getListProperty = (filter, limit = 12) => {
           currentPage: page,
           pageSize: limit,
         },
+      });
+    } catch (error) {
+      reject({
+        status: "ERR",
+        message: `Error fetching properties: ${error.message || error}`,
+      });
+    }
+  });
+};
+
+const getListPropertyByAdmin = async (filter) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { page = 1, text, limit = 12, status, city } = filter;
+
+      const offset = (page - 1) * limit;
+
+      let whereConditions = {};
+
+      if (text) {
+        whereConditions = {
+          [Op.or]: [
+            { name: { [Op.like]: `%${text}%` } },
+            { "$users.firstName$": { [Op.like]: `%${text}%` } },
+            { "$users.lastName$": { [Op.like]: `%${text}%` } },
+          ],
+        };
+      }
+
+      if (city) {
+        whereConditions["$propertyAddress.city$"] = {
+          [Op.like]: `%${city}%`,
+        };
+      }
+
+      if (status) {
+        whereConditions["status"] = status;
+      }
+
+      const properties = await db.Property.findAndCountAll({
+        where: {
+          ...whereConditions,
+        },
+        attributes: [
+          "id",
+          "name",
+          "idCategory",
+          "status",
+          "createdAt",
+          "updatedAt",
+          "approved",
+          "reject",
+        ],
+        include: [
+          {
+            model: db.Address,
+            as: "propertyAddress",
+            attributes: ["id", "city"],
+          },
+          {
+            model: db.User,
+            as: "users",
+            attributes: ["id", "firstName", "lastName"],
+          },
+          {
+            model: db.Category,
+            as: "category",
+            attributes: ["id", "name"],
+          },
+          {
+            model: db.ImageProperty,
+            as: "images",
+            attributes: ["id", "image"],
+            limit: 1,
+          },
+        ],
+        limit,
+        offset,
+      });
+
+      resolve({
+        status: properties.rows.length > 0 ? "OK" : "ERR",
+        data: properties.rows || [],
+        pagination: {
+          totalItems: properties.count,
+          totalPages: Math.ceil(properties.count / limit),
+          currentPage: page,
+          pageSize: limit,
+        },
+      });
+    } catch (error) {
+      console.log({ error });
+      reject({
+        status: "ERR",
+        message: `Error fetching properties: ${error.message || error}`,
+      });
+    }
+  });
+};
+
+const updateStatusProperty = async (id, status) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const property = await db.Property.update({ status }, { where: { id } });
+      resolve({
+        status: "OK",
+        data: property,
       });
     } catch (error) {
       reject({
@@ -554,6 +663,7 @@ const getDetailBySlug = (slug) => {
             model: db.ImageProperty,
             as: "images",
             attributes: ["id", "image"],
+            limit: 6,
           },
           {
             model: db.Amenity,
@@ -592,6 +702,31 @@ const getDetailBySlug = (slug) => {
       resolve({
         status: result ? "OK" : "ERR",
         data: result || null,
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const getImageByPropertyId = (propertyId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const property = await db.Property.findOne({
+        where: { id: propertyId },
+        attributes: ["id"],
+        include: [
+          {
+            model: db.ImageProperty,
+            as: "images",
+            attributes: ["id", "image"],
+          },
+        ],
+      });
+
+      resolve({
+        status: property ? "OK" : "ERR",
+        data: property || null,
       });
     } catch (error) {
       reject(error);
@@ -895,4 +1030,7 @@ module.exports = {
   renewalAdByUserId,
   getAdvertisingByPropertyId,
   getTotalDashboard,
+  getImageByPropertyId,
+  getListPropertyByAdmin,
+  updateStatusProperty,
 };

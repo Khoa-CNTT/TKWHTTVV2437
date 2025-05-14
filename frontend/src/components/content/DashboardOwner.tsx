@@ -129,17 +129,6 @@ const DashboardOwner = () => {
     fetDataBarChart();
   }, [propertyId, type]);
 
-  useEffect(() => {
-    const status = searchParams.get("status");
-    if (status === "true") {
-      toast.success("Thanh toán thành công");
-      router.push("/homestay/dashboard");
-    } else if (status === "false") {
-      toast.error("Thanh toán thất bại");
-      router.push("/homestay/dashboard");
-    }
-  }, [searchParams]);
-
   return (
     <div className="w-full">
       <div className="p-10">
@@ -237,13 +226,6 @@ const DashboardOwner = () => {
             <div className="mt-8">
               <TopRoomContainer propertyId={propertyId} />
             </div>
-          </div>
-
-          <div className="flex-2">
-            <PayCommissionContainer
-              propertyId={propertyId}
-              userId={user?.id || ""}
-            />
           </div>
         </div>
       </div>

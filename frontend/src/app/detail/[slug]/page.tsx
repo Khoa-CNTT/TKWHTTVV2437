@@ -18,14 +18,10 @@ import { IProperty } from "@/app/types/property";
 import ViewReviewButton from "@/components/button/ViewReviewButton";
 import Footer from "@/components/header/Footer";
 import type { Metadata, ResolvingMetadata } from "next";
+import ImageContainer from "@/components/container/ImageContainer";
 
 interface IProps {
   params: { slug: string };
-}
-
-interface IImage {
-  image: string;
-  id: string;
 }
 
 export async function generateMetadata(
@@ -47,11 +43,13 @@ export async function generateMetadata(
 const DetailPage = async (props: IProps) => {
   const { params } = props;
 
-  const property = await apisProperty.getPropertyBySlug(params.slug);
-  const rating = await apisReview.getReviewByProperty(property.data.id);
-  const reviews = await apisReview.getListReviewByPropertyId(property.data.id);
+  const property = await apisProperty.getPropertyBySlug(params?.slug);
+  const rating = await apisReview.getReviewByProperty(property?.data?.id);
+  const reviews = await apisReview.getListReviewByPropertyId(
+    property?.data?.id
+  );
   const properties = await apisProperty.getListProperty({
-    city: property.data.propertyAddress.city,
+    city: property?.data?.propertyAddress?.city,
   });
 
   return (
@@ -59,74 +57,67 @@ const DetailPage = async (props: IProps) => {
       <div className="pt-4 w-[1260px] mx-auto">
         <div className="grid grid-cols-2 gap-1">
           <img
-            className="w-full h-[418px] rounded-md"
-            src={property.data?.images[0]?.image}
+            className="w-full object-fill h-[418px] rounded-md"
+            src={property?.data?.images[0]?.image}
             alt="anh"
           />
 
-          <div className="grid grid-cols-2 gap-1">
-            {property.data.images.map(
-              (item: IImage, index: number) =>
-                index > 0 && (
-                  <img
-                    key={index}
-                    className="w-full h-[207px] rounded-md"
-                    src={item.image}
-                    alt=""
-                  />
-                )
-            )}
-          </div>
+          <ImageContainer
+            propertyId={property?.data?.id}
+            images={property?.data?.images}
+          />
         </div>
 
         <div className="flex p-4 gap-5">
           <div className="mt-2 flex-7">
-            <h2 className="font-semibold text-2xl">{property.data.name}</h2>
+            <h2 className="font-semibold text-2xl">{property?.data?.name}</h2>
 
             <div className="flex items-center gap-1 mt-1">
               <IoLocationSharp size={22} className="text-blue-600" />
-              <p className="text-sm">{`${property.data.propertyAddress.street}, ${property.data.propertyAddress.district}, ${property.data.propertyAddress.city}, ${property.data.propertyAddress.country}`}</p>
+              <p className="text-sm">{`${property?.data?.propertyAddress?.street}, ${property?.data?.propertyAddress?.district}, ${property?.data?.propertyAddress?.city}, ${property?.data?.propertyAddress?.country}`}</p>
             </div>
 
             <div className="mt-5">
               <div className="flex items-center gap-2">
                 <div className="px-2 py-1 rounded-md text-sm font-medium text-white bg-green-800">
-                  {rating.data.averageRating || 0}
+                  {rating?.data?.averageRating || 0}
                 </div>
                 <span className="font-semibold text-xl">
-                  {ratingText(rating.data.averageRating)}
+                  {ratingText(rating?.data?.averageRating)}
                 </span>
               </div>
 
               <ViewReviewButton
-                propertyId={property.data.id}
-                avgRating={rating.data.averageRating || 0.0}
-                reviewCount={rating.data.reviewCount}
-                image={property.data.images[0].image}
-                name={property.data.name}
-                advertising={property.data.advertising}
-                city={property.data.propertyAddress.city}
-                price={property.data.price}
-                slug={property.data.slug}
-                status={property.data.status}
+                propertyId={property?.data?.id}
+                avgRating={rating?.data?.averageRating || 0.0}
+                reviewCount={rating?.data?.reviewCount}
+                image={property?.data?.images[0]?.image}
+                name={property?.data?.name}
+                advertising={property?.data?.advertising}
+                city={property?.data?.propertyAddress?.city}
+                price={property?.data?.price}
+                slug={property?.data?.slug}
+                status={property?.data?.status}
               />
             </div>
 
             <div className="mt-4">
-              <ShowDescriptionEditext description={property.data.description} />
+              <ShowDescriptionEditext
+                description={property?.data?.description}
+              />
             </div>
 
             <div>
               <h5 className="mt-4 font-semibold text-lg">
                 Các tiện nghi được ưa chuộng nhất
               </h5>
-              <AnmenityContainer amenities={property.data.amenities} />
+              <AnmenityContainer amenities={property?.data?.amenities} />
             </div>
 
             <div>
               <h5 className="mt-8 font-semibold text-lg">Thông tin phòng</h5>
               <ChooseDateContainer />
-              <ListRoomContainer propertyId={property.data.id} />
+              <ListRoomContainer propertyId={property?.data?.id} />
             </div>
 
             <div className="mt-8">
@@ -187,7 +178,7 @@ const DetailPage = async (props: IProps) => {
           </div>
           <div className="flex-3 ralative">
             <div className="sticky top-0">
-              <HighlightProperty highlights={property.data.highlights} />
+              <HighlightProperty highlights={property?.data?.highlights} />
             </div>
           </div>
         </div>
@@ -199,23 +190,23 @@ const DetailPage = async (props: IProps) => {
             <div>
               <div className="mt-4">
                 <p className="text-4xl text-green-700 font-semibold">
-                  {rating.data.averageRating || 0}/5
+                  {rating?.data?.averageRating || 0}/5
                 </p>
                 <p className="font-semibold">
-                  {ratingText(rating.data.averageRating)}
+                  {ratingText(rating?.data?.averageRating)}
                 </p>
                 <div className="flex items-center gap-2 mt-2 text-sm font-medium text-gray-600">
-                  <p>{rating.data.reviewCount} Reviews</p>
+                  <p>{rating?.data?.reviewCount} Reviews</p>
                   <RiErrorWarningLine />
                 </div>
               </div>
 
               <div className="mt-4">
                 <ReviewContainer
-                  reviews={reviews.data}
-                  propertyId={property.data.id}
-                  avgRating={rating.data.averageRating}
-                  reviewCount={rating.data.reviewCount}
+                  reviews={reviews?.data}
+                  propertyId={property?.data?.id}
+                  avgRating={rating?.data?.averageRating}
+                  reviewCount={rating?.data?.reviewCount}
                 />
               </div>
             </div>
@@ -223,7 +214,7 @@ const DetailPage = async (props: IProps) => {
         )}
 
         {properties?.data?.filter(
-          (item: IProperty) => item.id !== property?.data?.id
+          (item: IProperty) => item?.id !== property?.data?.id
         ).length > 0 && (
           <div className="mt-8">
             <ContainerRecomendCity
