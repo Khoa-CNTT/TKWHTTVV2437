@@ -271,7 +271,7 @@ const vnpay_ipn_comission = async (req, res) => {
 
     if (secureHash !== signed) {
       return res.redirect(
-        `${process.env.URL_CLIENT}/homestay/advertising?status=false`
+        `${process.env.URL_CLIENT}/homestay/pay-commission?status=false`
       );
     }
 
@@ -282,7 +282,7 @@ const vnpay_ipn_comission = async (req, res) => {
     if (!order) {
       console.error("Order not found:", orderId);
       return res.redirect(
-        `${process.env.URL_CLIENT}/homestay/dashboard?status=false`
+        `${process.env.URL_CLIENT}/homestay/pay-commission?status=false`
       );
     }
 
@@ -294,17 +294,17 @@ const vnpay_ipn_comission = async (req, res) => {
       });
 
       return res.redirect(
-        `${process.env.URL_CLIENT}/homestay/dashboard?status=true`
+        `${process.env.URL_CLIENT}/homestay/pay-commission?status=true`
       );
     } else {
       return res.redirect(
-        `${process.env.URL_CLIENT}/homestay/dashboard?status=false`
+        `${process.env.URL_CLIENT}/homestay/pay-commission?status=false`
       );
     }
   } catch (error) {
     console.error("VNPAY IPN ERROR:", error);
     return res.redirect(
-      `${process.env.URL_CLIENT}homestay/dashboard?status=false`
+      `${process.env.URL_CLIENT}/homestay/pay-commission?status=false`
     );
   }
 };

@@ -122,6 +122,8 @@ const ManagerRoom = () => {
     setRooms(newRooms);
   }, [valueSearch]);
 
+  console.log(rooms);
+
   return (
     <div className="w-full">
       <div className="p-10">

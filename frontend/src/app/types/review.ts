@@ -10,3 +10,16 @@ export interface IReview {
     avatar: string;
   };
 }
+
+export interface IReviewPost {
+  idUser: string;
+  idProperty: string;
+  rating: number;
+  text: string;
+}
+
+export interface IReviewUpdate {
+  id: string;
+  rating: number;
+  text: string;
+}

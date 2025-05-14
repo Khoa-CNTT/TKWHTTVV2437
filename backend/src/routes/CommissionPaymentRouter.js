@@ -14,6 +14,12 @@ router.get(
   "/list-commission-admin",
   commissionPaymentController.getListCommissionPaymentByAdmin
 );
+
+router.get(
+  "/commission-payment/:id",
+  commissionPaymentController.getCommissionPaymentByPropertyId
+);
+
 router.put("/:id", commissionPaymentController.updateCommissionPayment);
 
 module.exports = router;

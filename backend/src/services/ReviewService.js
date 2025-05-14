@@ -1,5 +1,6 @@
 const db = require("../models");
 const { fn, col } = require("sequelize");
+const { v4: uuidv4 } = require("uuid");
 
 const getRatingByPropertyId = (propertyId) => {
   return new Promise(async (resolve, reject) => {
@@ -70,7 +71,81 @@ const getListReviewByProperyId = (propertyId, filter) => {
   });
 };
 
+const createReview = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { idUser, idProperty, rating, text } = data;
+
+      const result = await db.Review.create({
+        id: uuidv4(),
+        idUser,
+        idProperty,
+        rating,
+        text,
+        reviewDate: new Date(),
+      });
+
+      resolve({
+        status: result ? "OK" : "ERR",
+        data: result || [],
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const updateReview = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { id, rating, text } = data;
+
+      console.log("id", id);
+      console.log("rating", rating);
+      console.log("text", text);
+
+      const result = await db.Review.update(
+        {
+          rating,
+          text,
+        },
+        { where: { id } }
+      );
+
+      resolve({
+        status: result ? "OK" : "ERR",
+        data: result || [],
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const getReviewByUserId = (filter) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { idUser, idProperty } = filter;
+
+      const result = await db.Review.findOne({
+        where: { idUser, idProperty },
+        attributes: ["id", "rating", "text", "reviewDate", "createdAt"],
+      });
+
+      resolve({
+        status: result ? "OK" : "ERR",
+        data: result || [],
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   getRatingByPropertyId,
   getListReviewByProperyId,
+  createReview,
+  updateReview,
+  getReviewByUserId,
 };

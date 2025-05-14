@@ -52,7 +52,7 @@ const PayingCommissionModal: React.FC<IProps> = ({
   };
   return (
     <div className="fixed w-creeen h-screen z-10 inset-0 flex items-center justify-center bg-overblack ">
-      <div className="bg-white w-[500px] h-[70vh] rounded-md shadow-lg p-4 flex flex-col">
+      <div className="bg-white w-[500px] rounded-md shadow-lg p-4 flex flex-col text-black">
         <div className="flex items-center gap-4">
           <IoMdClose
             onClick={() => onShowModal(false)}
@@ -65,7 +65,7 @@ const PayingCommissionModal: React.FC<IProps> = ({
           </p>
         </div>
 
-        <ul className="w-[70%] mx-auto border border-gray-300 p-4 rounded-md mt-8">
+        <ul className="w-[80%] mx-auto border border-gray-300 py-4 px-8 rounded-md mt-6">
           <li className="mt-2">
             <div className="flex items-center justify-between">
               <p>Doanh thu của tháng:</p>
@@ -92,7 +92,7 @@ const PayingCommissionModal: React.FC<IProps> = ({
           </li>
         </ul>
 
-        <div className="mt-auto px-6">
+        <div className="mt-6 px-6">
           <div className="flex items-center justify-between">
             <p className="text-sm">Tổng thanh toán</p>
             <p className="text-lg text-red-600 font-semibold">

@@ -81,7 +81,7 @@ const SearchContainer = () => {
   };
 
   return (
-    <div className="bg-white py-4 px-6 rounded-xl flex items-center gap-4 w-[850px]">
+    <div className="bg-white py-5 px-6 rounded-xl flex items-center gap-4 w-[850px]">
       <div
         ref={containerRef}
         className="relative border-[2px] rounded-xl border-gray-300 px-4 py-2 flex items-center gap-2 flex-5"

@@ -13,6 +13,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import { FaHotel } from "react-icons/fa";
 import slugify from "slugify";
 
 import Box from "@mui/material/Box";
@@ -40,6 +41,12 @@ const menuCategory = [
     icon: <GiVikingLonghouse size={40} />,
     title: "Resort",
     categoryId: 2,
+  },
+  {
+    id: 4,
+    icon: <FaHotel size={37} />,
+    title: "Khách sạn",
+    categoryId: 3,
   },
 ];
 

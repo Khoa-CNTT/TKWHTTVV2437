@@ -11,6 +11,10 @@ export interface ICommissionPayment {
   paymentDate: string;
   methodPay: string;
   orderQuantity: number;
+  user?: {
+    firstName: string;
+    lastName: string;
+  };
 }
 
 export interface ICommissionPaymentAdmin {

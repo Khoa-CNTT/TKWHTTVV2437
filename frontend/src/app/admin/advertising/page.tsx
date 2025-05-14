@@ -163,7 +163,7 @@ const Advertising = () => {
                 }}
               >
                 <MenuItem value={"0"}>Chọn trạng thái</MenuItem>
-                <MenuItem value={"pending"}>Chờ xác nhận</MenuItem>
+                <MenuItem value={"pending"}>Chưa thanh toán</MenuItem>
                 <MenuItem value={"done"}>Thành công</MenuItem>
                 <MenuItem value={"failed"}>Thất bại</MenuItem>
               </Select>
@@ -209,7 +209,7 @@ const Advertising = () => {
                     </td>
                     <td className="px-4 py-5">
                       {item?.status === "pending"
-                        ? "Đang thực hiện"
+                        ? "Chưa thanh toán"
                         : item?.status === "done"
                           ? "Thành công"
                           : item?.status === "failed"

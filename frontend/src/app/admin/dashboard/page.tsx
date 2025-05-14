@@ -154,7 +154,7 @@ const DashboardPage = () => {
             data: response.data.data,
             backgroundColor: "rgba(54, 162, 235, 0.6)", // Blue with 60% opacity
             borderColor: "rgba(54, 162, 235, 1)",
-            borderWidth: 1,
+            borderWidth: 2,
           },
         ],
       });
@@ -166,7 +166,7 @@ const DashboardPage = () => {
   useEffect(() => {
     const fetDataBarChart = async () => {
       const response = await apisCommissionPayment.getDataBarChartAdmin({
-        type: typeAd,
+        type: typeCommission,
       });
 
       setBarChartCommission({
@@ -175,9 +175,9 @@ const DashboardPage = () => {
           {
             label: "Doanh thu",
             data: response.data.data,
-            backgroundColor: "rgba(54, 162, 235, 0.6)", // Blue with 60% opacity
-            borderColor: "rgba(54, 162, 235, 1)",
-            borderWidth: 1,
+            backgroundColor: "rgba(255, 99, 132, 0.6)", // Màu hồng với 60% opacity
+            borderColor: "rgba(255, 99, 132, 1)",
+            borderWidth: 2,
           },
         ],
       });

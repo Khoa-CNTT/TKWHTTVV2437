@@ -4,6 +4,7 @@ import Header from "@/components/header/Header";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CheckoutProvider } from "./contexts/CheckoutContext";
 import { ReservationProvider } from "./contexts/ReservationContext";
+import { ToastContainer } from "react-toastify";
 
 export const metadata: Metadata = {
   title: "Love Trip",
@@ -22,7 +23,10 @@ export default function RootLayout({
           <ReservationProvider>
             <body className={`font-roboto antialiased `}>
               <Header />
-              <div>{children}</div>
+              <div>
+                {children}{" "}
+                <ToastContainer position="top-right" autoClose={3000} />
+              </div>
             </body>
           </ReservationProvider>
         </CheckoutProvider>

@@ -31,9 +31,9 @@ const SidebarAdmin = () => {
       path: "/admin/Account",
     },
     {
-      title: "Properties",
+      title: "Chủ sở hữu",
       icon: <FaHome />,
-      path: "/admin/Properties",
+      path: "/admin/property",
     },
     // {
     //   title: "Quản lý Amenities",
