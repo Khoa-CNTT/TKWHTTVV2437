@@ -359,7 +359,7 @@ const DetailPage = async (props: IProps) => {
                     Hãy email cho chỗ nghĩ và họ sẽ trả lời sớm nhất có thể
                   </p>
                   <a
-                    href={`mailto:${property?.data?.users.mail}`}
+                    href={`mailto:${property?.data?.users?.mail}`}
                     className="font-semibold text-primary hover:opacity-70 cursor-pointer"
                   >
                     Gởi email
@@ -375,10 +375,10 @@ const DetailPage = async (props: IProps) => {
                   <h3 className="font-semibold">Gọi điện cho chỗ nghỉ</h3>
 
                   <a
-                    href={`tel:${property?.data?.users.phone}`}
+                    href={`tel:${property?.data?.users?.phone}`}
                     className="font-semibold text-primary hover:opacity-70 cursor-pointer"
                   >
-                    {property?.data?.users.phone}
+                    {property?.data?.users?.phone}
                   </a>
                 </div>
               </div>
@@ -413,18 +413,18 @@ const DetailPage = async (props: IProps) => {
           {/* Liên hệ chỗ nghỉ */}
           <div className="border rounded-lg shadow p-6 flex flex-col gap-4 text-sm">
             <p className="font-semibold">Liên hệ chỗ nghỉ</p>
-            <p>Điện thoại: {property?.data?.users.phone}</p>
+            <p>Điện thoại: {property?.data?.users?.phone}</p>
             <a
-              href={`mailto:${property?.data?.users.email}`}
+              href={`mailto:${property?.data?.users?.email}`}
               className="text-blue-600 underline text-left hover:text-blue-800"
             >
-              Gởi email: {property?.data?.users.email}
+              Gởi email: {property?.data?.users?.email}
             </a>
             <a
-              href={`tel:${property?.data?.users.phone}`}
+              href={`tel:${property?.data?.users?.phone}`}
               className="text-blue-600 underline text-left hover:text-blue-800"
             >
-              Gọi điện: {property?.data?.users.phone}
+              Gọi điện: {property?.data?.users?.phone}
             </a>
           </div>
         </div>

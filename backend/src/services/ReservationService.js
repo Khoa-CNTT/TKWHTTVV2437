@@ -1,7 +1,7 @@
 const db = require("../models");
 import { v4 } from "uuid";
 import moment from "moment";
-import { Op } from "sequelize";
+import { Op, where } from "sequelize";
 import sendMail from "../utils/sendMail";
 import convertToVietnameseDate from "../utils/convertToVietNameseDate";
 import getDatesInRange from "../utils/getDatesInRange";
@@ -402,10 +402,13 @@ const createReservation = (body) => {
   });
 };
 
-const listReservationApprove = ({ filter }) => {
+const listReservationApprove = ({ filter, status, page, limit = 10 }) => {
   return new Promise(async (resolve, reject) => {
     try {
-      console.log("filter ", filter);
+      console.log(filter, status, page, limit);
+      let queries = {
+        statusLock: "confirmed",
+      };
       let order;
       switch (filter) {
         case "latest":
@@ -422,12 +425,23 @@ const listReservationApprove = ({ filter }) => {
           order = [["createdAt", "ASC"]];
           break;
       }
+      if (status === "handle") {
+        queries.status = {
+          [Op.ne]: "waiting",
+        };
+      } else {
+        queries.status = status;
+      }
 
+      let offset = !page || +page <= 1 ? 0 : +page - 1;
       const response = await db.Reservation.findAndCountAll({
-        where: {
-          status: "waiting",
-          statusLock: "confirmed",
-        },
+        // where: {
+        //   status: "waiting",
+        //   statusLock: "confirmed",
+        // },
+        where: queries,
+        offset: offset * limit,
+        limit: limit,
         include: [
           {
             model: db.Room,
@@ -440,6 +454,8 @@ const listReservationApprove = ({ filter }) => {
 
       resolve({
         status: response ? "OK" : "ERR",
+        limit: limit,
+        page: offset + 1,
         data: response,
       });
     } catch (error) {
@@ -1485,6 +1501,82 @@ const getDataBarChart = async (propertyId, filter) => {
   });
 };
 
+const listReservationByAdmin = ({ filter, idProperty, page, limit = 10 }) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log(filter, idProperty, page);
+      let queries = {};
+      let order;
+      switch (filter) {
+        case "latest":
+          order = [["createdAt", "DESC"]];
+          break;
+        case "price-asc":
+          order = [["totalPrice", "ASC"]];
+          break;
+        case "price-desc":
+          order = [["totalPrice", "DESC"]];
+          break;
+
+        default:
+          order = [["createdAt", "ASC"]];
+          break;
+      }
+      if (idProperty !== "0") {
+        queries.id = idProperty;
+      }
+
+      let offset = !page || +page <= 1 ? 0 : +page - 1;
+      const response = await db.Reservation.findAndCountAll({
+        where: {
+          // status: "waiting",
+          statusLock: "confirmed",
+        },
+        attributes: {
+          exclude: ["statusLock", "locked_until"],
+        },
+        offset: offset * limit,
+        limit: limit,
+        include: [
+          {
+            model: db.Room,
+            as: "rooms",
+            attributes: ["id", "name"],
+          },
+          {
+            model: db.User,
+            as: "users",
+            attributes: ["email", "phone", "firstName", "lastName"],
+          },
+          {
+            model: db.Property,
+            as: "properties",
+            attributes: ["name", "id"],
+            where: queries,
+            include: [
+              {
+                model: db.User,
+                as: "users",
+                attributes: ["email", "phone", "firstName", "lastName"],
+              },
+            ],
+          },
+        ],
+        order,
+      });
+
+      resolve({
+        status: response ? "OK" : "ERR",
+        limit: limit,
+        page: offset + 1,
+        data: response,
+      });
+    } catch (error) {
+      reject("error " + error);
+    }
+  });
+};
+
 module.exports = {
   lockBooking,
   removeExpiredBookings,
@@ -1498,4 +1590,5 @@ module.exports = {
   getDataBarChart,
   updateStatusUserReservation,
   getTimeOfResLockbyId,
+  listReservationByAdmin,
 };

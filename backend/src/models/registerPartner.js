@@ -4,6 +4,10 @@ module.exports = (sequelize, DataTypes) => {
   class RegisterPartner extends Model {
     static associate(models) {
       // define association here
+      RegisterPartner.belongsTo(models.User, {
+        foreignKey: "idUser", // Khóa ngoại trong bảng trung gian trỏ đến Summary
+        as: "user", // Alias để truy cập
+      });
     }
   }
   RegisterPartner.init(

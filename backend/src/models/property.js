@@ -61,6 +61,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "idUser",
         as: "users",
       });
+
+      Property.hasMany(models.Reservation, {
+        foreignKey: "idProperty", // Khóa ngoại trong bảng imageRoom
+        as: "reservations", // Alias để truy cập
+      });
     }
   }
   Property.init(

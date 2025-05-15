@@ -74,9 +74,29 @@ const cancelRegisterPartner = async (req, res) => {
   }
 };
 
+const getAllRegisterPartner = async (req, res) => {
+  try {
+    const { status, filter, page } = req.query;
+    console.log(req.query);
+    const response = await RegisterPartnerService.getAllRegisterPartner(
+      status,
+      filter,
+      page,
+      10
+    );
+
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
 module.exports = {
   registerPartner,
   detailRegisterPartner,
   updateRegisterPartner,
   cancelRegisterPartner,
+  getAllRegisterPartner,
 };
