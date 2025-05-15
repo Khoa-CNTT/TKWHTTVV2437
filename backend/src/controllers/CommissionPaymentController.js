@@ -5,6 +5,7 @@ const getListCommissionPaymentByPropertyId = async (req, res) => {
   try {
     const response =
       await commissionPaymentService.getListCommissionPaymentByPropertyId(
+        req.query,
         req.params.id
       );
     return res.status(200).json(response);
@@ -53,9 +54,25 @@ const getListCommissionPaymentByAdmin = async (req, res) => {
   }
 };
 
+const getCommissionPaymentByPropertyId = async (req, res) => {
+  try {
+    const response =
+      await commissionPaymentService.getCommissionPaymentByPropertyId(
+        req.query,
+        req.params.id
+      );
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
 module.exports = {
   getListCommissionPaymentByPropertyId,
   updateCommissionPayment,
   getDataBarChartCommissionAdmin,
   getListCommissionPaymentByAdmin,
+  getCommissionPaymentByPropertyId,
 };

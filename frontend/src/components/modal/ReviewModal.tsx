@@ -76,6 +76,7 @@ const ReviewModal: React.FC<IProps> = ({
   const [totalItem, setTotalItem] = useState<number>(0);
   const [sort, setSort] = useState<SortKey>("highest");
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -88,6 +89,7 @@ const ReviewModal: React.FC<IProps> = ({
           query
         );
         if (response?.data) {
+          setTotalItem(response.pagination.totalItems);
           setReviews((prev) => {
             // On initial load or when sort changes (page is reset to 1)
             if (page === 1 || isInitialLoad) {
@@ -97,7 +99,6 @@ const ReviewModal: React.FC<IProps> = ({
             // For pagination, append new reviews
             return [...prev, ...response.data];
           });
-          setTotalItem(response.pagination.totalItems);
         }
       } catch (error) {
         console.log(error);

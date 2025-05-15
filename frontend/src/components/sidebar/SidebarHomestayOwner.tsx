@@ -28,15 +28,15 @@ const links = [
     label: "Theo dõi phòng",
     icon: <FaRegCalendarCheck size={25} />,
   },
-  // {
-  //   href: "/homestay/payment-info",
-  //   label: "Quản lý thanh toán",
-  //   icon: <FaRegCreditCard size={22} />,
-  // },
   {
     href: "/homestay/list-reservation-approve",
     label: "Quản lí đơn đặt phòng",
     icon: <MdNewspaper size={25} />,
+  },
+  {
+    href: "/homestay/pay-commission",
+    label: "Thanh toán hoa hồng",
+    icon: <FaRegCreditCard size={22} />,
   },
   {
     href: "/homestay/advertising",

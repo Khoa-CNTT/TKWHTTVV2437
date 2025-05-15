@@ -1,18 +1,44 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { IReservationObject } from "@/app/types/reservation";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import { GrFormNext } from "react-icons/gr";
+import { MdOutlineFeedback } from "react-icons/md";
+import FeedbackModal from "../modal/FeedbackModal";
+import apisReview from "@/apis/review";
+import moment from "moment";
 
 interface IProps {
   data: IReservationObject;
+  userId: string;
 }
 
-const BookingCard = ({ data }: IProps) => {
+const BookingCard = ({ data, userId }: IProps) => {
   const router = useRouter();
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [reviewId, setReviewId] = useState<string>("");
+  const [text, setText] = useState<string>("");
+  const [star, setStar] = useState(5);
 
-  console.log("data ", data);
+  // get review by user id
+  useEffect(() => {
+    const getReviewByUserId = async () => {
+      const response = await apisReview.getReviewByUserId({
+        idUser: userId,
+        idProperty: data?.rooms?.property?.id,
+      });
+
+      if (response?.status === "OK") {
+        setReviewId(response?.data?.id || "");
+        setStar(response?.data?.rating || 5);
+        setText(response?.data?.text || "");
+      }
+    };
+    getReviewByUserId();
+  }, [data?.rooms?.property?.id, userId, showModal]);
+
   const handleNavigateDetail = (id: string) => {
     router.push(`/mytrip/detail/${id}`);
   };
@@ -77,6 +103,32 @@ const BookingCard = ({ data }: IProps) => {
               >
                 {getStatusText(data?.status)}
               </p>
+
+              {data?.status === "confirmed" &&
+                moment(data?.checkOutdate).isAfter(moment()) && (
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowModal(true);
+                    }}
+                    className="relative border border-blue-500 rounded-sm px-3 hover:bg-blue-100 cursor-pointer py-1 flex ml-4 text-blue-500 items-center gap-2"
+                  >
+                    <MdOutlineFeedback size={20} />
+                    <span>{reviewId ? "Cập nhật đánh giá" : "Đánh giá"}</span>
+
+                    <div className="absolute">
+                      {showModal && (
+                        <FeedbackModal
+                          propertyId={data?.rooms?.property?.id}
+                          onCloseModal={setShowModal}
+                          reviewId={reviewId}
+                          star={star}
+                          text={text}
+                        />
+                      )}
+                    </div>
+                  </div>
+                )}
             </div>
           </div>
 

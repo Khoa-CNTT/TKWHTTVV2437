@@ -28,19 +28,43 @@ const getListReviewByProperyId = async (req, res) => {
   }
 };
 
-const createProperty = async (req, res) => {
+const createReview = async (req, res) => {
   try {
-    const response = await ReviewService.createPropertyReview(req.body);
+    const response = await ReviewService.createReview(req.body);
     return res.status(200).json(response);
   } catch (error) {
-    return res.status(500).json({
-      msg: "Error in controller: " + (error.message || "Unknown error"),
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
+const updateReview = async (req, res) => {
+  try {
+    const response = await ReviewService.updateReview(req.body);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
+const getReviewByUserId = async (req, res) => {
+  try {
+    const response = await ReviewService.getReviewByUserId(req.query);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
     });
   }
 };
 
 module.exports = {
-  createProperty,
   getRatingByPropertyId,
   getListReviewByProperyId,
+  createReview,
+  updateReview,
+  getReviewByUserId,
 };

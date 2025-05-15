@@ -21,6 +21,8 @@ class QueryController {
   async query(req, res) {
     const { text, limit = 5 } = req.query;
     let sessionId = req.headers["x-session-id"] || req.query.sessionId;
+
+    console.log("sessionId", sessionId);
     const startTime = Date.now();
 
     if (!text) {
@@ -44,7 +46,11 @@ class QueryController {
         "x-session-id": sessionId, // Gửi sessionId trong header
       });
 
-      let context = contextCache.get(sessionId) || { history: [] };
+      // Khởi tạo context mới nếu sessionId chưa tồn tại
+      if (!contextCache.has(sessionId)) {
+        contextCache.set(sessionId, { history: [] });
+      }
+      let context = contextCache.get(sessionId);
       const previousQuery =
         context.history.length > 0
           ? context.history[context.history.length - 1]
@@ -92,32 +98,39 @@ class QueryController {
         queryResult,
         previousQuery
       );
-
-      console.log("Response text:", responseText);
+      const cleanResponseText = responseText
+        .replace(/<[^>]*>/g, "") // Xóa các HTML tags
+        .replace(/\n\s*\n/g, "\n") // Xóa các dòng trống thừa
+        .replace(/\s+/g, " ") // Xóa khoảng trắng thừa
+        .trim();
 
       // Tạo prompt với tất cả intents
-      let prompt = `Bạn là một trợ lý du lịch thân thiện. Dựa trên câu hỏi hiện tại: "${text}", và thông tin từ cơ sở dữ liệu (lọc theo các loại: ${intents.join(
+      let prompt = `Bạn là một trợ lý du lịch thân thiện của webite LoveTrip. Dựa trên câu hỏi hiện tại: "${text}", và thông tin từ cơ sở dữ liệu (lọc theo các loại: ${intents.join(
         ", "
-      )}):\n\n${responseText}\n\n`;
+      )}):\n\n`;
+
+      prompt += cleanResponseText + "\n\n";
 
       if (previousQuery) {
         console.log("Previous query:", previousQuery);
-        prompt += `Ngữ cảnh từ câu hỏi trước:\n- Câu hỏi: "${previousQuery.query}"\n- Câu trả lời: "${previousQuery.response}"\n\n`;
+        prompt += `Ngữ cảnh từ câu hỏi trước:\n- Câu hỏi: "${previousQuery.query}"\n, phản hồi: "${previousQuery.response}"`;
       }
 
-      prompt += `Vui lòng trả lời bằng tiếng Việt, ngắn gọn (tối đa 2-3 câu), đúng trọng tâm và tự nhiên.Nếu có trạng thái của khách sạn, hãy đưa ra thông tin về trạng thái đó. Nếu có thông tin, hãy phản hồi các thuộc tính liên quan như địa điểm, tiện nghi, giá, v.v.Đưa ra các url như hình ảnh , hoặc đường dẫn đến trang web nếu có . Nếu không có kết quả phù hợp, hãy đưa ra một gợi ý tích cực và lịch sự.Tránh sử dụng các cụm như "không có thông tin" hay "không tìm thấy" . \n\nCâu trả lời:`;
+      prompt += `Vui lòng trả lời bằng tiếng Việt, ngắn gọn (tối đa 2-3 câu), đúng trọng tâm và tự nhiên. Nếu có trạng thái của khách sạn, hãy đưa ra thông tin về trạng thái đó. Nếu có thông tin, hãy phản hồi các thuộc tính liên quan như địa điểm, tiện nghi, giá, v.v. Đưa ra các url như hình ảnh, hoặc đường dẫn đến trang web nếu có. Nếu không có kết quả phù hợp, hãy đưa ra một gợi ý tích cực và lịch sự. Tránh sử dụng các cụm như "không có thông tin" hay "không tìm thấy".\n\nCâu trả lời:`;
+
+      console.log("Clean Prompt:", prompt);
 
       const [groqResult, deepSeekResult] = await Promise.all([
-        callDeepSeekWithTimeout(prompt, 3000).catch((err) => ({
+        callDeepSeekWithTimeout(prompt, previousQuery, 3000).catch((err) => ({
           response: null,
           source: "deepseek",
           error: err.message,
         })),
-        callGroqWithTimeout(prompt, 3000).catch((err) => ({
-          response: null,
-          source: "groq",
-          error: err.message,
-        })),
+        // callGroqWithTimeout(prompt, 3000).catch((err) => ({
+        //   response: null,
+        //   source: "groq",
+        //   error: err.message,
+        // })),
       ]);
 
       const aiResponse = selectBestResponse(groqResult, deepSeekResult, text);
@@ -129,12 +142,14 @@ class QueryController {
         query: text,
         response: aiResponse,
         matchedItems: matchedItems.slice(0, 5),
-        intents, // Lưu tất cả intents
+        intents,
       });
       if (context.history.length > 5) {
         context.history.shift();
       }
       contextCache.set(sessionId, context);
+      console.log("Updated context:", context);
+      console.log("Context cache size:", contextCache.size);
 
       const finalResult = {
         answer: aiResponse || "Hiện tại hệ thống bận, bạn thử lại ngay nhé!",

@@ -81,6 +81,8 @@ module.exports = (sequelize, DataTypes) => {
       idAdvertising: DataTypes.STRING,
       payCommissionAt: DataTypes.DATE,
       status: DataTypes.STRING,
+      approved: DataTypes.INTEGER,
+      reject: DataTypes.INTEGER,
     },
     {
       sequelize,

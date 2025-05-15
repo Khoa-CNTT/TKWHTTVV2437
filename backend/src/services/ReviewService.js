@@ -1,6 +1,7 @@
 const { v4 } = require("uuid");
 const db = require("../models");
 const { fn, col } = require("sequelize");
+const { v4: uuidv4 } = require("uuid");
 const { saveEmbedding } = require("./queryService");
 const { getDetailProperyById } = require("./PropertyService");
 const { deleteCollection } = require("./collectionService");
@@ -130,8 +131,91 @@ const getListReviewByProperyId = (propertyId, filter) => {
   });
 };
 
+const createReview = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { idUser, idProperty, rating, text } = data;
+
+      const result = await db.Review.create({
+        id: uuidv4(),
+        idUser,
+        idProperty,
+        rating,
+        text,
+        reviewDate: new Date(),
+      });
+
+      try {
+        await embeddingReview(newReview.idProperty); // Gọi hàm embeddingRoom với idProperty
+      } catch (err) {
+        console.error(
+          "❌ Failed to perform embeddingRoom:",
+          err.message || err
+        );
+      }
+
+      resolve({
+        status: result ? "OK" : "ERR",
+        data: result || [],
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const updateReview = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { id, rating, text } = data;
+
+      console.log("id", id);
+      console.log("rating", rating);
+      console.log("text", text);
+
+      const result = await db.Review.update(
+        {
+          rating,
+          text,
+        },
+        { where: { id } }
+      );
+
+      resolve({
+        status: result ? "OK" : "ERR",
+        data: result || [],
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const getReviewByUserId = (filter) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { idUser, idProperty } = filter;
+
+      const result = await db.Review.findOne({
+        where: { idUser, idProperty },
+        attributes: ["id", "rating", "text", "reviewDate", "createdAt"],
+      });
+
+      resolve({
+        status: result ? "OK" : "ERR",
+        data: result || [],
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   createPropertyReview,
   getRatingByPropertyId,
   getListReviewByProperyId,
+  createReview,
+  updateReview,
+  getReviewByUserId,
 };

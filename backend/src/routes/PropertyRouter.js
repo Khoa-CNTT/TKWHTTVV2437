@@ -11,6 +11,11 @@ router.get(
   "/property-id-by-user-id/:id",
   propertyController.getPropertyIdByUserId
 );
+router.get(
+  "/image-by-property-id/:id",
+  propertyController.getImageByPropertyId
+);
+router.get("/admin/list-property", propertyController.getListPropertyByAdmin);
 router.get("/total-dashboard/:id", propertyController.getTotalDashboard);
 router.get("/advertising/:id", propertyController.getAdvertisingByPropertyId);
 router.get("/search", propertyController.getListSearchText);
@@ -22,4 +27,6 @@ router.get("/detail/:slug", propertyController.getDetailBySlug);
 router.post("/", propertyController.createProperty);
 router.put("/:id", propertyController.updateProperty);
 router.get("/getAllPropertyByAdmin", propertyController.getAllPropertyByAdmin);
+router.put("/admin/update-status/:id", propertyController.updateStatusProperty);
+
 module.exports = router;

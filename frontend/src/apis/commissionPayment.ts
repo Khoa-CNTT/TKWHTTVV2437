@@ -1,7 +1,14 @@
 const apisCommissionPayment = {
-  getListCommissionPaymentByPropertyId: async (propertyId: string) => {
+  getListCommissionPaymentByPropertyId: async (
+    query: Record<string, string | number>,
+    propertyId: string
+  ) => {
+    const queryString = new URLSearchParams(
+      query as Record<string, string>
+    ).toString();
+
     const response = await fetch(
-      `${process.env.URL_SERVER_API}/commission/all-commission/${propertyId}`,
+      `${process.env.URL_SERVER_API}/commission/all-commission/${propertyId}?${queryString}`,
       {
         method: "GET",
         cache: "no-store",
@@ -48,6 +55,18 @@ const apisCommissionPayment = {
 
     const response = await fetch(
       `${process.env.URL_SERVER_API}/commission/list-commission-admin?${queryString}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
+
+    return response.json();
+  },
+
+  getCommissionPaymentByPropertyId: async (propertyId: string) => {
+    const response = await fetch(
+      `${process.env.URL_SERVER_API}/commission/commission-payment/${propertyId}`,
       {
         method: "GET",
         cache: "no-store",

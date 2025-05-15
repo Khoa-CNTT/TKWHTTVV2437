@@ -18,7 +18,7 @@ const config: Config = {
       },
       backgroundColor: {
         primary: "#1668e3",
-        overblack: "rgba(0, 0, 0, 0.3)",
+        overblack: "rgba(0, 0, 0, 0.1)",
       },
       colors: {
         background: "var(--background)",
@@ -47,7 +47,6 @@ const config: Config = {
       borderRadius: {
         "[-50]": "50%",
       },
-      
     },
   },
   plugins: [],

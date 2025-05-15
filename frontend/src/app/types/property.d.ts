@@ -29,6 +29,7 @@ export interface IProperty {
   advertising: string;
   expiredAd: string;
   idUser: string;
+  user: IUser;
 }
 
 export interface IPropertyCreate {
@@ -43,4 +44,17 @@ export interface IPropertyCreate {
   amenities?: string[];
   highlights?: string[];
   images?: { id?: string; image?: string }[];
+}
+
+export interface IPropertyAdmin {
+  id: string;
+  name: string;
+  category: ICategory;
+  city: ICity;
+  users: IUser;
+  propertyAddress: IAddress;
+  status: string;
+  approved: number;
+  reject: number;
+  images: IImage[];
 }

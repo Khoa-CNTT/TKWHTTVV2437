@@ -2,18 +2,25 @@ const db = require("../models");
 const Op = require("sequelize").Op;
 const moment = require("moment");
 
-const getListCommissionPaymentByPropertyId = (propertyId) => {
+const getListCommissionPaymentByPropertyId = (filter, propertyId) => {
   return new Promise(async (resolve, reject) => {
-    console.log({ propertyId });
     try {
+      const { page = 1, limit = 12, sort = "DESC", status } = filter;
+      const offset = (page - 1) * limit;
+      const where = {};
+
+      if (status) {
+        where.status = status;
+      }
+
       const currentDate = new Date();
       const currentMonth = currentDate.getMonth() + 1; // Months are 0-indexed in JS, so +1
       const currentYear = currentDate.getFullYear();
 
-      const commissionPayment = await db.CommissionPayment.findAll({
+      const commissionPayment = await db.CommissionPayment.findAndCountAll({
         where: {
+          ...where,
           idProperty: propertyId,
-          status: "pending",
           [db.Sequelize.Op.and]: [
             // Trường hợp năm nhỏ hơn năm hiện tại (tháng nào cũng được)
             {
@@ -27,14 +34,22 @@ const getListCommissionPaymentByPropertyId = (propertyId) => {
           ],
         },
         order: [
-          ["year", "ASC"], // Sắp xếp năm tăng dần (cũ → mới)
-          ["month", "ASC"], // Nếu cùng năm, sắp xếp tháng tăng dần
+          ["year", sort], // Sắp xếp năm tăng dần (cũ → mới)
+          ["month", sort], // Nếu cùng năm, sắp xếp tháng tăng dần
         ],
+        offset,
+        limit,
       });
 
       resolve({
-        status: commissionPayment.length > 0 ? "OK" : "ERR",
-        data: commissionPayment || [],
+        status: commissionPayment.rows.length > 0 ? "OK" : "ERR",
+        data: commissionPayment.rows || [],
+        pagination: {
+          totalItems: commissionPayment.count,
+          totalPages: Math.ceil(commissionPayment.count / limit),
+          currentPage: parseInt(page),
+          pageSize: parseInt(limit),
+        },
       });
     } catch (error) {
       reject(error);
@@ -241,9 +256,27 @@ const getListCommissionPaymentByAdmin = (filter) => {
   });
 };
 
+const getCommissionPaymentByPropertyId = (propertyId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const commissionPayment = await db.CommissionPayment.findAll({
+        where: { idProperty: propertyId },
+      });
+
+      resolve({
+        status: commissionPayment.length > 0 ? true : false,
+        data: commissionPayment,
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   getListCommissionPaymentByPropertyId,
   updateCommissionPayment,
   getDataBarChartCommissionAdmin,
   getListCommissionPaymentByAdmin,
+  getCommissionPaymentByPropertyId,
 };

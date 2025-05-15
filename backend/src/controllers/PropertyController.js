@@ -33,9 +33,31 @@ const getDetailBySlug = async (req, res) => {
   }
 };
 
+const getImageByPropertyId = async (req, res) => {
+  try {
+    const response = await PropertyService.getImageByPropertyId(req.params.id);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
 const getDetailProperyById = async (req, res) => {
   try {
     const response = await PropertyService.getDetailProperyById(req.params.id);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
+const getListPropertyByAdmin = async (req, res) => {
+  try {
+    const response = await PropertyService.getListPropertyByAdmin(req.query);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(404).json({
@@ -164,6 +186,19 @@ const getAllPropertyByAdmin = async (req, res) => {
     });
   }
 };
+const updateStatusProperty = async (req, res) => {
+  try {
+    const response = await PropertyService.updateStatusProperty(
+      req.params.id,
+      req.body.status
+    );
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
 
 module.exports = {
   // fetchFullData,
@@ -181,4 +216,7 @@ module.exports = {
   getAdvertisingByPropertyId,
   getTotalDashboard,
   getAllPropertyByAdmin,
+  getImageByPropertyId,
+  getListPropertyByAdmin,
+  updateStatusProperty,
 };

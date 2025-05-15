@@ -11,6 +11,12 @@ router.get(
   "/list-review/:propertyId",
   reviewController.getListReviewByProperyId
 );
-router.post("/property", reviewController.createProperty);
+// router.post("/property", reviewController.createProperty);
+
+router.post("/create-review", reviewController.createReview);
+
+router.put("/update-review", reviewController.updateReview);
+
+router.get("/review-by-user", reviewController.getReviewByUserId);
 
 module.exports = router;
