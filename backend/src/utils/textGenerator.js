@@ -4,8 +4,10 @@ function generateText(item, type) {
     text += `Khách sạn: ${item.name}\n`;
     text += `ID khách sạn: ${item.id}\n`;
     text += `Mô tả: ${item.description || "Không có mô tả"}\n`;
-    text += `Trạng thái: ${item.status || "Không xác định"}\n`;
-    text += `Link: ${item.link} \n`;
+    text += `Trạng thái: ${
+      item.status?.toLowerCase() === "active" ? "Hoạt động" : "Không hoạt động"
+    }\n`;
+    text += `Link: [${item.name}](${item.link}) \n`;
     if (item.address && typeof item.address === "object") {
       const addr = item.address;
       text += `\n Địa chỉ:\n`;
@@ -21,8 +23,9 @@ function generateText(item, type) {
     if (item.images && item.images.length > 0) {
       text += `Hình ảnh (${item.images.length}):\n`;
       text +=
-        item.images.map((img, i) => `- [${i + 1}] ${img.image}`).join("\n") +
-        "\n";
+        item.images
+          .map((img, i) => `- [${i + 1}] ![Hình ${i + 1}](${img.image})`)
+          .join("\n") + "\n";
     }
     if (item.amenities && item.amenities.length > 0) {
       text += `Tiện nghi: ${item.amenities.map((a) => a?.name).join(", ")}\n`;
@@ -34,14 +37,17 @@ function generateText(item, type) {
     text += `Mô tả: ${item.description || "Không có mô tả"}\n`;
     text += `Số người tối đa: ${item.maxPerson || "Không xác định"}\n`;
     text += `Giá: ${item.price || "Không xác định"} VND\n`;
-    text += `Trạng thái: ${item.status || "Không xác định"}\n`;
+    text += `Trạng thái Phòng: ${
+      item.status?.toLowerCase() === "active" ? "Hoạt động" : "Không hoạt động"
+    }\n`;
     if (item.amenities && item.amenities.length > 0)
       text += `Tiện nghi: ${item.amenities.map((a) => a.name).join(", ")}\n`;
     if (item.images && item.images.length > 0) {
       text += `Hình ảnh (${item.images.length}):\n`;
       text +=
-        item.images.map((img, i) => `- [${i + 1}] ${img.image}`).join("\n") +
-        "\n";
+        item.images
+          .map((img, i) => `- [${i + 1}] ![Hình ${i + 1}](${img.image})`)
+          .join("\n") + "\n";
     }
     if (item.summaries && item.summaries.length > 0) {
       text += `Tóm tắt: ${item.summaries.map((s) => s.name).join(", ")}\n`;
