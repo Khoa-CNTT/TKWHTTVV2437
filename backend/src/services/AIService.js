@@ -48,13 +48,23 @@ async function callGroqWithTimeout(prompt, timeoutMs = 3000) {
   }
 }
 
-async function callDeepSeekWithTimeout(prompt, timeoutMs = 3000) {
+async function callDeepSeekWithTimeout(
+  prompt,
+  previousQuery,
+  timeoutMs = 3000
+) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
     if (aiResponseCache.has(prompt)) {
       return { response: aiResponseCache.get(prompt), source: "cache" };
+    }
+
+    // Tạo prompt với ngữ cảnh từ câu hỏi trước
+    let fullPrompt = prompt;
+    if (previousQuery) {
+      fullPrompt = `Ngữ cảnh từ câu hỏi trước:\n- Câu hỏi: "${previousQuery.query}"\n- Câu trả lời: "${previousQuery.response}"\n\n${prompt}`;
     }
 
     const deepSeekResponse = await fetch(
@@ -72,7 +82,7 @@ async function callDeepSeekWithTimeout(prompt, timeoutMs = 3000) {
           messages: [
             {
               role: "system",
-              content: prompt,
+              content: fullPrompt,
             },
             { role: "user", content: prompt },
           ],

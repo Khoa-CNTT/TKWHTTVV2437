@@ -46,7 +46,6 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
     const previousHotelIds = previousContext.matchedItems
       .filter((item) => item.metadata.type === "hotel")
       .filter((item) => item.metadata.type === "reviewPeroperty")
-
       .map((item) => item.metadata.itemId);
     filteredItems = matchedItems.sort((a, b) => {
       const aIsRelevant = previousHotelIds.includes(
@@ -70,18 +69,15 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
   if (filteredItems && filteredItems.length > 0) {
     filteredItems.forEach((item, index) => {
       const { document, metadata } = item;
-      console.log(metadata, "metadata lalalalalal");
       if (!document || !metadata) return;
 
       if (typeof document === "string") {
         const parsedDoc = parseStringDocument(document);
 
-        console.log(parsedDoc, "parsedDoc lalalalalal");
-
         if (metadata.type === "hotel" || parsedDoc.type === "hotel") {
           response += `${index + 1}. 🏨 ${
             metadata.name || parsedDoc.name || "Khách sạn"
-          } (ID: ${metadata.itemId || parsedDoc.id})\n`;
+          }\n`;
           response += `   Mô tả: ${
             parsedDoc.description || "Không có mô tả"
           }\n`;
@@ -101,23 +97,40 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
           response += `   Tiện ích: ${
             metadata.amenities || "Wifi miễn phí, hồ bơi, bãi đỗ xe"
           }\n`;
-          response += `   Link: ${
-            parsedDoc.link || metadata.link || "Không có đường dẫn"
-          }\n`;
 
-          if (parsedDoc.images && parsedDoc.images.length > 0) {
-            response += `   Hình ảnh: ${parsedDoc.images.join(", ")}\n`;
+          // Xử lý link markdown
+          const linkMatch = document.match(/Link: \[(.*?)\]\((.*?)\)/);
+          if (linkMatch) {
+            response += `   Link: [${parsedDoc.link || metadata.link[1]}](${
+              parsedDoc.link || metadata.link[2]
+            })\n`;
+          } else {
+            response += `   Link: Không có đường dẫn\n`;
+          }
+
+          // Xử lý hình ảnh markdown
+          const imageMatches = document.matchAll(/!\[Hình \d+\]\((.*?)\)/g);
+          const images = Array.from(imageMatches).map((match) => match[1]);
+          if (images.length > 0) {
+            response += `   Hình ảnh:\n`;
+            response += images
+              .map((img, i) => `![Hình ${i + 1}](${img})`)
+              .join(" ");
           } else {
             response += `   Hình ảnh: Không có hình ảnh\n`;
           }
 
           if (parsedDoc.status) {
-            response += `   Trạng thái: ${parsedDoc.status}\n`;
+            response += `   Trạng thái: ${
+              parsedDoc.status.toLowerCase() === "active"
+                ? "Hoạt động"
+                : "Không hoạt động"
+            }\n`;
           }
         } else if (metadata.type === "room" || parsedDoc.type === "room") {
           response += `${index + 1}. 🛏️ ${
             metadata.name || parsedDoc.name || "Phòng"
-          } (Khách sạn ID: ${metadata.propertyId || parsedDoc.propertyId})\n`;
+          }\n`;
           response += `   Giá: ${parsedDoc.price || "N/A"}\n`;
           response += `   Thuộc khách sạn: ${parsedDoc.property || "N/A"}\n`;
           response += `   Số người tối đa: ${parsedDoc.maxGuests || "N/A"}\n`;
@@ -126,15 +139,19 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
             metadata.amenities || "Không có thông tin"
           }\n`;
 
-          if (parsedDoc.images && parsedDoc.images.length > 0) {
-            response += `   Hình ảnh: ${parsedDoc.images.join(", ")}\n`;
+          // Xử lý hình ảnh markdown
+          const imageMatches = document.matchAll(/!\[Hình \d+\]\((.*?)\)/g);
+          const images = Array.from(imageMatches).map((match) => match[1]);
+          if (images.length > 0) {
+            response += `   Hình ảnh:\n`;
+            response += images
+              .map((img, i) => `![Hình ${i + 1}](${img})`)
+              .join(" ");
           } else {
             response += `   Hình ảnh: Không có hình ảnh\n`;
           }
         } else if (metadata.type === "reviewPeroperty") {
-          response += `${index + 1}. 📝 ${metadata.name || "Đánh giá"} (ID: ${
-            metadata.itemId
-          })\n`;
+          response += `${index + 1}. 📝 ${metadata.name || "Đánh giá"}\n`;
           response += `   Đánh giá: ${
             parsedDoc.averageRating || "Chưa có đánh giá"
           }\n`;
@@ -143,9 +160,7 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
         const parsedDoc = parseDocument(document);
 
         if (metadata.type === "hotel") {
-          response += `${index + 1}. 🏨 ${metadata.name || "Khách sạn"} (ID: ${
-            metadata.itemId
-          })\n`;
+          response += `${index + 1}. 🏨 ${metadata.name || "Khách sạn"}\n`;
           const description = document.match(/Mô tả:(.*?)(?=\n|$)/);
           response += `   Mô tả: ${
             description && description[1]
@@ -175,20 +190,25 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
             metadata.amenities || "Wifi miễn phí, hồ bơi, bãi đỗ xe"
           }\n`;
 
-          if (parsedDoc["Hình ảnh"] && parsedDoc["Hình ảnh"].length > 0) {
-            const imageUrls = parsedDoc["Hình ảnh"]
-              .map((line) => line.match(/- \[\d+\] (https?:\/\/[^\s]+)/)?.[1])
-              .filter((url) => url);
-            response += `   Hình ảnh: ${
-              imageUrls.length > 0 ? imageUrls.join(", ") : "Không có hình ảnh"
-            }\n`;
+          // Xử lý link markdown
+          const linkMatch = document.match(/Link: \[(.*?)\]\((.*?)\)/);
+          if (linkMatch) {
+            response += `   Link: [${linkMatch[1]}](${linkMatch[2]})\n`;
+          }
+
+          // Xử lý hình ảnh markdown
+          const imageMatches = document.matchAll(/!\[Hình \d+\]\((.*?)\)/g);
+          const images = Array.from(imageMatches).map((match) => match[1]);
+          if (images.length > 0) {
+            response += `   Hình ảnh:\n`;
+            response += images
+              .map((img, i) => `![Hình ${i + 1}](${img})`)
+              .join(" ");
           } else {
             response += `   Hình ảnh: Không có hình ảnh\n`;
           }
         } else if (metadata.type === "room") {
-          response += `${index + 1}. 🛏️ ${
-            metadata.name || "Phòng"
-          } (Khách sạn ID: ${metadata.propertyId})\n`;
+          response += `${index + 1}. 🛏️ ${metadata.name || "Phòng"}\n`;
 
           const price = document.match(/Giá: (.*?)(?=\n|$)/);
           response += `   Giá: ${
@@ -202,34 +222,27 @@ function generateSimplifiedResponseText(queryResult, previousContext = null) {
 
           const status = document.match(/Trạng thái: (.*?)(?=\n|$)/);
           response += `   Trạng thái: ${
-            status && status[1] ? status[1].trim() : "N/A"
+            status && status[1]
+              ? status[1].trim().toLowerCase() === "active"
+                ? "Hoạt động"
+                : "Không hoạt động"
+              : "N/A"
           }\n`;
 
           response += `   Tiện nghi: ${
             metadata.amenities || "Không có thông tin"
           }\n`;
 
-          if (parsedDoc["Hình ảnh"] && parsedDoc["Hình ảnh"].length > 0) {
-            const imageUrls = parsedDoc["Hình ảnh"]
-              .map((line) => line.match(/- \[\d+\] (https?:\/\/[^\s]+)/)?.[1])
-              .filter((url) => url);
-            response += `   Hình ảnh: ${
-              imageUrls.length > 0 ? imageUrls.join(", ") : "Không có hình ảnh"
-            }\n`;
+          // Xử lý hình ảnh markdown
+          const imageMatches = document.matchAll(/!\[Hình \d+\]\((.*?)\)/g);
+          const images = Array.from(imageMatches).map((match) => match[1]);
+          if (images.length > 0) {
+            response += `   Hình ảnh:\n`;
+            response += images
+              .map((img, i) => `![Hình ${i + 1}](${img})`)
+              .join(" ");
           } else {
             response += `   Hình ảnh: Không có hình ảnh\n`;
-          }
-
-          if (
-            parsedDoc["Điểm đanh giá"] &&
-            parsedDoc["Điểm đánh giá"].length > 0
-          ) {
-            const rating = parsedDoc["Điểm đánh giá"]
-              .map((line) => line.match(/- \[\d+\] (.*?)(?=\n|$)/)?.[1])
-              .filter((url) => url);
-            response += `   Điểm đánh giá: ${
-              rating.length > 0 ? rating.join(", ") : "Không có đánh giá"
-            }\n`;
           }
         }
       }
