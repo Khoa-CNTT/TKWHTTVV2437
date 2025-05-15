@@ -54,6 +54,36 @@ const detailRegisterPartner = (idUser) => {
 const updateRegisterPartner = (id, payload) => {
   return new Promise(async (resolve, reject) => {
     try {
+      if (payload?.status === "confirmed") {
+        const registerParner = await db.RegisterPartner.findOne({
+          where: { id: id },
+        });
+
+        const upadteRoleUser = await db.User.update(
+          {
+            role: "7",
+          },
+          {
+            where: { id: registerParner?.idUser },
+          }
+        );
+      }
+
+      if (payload?.status === "rejected") {
+        const registerParner = await db.RegisterPartner.findOne({
+          where: { id: id },
+        });
+
+        const upadteRoleUser = await db.User.update(
+          {
+            role: "3",
+          },
+          {
+            where: { id: registerParner?.idUser },
+          }
+        );
+      }
+
       const respone = await db.RegisterPartner.update(
         { ...payload },
         {
@@ -90,9 +120,52 @@ const cancelRegisterPartner = (idUser) => {
   });
 };
 
+const getAllRegisterPartner = (status, filter, page, limit = 10) => {
+  return new Promise(async (resolve, reject) => {
+    console.log(filter, status);
+    let queries = {};
+    let order;
+    if (filter === "oldest") {
+      order = [["createdAt", "ASC"]];
+    } else {
+      order = [["createdAt", "DESC"]];
+    }
+    if (status && status !== "default") queries.status = status;
+    let offset = !page || +page <= 1 ? 0 : +page - 1;
+
+    try {
+      const response = await db.RegisterPartner.findAndCountAll({
+        where: queries,
+        offset: offset * limit,
+        limit: limit,
+        include: [
+          {
+            model: db.User,
+            as: "user", // alias đúng với association
+            attributes: {
+              exclude: ["createdAt", "updatedAt"],
+            },
+          },
+        ],
+        order,
+      });
+
+      resolve({
+        status: response ? "OK" : "ERR",
+        limit: limit,
+        page: offset + 1,
+        data: response,
+      });
+    } catch (error) {
+      reject("error :" + error);
+    }
+  });
+};
+
 module.exports = {
   registerPartner,
   detailRegisterPartner,
   updateRegisterPartner,
   cancelRegisterPartner,
+  getAllRegisterPartner,
 };

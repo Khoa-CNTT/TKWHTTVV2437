@@ -36,4 +36,9 @@ router.put(
   "/updateStatusUserReservation",
   reservationController.updateStatusUserReservation
 );
+
+router.get(
+  "/listReservationByAdmin",
+  reservationController.listReservationByAdmin
+);
 module.exports = router;

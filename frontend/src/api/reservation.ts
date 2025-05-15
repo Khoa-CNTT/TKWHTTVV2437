@@ -5,8 +5,10 @@ const apiReservation = {
   createReservation: (data: object) =>
     http.post(`reservation/createReservation`, data),
 
-  listReservationApprove: (filter: string) =>
-    http.get(`reservation/listReservationApprove?filter=${filter}`),
+  listReservationApprove: (filter: string, status: string, page: number) =>
+    http.get(
+      `reservation/listReservationApprove?filter=${filter}&status=${status}&page=${page}`
+    ),
 
   detailReservationApprove: (reid: string) =>
     http.get(`reservation/detailReservationApprove?reid=${reid}`),
@@ -22,6 +24,14 @@ const apiReservation = {
     http.put(`reservation/updateInfoReservation`, data),
   updateStatusUserReservation: (data: object) =>
     http.put(`reservation/updateStatusUserReservation`, data),
+  getAllReservationByAdmin: (
+    idProperty: string,
+    filter: string,
+    page: number
+  ) =>
+    http.get(
+      `reservation/listReservationByAdmin?filter=${filter}&idProperty=${idProperty}&page=${page}`
+    ),
 };
 
 export default apiReservation;

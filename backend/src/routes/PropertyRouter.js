@@ -21,5 +21,5 @@ router.get("/detail-user-id/:id", propertyController.getDetailProperyByUserId);
 router.get("/detail/:slug", propertyController.getDetailBySlug);
 router.post("/", propertyController.createProperty);
 router.put("/:id", propertyController.updateProperty);
-
+router.get("/getAllPropertyByAdmin", propertyController.getAllPropertyByAdmin);
 module.exports = router;

@@ -880,6 +880,23 @@ const getTotalDashboard = async (propertyId) => {
   });
 };
 
+const getAllPropertyByAdmin = async () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const res = await db.Property.findAll({
+        attributes: ["id", "name"],
+      });
+
+      resolve({
+        status: res?.length > 0 ? "OK" : "ERR",
+        data: res,
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   listTop10HomestayRating,
   getDetailBySlug,
@@ -895,4 +912,5 @@ module.exports = {
   renewalAdByUserId,
   getAdvertisingByPropertyId,
   getTotalDashboard,
+  getAllPropertyByAdmin,
 };

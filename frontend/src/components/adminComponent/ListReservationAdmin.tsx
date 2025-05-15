@@ -13,34 +13,53 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { IoReloadCircle } from "react-icons/io5";
 import ReactPaginate from "react-paginate";
 import { GrFormNext, GrFormPrevious } from "react-icons/gr";
+import ItemReservationAdmin from "./ItemReservationAdmin";
+import apiProperty from "@/api/property";
 
-interface IReservationApprove {
+interface IBooking {
   id: string;
   idUser: string;
   idRoom: string;
+  checkIndate: string; // ISO string
+  checkOutdate: string; // ISO string
+  numGuest: number | null;
+  totalPrice: number;
+  status: string;
+  message: string;
+  nameAccount: string;
+  numberAccount: string;
+  nameBank: string;
+  statusUser: string;
+  returnImgBanking: string | null;
+  code: string;
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
-  imageBanking: string | null;
-  message: string | null;
-  numberAccount: string;
-  nameAccount: string;
-  nameBank: string;
-  statusUser: string;
-  code: string;
-  returnImgBanking: string | null;
+  imageBanking: string;
   reason: string | null;
-  checkIndate: string; // ISO format from backend
-  checkOutdate: string;
-  numGuest: number | null;
-  totalPrice: number;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
+  idProperty: string;
+  createdAt: string; // ISO string
+  updatedAt: string; // ISO string
   rooms: {
+    id: string;
     name: string;
-    price: number;
+  };
+  users: {
+    email: string;
+    phone: string;
+    firstName: string;
+    lastName: string;
+  };
+  properties: {
+    id: string;
+    name: string;
+    users: {
+      email: string;
+      phone: string;
+      firstName: string;
+      lastName: string;
+    };
   };
 }
 
@@ -48,21 +67,27 @@ const ListReservationApprovePage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isOpenApprove, setIsOpenAppove] = useState(false);
-  const [listResApprove, setListResApprove] = useState<IReservationApprove[]>();
-  const { reservation, setReservation } = useReservationContext();
+
   const [filter, setFilter] = useState<string>("oldest");
-  const [status, setStatus] = useState<string | null>(null);
+
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number | null>(null);
   const [limit, setLimit] = useState<number>(10);
   const [action, setAction] = useState<boolean>(false);
+
+  const [dataBooking, setDataBooking] = useState<IBooking[] | null>(null);
+  const [itemBooking, setItemBooking] = useState<IBooking | null>(null);
+  const [properties, setProperties] = useState<{ id: string; name: string }[]>(
+    []
+  );
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
   useEffect(() => {
     const currentFilter = searchParams.get("filter") || "oldest";
     setFilter(currentFilter);
 
-    // Nếu cần thêm trạng thái:
-    const currentStatus = searchParams.get("status") || null;
-    setStatus(currentStatus);
+    const currentPropertyId = searchParams.get("propertyId") || "";
+    setSelectedPropertyId(currentPropertyId);
+
     const currentPage = parseInt(searchParams.get("page") || "1");
     setPage(currentPage);
   }, [searchParams.toString()]);
@@ -76,16 +101,14 @@ const ListReservationApprovePage = () => {
       params.set(key, value);
     }
 
-    if (key === "status") {
+    if (key === "propertyId") {
       params.set("page", "1");
       setPage(1); // Đồng bộ state luôn
     }
 
     // Nếu không còn param nào → về /partner
     const queryString = params.toString();
-    router.push(
-      queryString ? `?${queryString}` : "/homestay/list-reservation-approve"
-    );
+    router.push(queryString ? `?${queryString}` : "/admin/Reservation");
   };
 
   const handleOpenAppove = () => {
@@ -95,41 +118,47 @@ const ListReservationApprovePage = () => {
     setIsOpenAppove(false);
   };
 
-  const getListResApprove = async (
+  const getAllReservationByAdmin = async (
+    idProperty: string,
     filter: string,
-    status: string,
     page: number
   ) => {
-    const res = await apiReservation.listReservationApprove(
+    const res = await apiReservation.getAllReservationByAdmin(
+      idProperty,
       filter,
-      status,
       page
     );
-    if (res?.status === "OK") {
-      setListResApprove(res?.data?.rows);
+    if (res?.status === "OK" && res?.data !== null) {
+      setDataBooking(res?.data?.rows);
       setTotal(res?.data?.count);
     }
   };
-  useEffect(() => {
-    if (status === null) {
-      getListResApprove(filter, "waiting", pageXOffset);
-    } else {
-      getListResApprove(filter, status, page);
+
+  const getAllPropertyByAdmin = async () => {
+    const res = await apiProperty.getAllPropertyByAdmin();
+    if (res?.status === "OK") {
+      setProperties(res?.data);
     }
-  }, [reservation, filter, status, page, action]);
+  };
+  useEffect(() => {
+    getAllPropertyByAdmin();
+  }, []);
 
-  // console.log(listResApprove);
+  useEffect(() => {
+    if (selectedPropertyId) {
+      getAllReservationByAdmin(selectedPropertyId, filter, page);
+    } else {
+      getAllReservationByAdmin("0", filter, page);
+    }
+  }, [selectedPropertyId, page, filter, action]);
 
-  // console.log("filter ", filter);
   const handlePageChange = ({ selected }: { selected: number }) => {
     const newPage = selected + 1;
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", newPage.toString());
 
     const queryString = params.toString();
-    router.push(
-      queryString ? `?${queryString}` : "/homestay/list-reservation-approve"
-    );
+    router.push(queryString ? `?${queryString}` : "/admin/Reservation");
 
     setPage(newPage);
   };
@@ -137,8 +166,36 @@ const ListReservationApprovePage = () => {
   return (
     <div className="w-full">
       <div className="p-10">
-        <h1 className="text-2xl font-bold ">Danh sách cần phê duyệt</h1>
-        <div className="flex justify-between items-center mt-10">
+        <h1 className="text-2xl font-bold ">Danh sách các đơn đặt phòng</h1>
+        <div className="mt-4">
+          <label className="font-semibold mr-2 ">Lọc theo homestay:</label>
+          <select
+            className="border px-4 py-2 rounded-md "
+            value={selectedPropertyId}
+            onChange={(e) => {
+              const value = e.target.value;
+              setSelectedPropertyId(e.target.value);
+              const params = new URLSearchParams(searchParams.toString());
+              if (value) {
+                params.set("propertyId", value);
+              } else {
+                params.delete("propertyId");
+              }
+              // Reset page về 1 khi filter thay đổi
+              params.set("page", "1");
+
+              router.push(`?${params.toString()}`);
+            }}
+          >
+            <option value="">-- Tất cả --</option>
+            {properties.map((prop) => (
+              <option key={prop.id} value={prop.id}>
+                {prop.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex justify-between items-center mt-4">
           <div className="flex items-center gap-3">
             <button
               className={`flex items-center gap-1 px-4 py-2 border 
@@ -152,29 +209,6 @@ const ListReservationApprovePage = () => {
               <span>
                 <IoReloadCircle />
               </span>
-            </button>
-
-            <button
-              className={`flex items-center gap-1 px-4 py-2 border 
-                            ${status === null ? "border-primary text-primary" : "border-gray-500 hover:bg-gray-100 text-gray-700"} 
-                            font-semibold rounded-xl bg-white text-sm shadow-sm 
-                            transition-transform active:scale-95
-                          `}
-              // onClick={() => getListResApprove(filter)}
-              onClick={() => handleUpdateParams("status", null)}
-            >
-              Đang chờ xử lí
-            </button>
-            <button
-              className={`flex items-center gap-1 px-4 py-2 border 
-                            ${status === "handle" ? "border-primary text-primary" : "border-gray-500 hover:bg-gray-100 text-gray-700"} 
-                            font-semibold rounded-xl bg-white text-sm shadow-sm 
-                            transition-transform active:scale-95
-                          `}
-              // onClick={() => getListResApprove(filter)}
-              onClick={() => handleUpdateParams("status", "handle")}
-            >
-              Đã xử lí
             </button>
           </div>
           <div className="flex items-center gap-4">
@@ -231,12 +265,15 @@ const ListReservationApprovePage = () => {
                   <input type="checkbox" />
                 </th> */}
                 <th className="px-4 py-3 text-left w-[100px]">Mã đơn</th>
-                <th className="px-4 py-3 text-left w-[200px]">Loại phòng</th>
-                <th className="px-4 py-3 text-left w-[180px]">
-                  Tên khách hàng
+                <th className="px-4 py-3 text-left w-[250px]">
+                  Homestay/Resort
+                </th>
+
+                <th className="px-4 py-3 text-left w-[250px]">
+                  Email khách hàng
                 </th>
                 <th className="px-4 py-3 text-left w-[150px]">Check In</th>
-                <th className="px-4 py-3 text-left w-[150px]">Check Out</th>
+
                 <th className="px-4 py-3 text-left w-[140px]">Tổng tiền</th>
                 <th className="px-4 py-3 text-left w-[100px]">Yêu cầu</th>
                 <th className="px-4 py-3 text-left w-[150px]">Ngày đặt</th>
@@ -244,32 +281,25 @@ const ListReservationApprovePage = () => {
               </tr>
             </thead>
             <tbody className=" text-[-14] font-semibold ">
-              {listResApprove != null &&
-                listResApprove?.map((item, index: number) => {
+              {dataBooking !== null &&
+                dataBooking?.map((item, index: number) => {
                   return (
                     <tr key={index} className="border-b border-gray-200">
                       {/* <td className="px-4 py-5">
                         <input type="checkbox" />
                       </td> */}
                       <td className="px-4 py-5">{item?.code}</td>
-                      <td className="px-4 py-5 ">{item?.rooms?.name}</td>
+                      <td className="px-4 py-5 ">{item?.properties?.name}</td>
                       <td className="px-4 py-5">
                         <div className="w-fit flex items-center gap-2 border border-b-[3px] border-gray-400 rounded-3xl py-1 px-3">
-                          <img
-                            src="https://a0.anyrgb.com/pngimg/1236/14/no-facial-features-no-avatar-no-eyes-expressionless-avatar-icon-delayering-avatar-user-avatar-men-head-portrait-thumbnail.png"
-                            alt=""
-                            className="w-6 h-6 rounded-full"
-                          />
-                          <p>{`${item?.firstName} ${item?.lastName}`}</p>
+                          <p>{`${item?.users?.email}`}</p>
                         </div>
                       </td>
 
                       <td className="px-4 py-5">
                         {dayjs(item?.checkIndate)?.format("DD/MM/YYYY HH:mm")}
                       </td>
-                      <td className="px-4 py-5">
-                        {dayjs(item?.checkOutdate)?.format("DD/MM/YYYY HH:mm")}
-                      </td>
+
                       <td className="px-4 py-5 ">
                         {item?.totalPrice?.toLocaleString("it-IT", {
                           style: "currency",
@@ -286,73 +316,15 @@ const ListReservationApprovePage = () => {
                         {dayjs(item?.createdAt)?.format("DD/MM/YYYY HH:mm")}
                       </td>
                       <td className="px-4 py-5 ">
-                        {status === null ? (
-                          <button
-                            className={`w-fit py-2 px-4 rounded-3xl text-white font-semibold cursor-pointer min-w-32 ${item?.statusUser === "created" ? "bg-green-700" : "bg-red-600"}`}
-                            onClick={() => {
-                              setReservation({
-                                id: item?.id,
-                                nameRoom: item?.rooms?.name,
-                                firstName: item?.firstName,
-                                lastName: item?.lastName,
-                                message: item?.message,
-                                checkIn: dayjs(item?.checkIndate),
-                                checkOut: dayjs(item?.checkOutdate),
-                                totalPrice: item?.totalPrice,
-                                status: item?.status,
-                                email: item?.email,
-                                phone: item?.phone,
-                                imageBanking: item?.imageBanking,
-                                createdAt: dayjs(item?.createdAt),
-                                numberAccount: item?.numberAccount,
-                                nameAccount: item?.nameAccount,
-                                nameBank: item?.nameBank,
-                                statusUser: item?.statusUser,
-                                code: item?.code,
-                              });
-                              handleOpenAppove();
-                            }}
-                          >
-                            {item?.statusUser === "created"
-                              ? "Phê duyệt"
-                              : "Hoàn tiền"}
-                          </button>
-                        ) : (
-                          <button
-                            className={`w-fit py-2 px-4 rounded-3xl text-white font-semibold cursor-pointer min-w-32  ${item?.statusUser === "created" ? "bg-green-700" : "bg-red-600"}`}
-                            onClick={() => {
-                              setReservation({
-                                id: item?.id,
-                                nameRoom: item?.rooms?.name,
-                                firstName: item?.firstName,
-                                lastName: item?.lastName,
-                                message: item?.message,
-                                checkIn: dayjs(item?.checkIndate),
-                                checkOut: dayjs(item?.checkOutdate),
-                                totalPrice: item?.totalPrice,
-                                status: item?.status,
-                                email: item?.email,
-                                phone: item?.phone,
-                                imageBanking: item?.imageBanking,
-                                createdAt: dayjs(item?.createdAt),
-                                numberAccount: item?.numberAccount,
-                                nameAccount: item?.nameAccount,
-                                nameBank: item?.nameBank,
-                                statusUser: item?.statusUser,
-                                code: item?.code,
-                                returnImgBanking: item?.returnImgBanking,
-                                reason: item?.reason,
-                              });
-                              handleOpenAppove();
-                            }}
-                          >
-                            {item?.status === "confirmed"
-                              ? "Đã phê duyệt"
-                              : item?.status === "reject"
-                                ? "Đã từ chối"
-                                : "Đã hoàn tiền"}
-                          </button>
-                        )}
+                        <button
+                          className={`w-fit py-2 px-4 rounded-3xl text-white font-semibold cursor-pointer min-w-32 bg-green-700`}
+                          onClick={() => {
+                            setItemBooking({ ...item });
+                            handleOpenAppove();
+                          }}
+                        >
+                          Chi tiết
+                        </button>
                       </td>
                     </tr>
                   );
@@ -379,10 +351,10 @@ const ListReservationApprovePage = () => {
           </div>
         )}
       </div>
-      {isOpenApprove && (
-        <ConfirmApprove
+      {isOpenApprove && itemBooking && (
+        <ItemReservationAdmin
+          data={itemBooking}
           handleCloseAppove={handleClosenAppove}
-          status={status}
         />
       )}
     </div>

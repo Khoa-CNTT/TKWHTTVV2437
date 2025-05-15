@@ -52,7 +52,7 @@ const SidebarAdmin = () => {
       path: "/admin/Reservation",
     },
     {
-      title: "Danh sách đăng kí dịch vụ",
+      title: "Danh sách đăng kí kinh doanh",
       icon: <FaClipboardList />,
       path: "/admin/ListRegisterPartner",
     },
