@@ -22,7 +22,6 @@ module.exports = (sequelize, DataTypes) => {
         as: "reviews", // Alias để truy cập
       });
 
-    
       Room.hasMany(models.Reservation, {
         foreignKey: "idRoom", // hoặc tên khóa ngoại tương ứng
         as: "reservations", // Alias này phải đúng như trong phần include

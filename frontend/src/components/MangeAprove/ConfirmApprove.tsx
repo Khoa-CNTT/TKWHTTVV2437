@@ -12,9 +12,10 @@ import apiPayment from "@/api/payment";
 import { validate } from "uuid";
 interface IProps {
   handleCloseAppove?: () => void;
+  status: string | null;
 }
 
-const ConfirmApprove = ({ handleCloseAppove }: IProps) => {
+const ConfirmApprove = ({ handleCloseAppove, status }: IProps) => {
   const { reservation, setReservation } = useReservationContext();
   // console.log("resv ", reservation);
   const [isOpenImage, setIsOpenImage] = useState(false);
@@ -169,6 +170,9 @@ const ConfirmApprove = ({ handleCloseAppove }: IProps) => {
           confirmButtonText: "OK",
           confirmButtonColor: "#3085d6",
         });
+
+        setReservation({ ...reservation, status: "refund" });
+        handleCloseAppove?.();
       } else {
         Swal.fire({
           title: "Hoàn tiền thất bại!",
@@ -223,7 +227,7 @@ const ConfirmApprove = ({ handleCloseAppove }: IProps) => {
       }}
     >
       <div
-        className="bg-white w-2/5 h-full max-h-screen overflow-y-auto pt-2 pb-10 px-10 flex flex-col gap-4 relative  "
+        className="bg-white w-2/5 h-full max-h-screen overflow-y-auto overflow-x-hidden pt-2 pb-10 px-10 flex flex-col gap-4 relative"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -344,131 +348,164 @@ const ConfirmApprove = ({ handleCloseAppove }: IProps) => {
               <img
                 src={reservation?.imageBanking}
                 alt=""
-                className="h-[120px] w-fit"
+                className="h-[120px] w-[200px] object-contain"
                 onClick={() => setIsOpenImage(true)}
               />
             )}
           </div>
         </div>
-
-        <div className="py-2 px-4 border border-black flex flex-col gap-4 rounded-xl">
-          <h1 className="font-semibold ">Cung cấp chứng từ từ chối</h1>
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="invalid-transfer"
-                className="h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500 font-semibold"
-                checked={isChecked}
-                onChange={handleCheckboxChange}
-              />
+        {status === null ? (
+          <div className="py-2 px-4 border border-black flex flex-col gap-4 rounded-xl">
+            <h1 className="font-semibold ">Cung cấp chứng từ từ chối</h1>
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="invalid-transfer"
+                  className="h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500 font-semibold"
+                  checked={isChecked}
+                  onChange={handleCheckboxChange}
+                />
+                <label
+                  htmlFor="invalid-transfer"
+                  className="text-sm text-red-700 font-medium"
+                >
+                  Chứng từ chuyển khoản không hợp lệ
+                </label>
+              </div>
+              <p>Hoặc</p>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="decline-reason" className="font-medium">
+                  Lý do từ chối đặt phòng
+                </label>
+                <select
+                  id="decline-reason"
+                  value={reason}
+                  onChange={(e) => {
+                    setReason(e.target.value);
+                    setIsChecked(false);
+                    setReasonNoInvalid("");
+                  }}
+                  className="p-2 border rounded-md"
+                >
+                  <option value="">-- Chọn lý do --</option>
+                  {reasons.map((r, idx) => (
+                    <option key={idx} value={r}>
+                      {r}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <p className="text-[-12] italic">
+                Và cung cấp chứng từ hoàn tiền
+              </p>
               <label
-                htmlFor="invalid-transfer"
-                className="text-sm text-red-700 font-medium"
+                htmlFor="file-upload"
+                // onClick={handleFocus}
+                className="px-4 py-2 w-[150px] font-bold bg-black text-white rounded-lg cursor-pointer hover:bg-indigo-700 transition"
               >
-                Chứng từ chuyển khoản không hợp lệ
+                📁 Chọn ảnh
               </label>
-            </div>
-            <p>Hoặc</p>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="decline-reason" className="font-medium">
-                Lý do từ chối đặt phòng
-              </label>
-              <select
-                id="decline-reason"
-                value={reason}
-                onChange={(e) => {
-                  setReason(e.target.value);
-                  setIsChecked(false);
-                  setReasonNoInvalid("");
-                }}
-                className="p-2 border rounded-md"
-              >
-                <option value="">-- Chọn lý do --</option>
-                {reasons.map((r, idx) => (
-                  <option key={idx} value={r}>
-                    {r}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <p className="text-[-12] italic">Và cung cấp chứng từ hoàn tiền</p>
-            <label
-              htmlFor="file-upload"
-              // onClick={handleFocus}
-              className="px-4 py-2 w-[150px] font-bold bg-black text-white rounded-lg cursor-pointer hover:bg-indigo-700 transition"
-            >
-              📁 Chọn ảnh
-            </label>
-            {/* {returnImgBanking !== null && (
+              {/* {returnImgBanking !== null && (
               <p className="mt-0.5 text-[-12] text-red-600 italic">
                 Cung cấp chứng từ hoàn tiền hoặc tích vào chứng từ không hợp lệ
               </p>
             )} */}
-            <input
-              id="file-upload"
-              type="file"
-              accept="image/png, image/jpeg, image/jpg, image/gif, image/webp"
-              className="hidden"
-              onChange={(e) => {
-                handleFileChange(e);
-              }}
-            />
-            {returnImgBanking && (
-              <div>
-                <div className="relative w-fit">
-                  <img
-                    src={returnImgBanking || ""}
-                    alt="Xem trước"
-                    className="h-[200px] object-contain rounded-lg border shadow"
-                  />
-                  <div
-                    className="absolute top-2 right-2 px-2 py-2 rounded-[-50] bg-gray-300 hover:opacity-25 cursor-pointer"
-                    onClick={handleFileRemove}
-                  >
-                    <FaRegTrashCan />
+              <input
+                id="file-upload"
+                type="file"
+                accept="image/png, image/jpeg, image/jpg, image/gif, image/webp"
+                className="hidden"
+                onChange={(e) => {
+                  handleFileChange(e);
+                }}
+              />
+              {returnImgBanking && (
+                <div>
+                  <div className="relative w-fit">
+                    <img
+                      src={returnImgBanking || ""}
+                      alt="Xem trước"
+                      className="h-[200px] object-contain rounded-lg border shadow"
+                    />
+                    <div
+                      className="absolute top-2 right-2 px-2 py-2 rounded-[-50] bg-gray-300 hover:opacity-25 cursor-pointer"
+                      onClick={handleFileRemove}
+                    >
+                      <FaRegTrashCan />
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
-        <div className="flex gap-16 mt-10 justify-center ">
-          {reservation?.statusUser === "created" ? (
-            <div className="flex gap-16 justify-center ">
-              {" "}
+        ) : (
+          <div className="py-2 px-4 border border-black flex flex-col gap-4 rounded-xl">
+            <h1 className="font-semibold text-[-18]">Hành động</h1>
+            <div>
+              <h3 className="font-semibold">Lí do từ chối</h3>
+              {reservation?.reason ? (
+                <p className="text-red-500">{reservation?.reason}</p>
+              ) : (
+                <p className="text-red-500">Không có</p>
+              )}
+            </div>
+            <div className="">
+              <div className=" font-bold  cursor-pointer ">
+                Chứng từ hoàn tiền
+              </div>
+
+              {reservation?.returnImgBanking ? (
+                <img
+                  src={reservation?.returnImgBanking}
+                  alt=""
+                  className="h-[120px] w-[200px] object-contain"
+                  onClick={() => setIsOpenImage(true)}
+                />
+              ) : (
+                <p className="text-red-500">Không có</p>
+              )}
+            </div>
+          </div>
+        )}
+        {status === null && (
+          <div className="flex gap-16 mt-10 justify-center ">
+            {reservation?.statusUser === "created" ? (
+              <div className="flex gap-16 justify-center ">
+                {" "}
+                <button
+                  className="flex items-center gap-2 px-8 py-2 text-green-600 font-semibold rounded-full border border-green-600 hover:bg-green-500/20 transition "
+                  onClick={handleAppove}
+                >
+                  <span>✔</span>
+                  Phê duyệt
+                </button>
+                {/* Từ chối */}
+                <button
+                  className="flex items-center gap-2 px-8 py-2 text-red-600 font-semibold rounded-full border border-red-600 hover:bg-red-500/20 transition "
+                  onClick={handleReject}
+                >
+                  <span>✖</span>
+                  Từ chối
+                </button>
+              </div>
+            ) : (
               <button
                 className="flex items-center gap-2 px-8 py-2 text-green-600 font-semibold rounded-full border border-green-600 hover:bg-green-500/20 transition "
-                onClick={handleAppove}
+                onClick={handleRefund}
               >
                 <span>✔</span>
-                Phê duyệt
+                Hoàn tiền
               </button>
-              {/* Từ chối */}
-              <button
-                className="flex items-center gap-2 px-8 py-2 text-red-600 font-semibold rounded-full border border-red-600 hover:bg-red-500/20 transition "
-                onClick={handleReject}
-              >
-                <span>✖</span>
-                Từ chối
-              </button>
-            </div>
-          ) : (
-            <button
-              className="flex items-center gap-2 px-8 py-2 text-green-600 font-semibold rounded-full border border-green-600 hover:bg-green-500/20 transition "
-              onClick={handleRefund}
-            >
-              <span>✔</span>
-              Hoàn tiền
-            </button>
-          )}
-          {/* Phê duyệt */}
-        </div>
+            )}
+            {/* Phê duyệt */}
+          </div>
+        )}
       </div>
 
       {isOpenImage && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 "
           onClick={() => setIsOpenImage(false)}
         >
           <button
@@ -480,7 +517,7 @@ const ConfirmApprove = ({ handleCloseAppove }: IProps) => {
           <img
             src={reservation?.imageBanking || ""}
             alt="Ảnh lớn"
-            className="h-screen rounded-xl shadow-lg"
+            className="h-screen w-1/2 object-contain rounded-xl shadow-lg"
             onClick={(e) => e.stopPropagation()} // để click vào ảnh không bị đóng modal
           />
         </div>

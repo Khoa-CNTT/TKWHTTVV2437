@@ -17,6 +17,8 @@ export interface IReservation {
   nameBank: string;
   statusUser: string;
   code: string;
+  returnImgBanking?: string | null;
+  reason?: string | null;
 }
 
 export interface IReservationObject {
