@@ -8,6 +8,7 @@ import { useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { TiArrowBack } from "react-icons/ti";
+import Swal from "sweetalert2";
 interface IDataEnter {
   resId: string;
   firstName: string;
@@ -108,7 +109,16 @@ const PaymentCheckout = ({
       if (respon?.status === "OK") {
         router.push(`/checkout?status=success&id=${respon?.data?.id}`);
       } else {
-        router.push(`/checkout?status=failed`);
+        if (respon?.status === "ERR") {
+          Swal.fire({
+            title: "Hết giờ!",
+            text: "Đã hết thời gian giữ phòng, vui lòng thử lại.",
+            icon: "warning",
+            confirmButtonText: "OK",
+          });
+        } else {
+          router.push(`/checkout?status=failed`);
+        }
       }
     }
   };
@@ -244,7 +254,7 @@ const PaymentCheckout = ({
 
       <div>
         <p className="mt-6 text-sm text-gray-600">
-          Nhấn và nút Quay lại để thay đổi thông tin
+          Nhấn vào nút trở lại để thay đổi thông tin
         </p>
         <div className="flex items-center justify-between">
           <button

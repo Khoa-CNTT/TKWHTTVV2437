@@ -128,7 +128,7 @@ const EditInfo = ({ data }: IProps) => {
   };
   return (
     <div>
-      <div className="fixed top-0 left-0 bottom-0 right-0 bg-white">
+      <div className="fixed top-0 left-0 bottom-0 right-0 bg-white ">
         <div className="p-5">
           <div
             onClick={closeModal}
@@ -140,8 +140,8 @@ const EditInfo = ({ data }: IProps) => {
             <p>Quay lại</p>
           </div>
         </div>
-        <div className="flex justify-center">
-          <div className="max-w-2/3 flex flex-col gap-10">
+        <div className="flex justify-center ">
+          <div className="max-w-2/3 w-2/3 flex flex-col gap-10">
             <div className="flex flex-col items-center justify-center">
               <h1 className="text-[text] text-[28px] font-semibold">
                 Cập nhật thông tin cá nhân của bạn

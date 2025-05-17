@@ -1,5 +1,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { IoWarningOutline } from "react-icons/io5";
+import { MdMapsHomeWork } from "react-icons/md";
 
 const FailedCheckout = () => {
   const searchParams = useSearchParams();
@@ -14,18 +16,26 @@ const FailedCheckout = () => {
   if (!show) return null;
   return (
     <div>
-      <div className="flex flex-col items-center justify-center mt-10 gap-4">
-        <h1 className="text-2xl font-bold">Đặt phòng không thành công</h1>
-        <p className="text-[-16] text-[text] italic">
-          Bạn có thể đặt phòng lại
-        </p>
+      <div className="flex flex-col items-center justify-center mt-10 gap-8">
+        {/* <span className="text-[100px] text-red-700">
+          <IoWarningOutline />
+        </span> */}
+        <h1 className="text-2xl font-bold">
+          Chúng tôi rất tiếc bạn đã đặt phòng không thành công!
+        </h1>
+
         <div className="flex justify-between gap-28">
-          <button className="text-[text] flex items-center gap-1 bg-gray-200 px-5 py-2 rounded-3xl mt-8 hover:bg-gray-300 transition duration-300 ease-in-out ">
-            Trang Home
-          </button>{" "}
-          {/* <button className="text-white font-semibold bg-blue-600 px-16 py-3 rounded-3xl mt-8 hover:bg-blue-700 transition duration-300 ease-in-out">
-            Thông tin đã đặt
-          </button> */}
+          <button
+            className="flex items-center bg-sky-500 hover:bg-sky-600 text-white font-semibold px-8 py-4 rounded-full shadow-md active:scale-95 transition-transform duration-100 "
+            onClick={() => {
+              router.push("/");
+            }}
+          >
+            Trang chủ
+            <span className="h-4 w-4 ml-2">
+              <MdMapsHomeWork />
+            </span>
+          </button>
         </div>
       </div>
     </div>
