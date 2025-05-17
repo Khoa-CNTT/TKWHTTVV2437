@@ -7,6 +7,10 @@ import { RiRobot2Line } from "react-icons/ri";
 import { HiExternalLink } from "react-icons/hi";
 import apisChatBot from "@/apis/chatbot";
 import { v4 as uuidv4 } from "uuid";
+import Markdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
+import remarkGfm from "remark-gfm";
+import { Components } from "react-markdown";
 
 interface IProps {
   onSetBox: (value: boolean) => void;
@@ -16,6 +20,12 @@ interface IMessage {
   id: number;
   text: string;
   sender: "user" | "bot";
+}
+
+interface ApiResponse {
+  answer: string;
+  fromCache: boolean;
+  queryTimeMs: number;
 }
 
 const BoxChat: React.FC<IProps> = ({ onSetBox }) => {
@@ -30,128 +40,29 @@ const BoxChat: React.FC<IProps> = ({ onSetBox }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Hàm phát hiện và định dạng URL
-  const detectAndFormatUrls = (text: string) => {
-    // Tách văn bản và URL ra để xử lý riêng
-    let processedText = text;
-    const elements = [];
-
-    // 1. Xử lý URL Cloudinary (ảnh)
-    const cloudinaryUrlPattern = /https:\/\/res\.cloudinary\.com\/[^\s"')]+/gi;
-    const cloudinaryUrls = [];
-    let match;
-
-    while ((match = cloudinaryUrlPattern.exec(text)) !== null) {
-      cloudinaryUrls.push(match[0]);
-      processedText = processedText.replace(match[0], "");
-    }
-
-    // 2. Xử lý URLs localhost (chuyển tiếp)
-    const localhostUrlPattern = /(http:\/\/localhost:[0-9]+\/[^\s"'),.]+)/gi;
-    const localhostUrls = [];
-
-    while ((match = localhostUrlPattern.exec(text)) !== null) {
-      localhostUrls.push(match[0]);
-      processedText = processedText.replace(match[0], "");
-    }
-
-    // 3. Xử lý các URL khác (hiển thị dạng link)
-    const otherUrlPattern =
-      /(https?:\/\/(?!res\.cloudinary\.com)(?!localhost)[^\s"'),.]+)/gi;
-    const otherUrls = [];
-
-    while ((match = otherUrlPattern.exec(text)) !== null) {
-      otherUrls.push(match[0]);
-      processedText = processedText.replace(match[0], "");
-    }
-
-    // Nếu còn text thì hiển thị
-    if (processedText.trim()) {
-      elements.push(
-        <span key="text" style={{ whiteSpace: "pre-line" }}>
-          {processedText}
-        </span>
-      );
-    }
-
-    // Hiển thị URLs localhost
-    localhostUrls.forEach((url, index) => {
-      const urlParts = url.split("/");
-      const pageName = urlParts[urlParts.length - 1]
-        .replace(/-/g, " ")
-        .split("?")[0]
-        .replace(/\b\w/g, (char) => char.toUpperCase());
-
-      elements.push(
-        <a
-          key={`localhost-${index}`}
-          href={url}
-          className="block my-2 text-blue-700 font-medium hover:underline break-all flex items-center gap-2 bg-blue-50 p-2 rounded-md border-l-4 border-blue-500"
-          onClick={(e) => {
-            e.preventDefault();
-            window.location.href = url;
-          }}
-        >
-          <span className="inline-block text-blue-600">📄</span>
-          <span className="inline-block">
-            <span className="font-semibold">Xem chi tiết:</span> {pageName}
-          </span>
-        </a>
-      );
-    });
-
-    // Hiển thị các URL khác
-    otherUrls.forEach((url, index) => {
-      elements.push(
-        <a
-          key={`external-${index}`}
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block my-1 text-blue-600 hover:underline break-all flex items-center gap-1"
-          onClick={(e) => {
-            e.preventDefault();
-            window.open(url, "_blank", "noopener,noreferrer");
-          }}
-        >
-          <HiExternalLink className="inline-block flex-shrink-0" />
-          <span className="inline-block">{url}</span>
-        </a>
-      );
-    });
-
-    // Hiển thị ảnh Cloudinary
-    if (cloudinaryUrls.length > 0) {
-      elements.push(
-        <div
-          key="image-group"
-          className={`my-3 grid gap-2 w-full ${
-            cloudinaryUrls.length > 1
-              ? cloudinaryUrls.length === 2
-                ? "grid-cols-2"
-                : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
-              : "grid-cols-1"
-          }`}
-        >
-          {cloudinaryUrls.map((url, imgIdx) => (
-            <div key={imgIdx} className="flex justify-center">
-              <img
-                src={url}
-                alt={`Image ${imgIdx + 1}`}
-                className="rounded-lg shadow-md max-h-64 max-w-full object-cover border border-gray-200"
-                loading="lazy"
-              />
-            </div>
-          ))}
-        </div>
-      );
-    }
-
-    return elements.length > 0 ? (
-      elements
-    ) : (
-      <span style={{ whiteSpace: "pre-line" }}>{text}</span>
-    );
+  const components: Components = {
+    a: ({ node, ...props }) => (
+      <a
+        {...props}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-blue-600 hover:underline"
+      />
+    ),
+    pre: ({ node, ...props }) => (
+      <pre
+        {...props}
+        className="bg-gray-100 p-2 rounded my-2 overflow-x-auto"
+      />
+    ),
+    p: ({ node, ...props }) => <p {...props} className="my-2" />,
+    ul: ({ node, ...props }) => (
+      <ul {...props} className="list-disc pl-5 my-2" />
+    ),
+    ol: ({ node, ...props }) => (
+      <ol {...props} className="list-decimal pl-5 my-2" />
+    ),
+    li: ({ node, ...props }) => <li {...props} className="my-1" />,
   };
 
   const handleSendMessage = async () => {
@@ -169,11 +80,22 @@ const BoxChat: React.FC<IProps> = ({ onSetBox }) => {
         { id: prev.length + 1, text: "", sender: "bot" },
       ]);
 
-      let response;
+      let response: ApiResponse;
       try {
         setLoading(true);
         response = await apisChatBot.getMessage(inputValue.trim(), uuidv4());
         setLoading(false);
+
+        // Update bot message with response
+        if (response?.answer) {
+          setMessages((prev) =>
+            prev.map((message) =>
+              message.id === prev.length
+                ? { ...message, text: response.answer }
+                : message
+            )
+          );
+        }
       } catch (e) {
         console.log("error", e);
         setLoading(false);
@@ -190,17 +112,6 @@ const BoxChat: React.FC<IProps> = ({ onSetBox }) => {
           )
         );
         return;
-      }
-
-      // Update bot message with response
-      if (response?.answer) {
-        setMessages((prev) =>
-          prev.map((message) =>
-            message.id === prev.length
-              ? { ...message, text: response.answer }
-              : message
-          )
-        );
       }
     }
   };
@@ -263,8 +174,14 @@ const BoxChat: React.FC<IProps> = ({ onSetBox }) => {
                         : "bg-blue-700 text-white"
                     }`}
                   >
-                    <div className="px-4 py-2">
-                      {detectAndFormatUrls(message.text)}
+                    <div className="px-4 py-2 prose prose-sm max-w-none">
+                      <Markdown
+                        rehypePlugins={[rehypeRaw]}
+                        remarkPlugins={[remarkGfm]}
+                        components={components}
+                      >
+                        {message.text}
+                      </Markdown>
                     </div>
                   </div>
                 ) : null}
