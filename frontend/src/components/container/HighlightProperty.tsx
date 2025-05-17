@@ -24,7 +24,7 @@ const HighlightProperty: React.FC<IProps> = ({ highlights }) => {
     <div className="border-[1px] border-gray-300 rounded-xl p-5 shadow-sm">
       <h3 className="text-lg font-semibold">Các điểm nổi bật tại chỗ nghỉ</h3>
 
-      {highlights.map((item) => (
+      {highlights?.map((item) => (
         <div key={item.id} className="flex items-center gap-3 mt-4">
           {iconMapHighlight[item.icon]}
           <div>

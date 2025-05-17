@@ -344,7 +344,7 @@ const DetailPage = async (props: IProps) => {
             )}
 
             <div className="my-10 border-y border-t-gray-200 border-b-gray-200 py-6 flex flex-col gap-4">
-              <h1 className="text-xl font-semibold">Liên hệ chỗ nghĩ</h1>
+              <h1 className="text-xl font-semibold">Liên hệ chỗ nghỉ</h1>
               <p className="text-[-14] ">
                 Đối với hầu hết các câu hỏi, chỗ nghỉ là nơi tốt nhất để liên hệ
               </p>
@@ -354,7 +354,7 @@ const DetailPage = async (props: IProps) => {
                   <MdOutlineEmail />
                 </span>
                 <div className="flex flex-col gap-1">
-                  <h3 className="font-semibold">Gởi email cho chỗ nghĩ</h3>
+                  <h3 className="font-semibold">Gởi email cho chỗ nghỉ</h3>
                   <p className="text-[-14]">
                     Hãy email cho chỗ nghĩ và họ sẽ trả lời sớm nhất có thể
                   </p>
@@ -413,7 +413,7 @@ const DetailPage = async (props: IProps) => {
           {/* Liên hệ chỗ nghỉ */}
           <div className="border rounded-lg shadow p-6 flex flex-col gap-4 text-sm">
             <p className="font-semibold">Liên hệ chỗ nghỉ</p>
-            <p>Điện thoại: {property?.data?.users?.phone}</p>
+            {/* <p>Điện thoại: {property?.data?.users?.phone}</p> */}
             <a
               href={`mailto:${property?.data?.users?.email}`}
               className="text-blue-600 underline text-left hover:text-blue-800"

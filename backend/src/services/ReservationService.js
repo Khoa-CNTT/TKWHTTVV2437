@@ -29,12 +29,13 @@ const lockBooking = (body) => {
 
       if (existingReservation) {
         await t.rollback();
-        resolve({
+        return resolve({
           status: "OK",
           msg: "Bạn đã giữ phòng này rồi, vui lòng thanh toán.",
           data: existingReservation,
         });
       }
+      console.log("123213 OKOK");
 
       const dates = getDatesInRange(startDay, endDay);
 
@@ -42,7 +43,7 @@ const lockBooking = (body) => {
 
       if (!room) {
         await t.rollback();
-        resolve({
+        return resolve({
           status: "OK",
           msg: "Không tìm thấy phòng",
         });
@@ -59,7 +60,7 @@ const lockBooking = (body) => {
 
         if ((availability?.blocked_quantity || 0) >= room.quantity) {
           await t.rollback();
-          resolve({
+          return resolve({
             status: "OK",
             msg: "Hết phòng",
           });
@@ -327,12 +328,12 @@ const createReservation = (body) => {
       const booking = await db.Reservation.findByPk(resId);
       const now = new Date();
       if (booking.statusLock !== "pending" || now > booking.locked_until) {
-        resolve({
+        return resolve({
           status: "ERR",
           msg: "Đã hết thời gian thanh toán phòng.",
         });
       }
-
+      console.log("123123");
       await sendMail({
         email: email,
         text: "Cảm ơn",

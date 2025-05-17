@@ -221,7 +221,10 @@ const EditPassword = () => {
                   />
 
                   <div className="mt-5">
-                    <ButtonLogin text="Countinue" onClick={handleSubmitEdit} />
+                    <ButtonLogin
+                      text="Lưu thông tin"
+                      onClick={handleSubmitEdit}
+                    />
                   </div>
                 </div>
               </div>
