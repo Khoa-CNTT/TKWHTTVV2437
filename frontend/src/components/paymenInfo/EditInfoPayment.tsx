@@ -47,7 +47,7 @@ const EditInfoPayment = ({ data }: IEditData) => {
   });
   useEffect(() => {
     setDataPayment({
-      numberAccount: data?.nameAccount || "",
+      numberAccount: data?.numberAccount || "",
       nameAccount: data?.nameAccount || "",
       nameBank: data?.nameBank || "",
       qrCode: data?.qrCode || "",
