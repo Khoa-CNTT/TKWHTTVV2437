@@ -1,7 +1,7 @@
 "use client";
 import { FaRegTrashCan } from "react-icons/fa6";
 import InputText from "../input/InputText";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import apiPayment from "@/api/payment";
 import ButtonLogin from "../button/ButtonLogin";
 import { useAuth } from "@/app/contexts/AuthContext";
@@ -41,6 +41,8 @@ const RegisterPage = () => {
   const [action, setAction] = useState(false);
 
   const [invalidFields, setInvalidFields] = useState<IInvalidField[]>([]);
+  const beforeRef = useRef<HTMLInputElement>(null);
+  const afterRef = useRef<HTMLInputElement>(null);
 
   const handleGetDetailRegisterPartner = async () => {
     if (user) {
@@ -75,6 +77,7 @@ const RegisterPage = () => {
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = e.target.files?.[0];
+
     if (file) {
       const formData = new FormData();
       formData.append("file", file);
@@ -108,16 +111,31 @@ const RegisterPage = () => {
       ...prev,
       beforeImage: "",
     }));
+    if (beforeRef?.current) {
+      beforeRef.current.value = "";
+    }
   };
   const handleFileRemoveAfter = () => {
     setData((prev) => ({
       ...prev,
       afterImage: "",
     }));
+    if (afterRef?.current) {
+      afterRef.current.value = "";
+    }
   };
 
   const handleSubmit = async () => {
-    const invalids = validate({ ...data }, setInvalidFields);
+    const invalids = validate(
+      {
+        name: data.name,
+        numberCCCD: data.numberCCCD,
+        beforeImage: data.afterImage,
+        afterImage: data.afterImage,
+      },
+      setInvalidFields
+    );
+    console.log(invalids);
     if (invalids === 0 && user) {
       const res = await apiRegisterPartner.resgister({
         ...data,
@@ -125,6 +143,7 @@ const RegisterPage = () => {
       });
       if (res.status === "OK") {
         setAction(!action);
+        setInvalidFields([]);
       }
     }
   };
@@ -243,6 +262,7 @@ const RegisterPage = () => {
                 )}
 
                 <input
+                  ref={beforeRef}
                   disabled={disable === true ? true : false}
                   id="file-upload1"
                   type="file"
@@ -291,6 +311,7 @@ const RegisterPage = () => {
                 )}
 
                 <input
+                  ref={afterRef}
                   disabled={disable === true ? true : false}
                   id="file-upload"
                   type="file"
@@ -343,6 +364,9 @@ const RegisterPage = () => {
               <button
                 disabled={!agreed}
                 onClick={handleSubmit}
+                // onClick={() => {
+                //   console.log("123");
+                // }}
                 className={`py-3 rounded-xl  text-white font-semibold  text-[-14] ${!agreed ? "w-full    font-semibold  bg-blue-300 text-white  cursor-not-allowed" : "bg-primary"}`}
               >
                 Gởi yêu cầu
