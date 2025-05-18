@@ -9,9 +9,18 @@ module.exports = (sequelize, DataTypes) => {
         as: "reviews",
       });
 
+      models.User.hasOne(models.RegisterPartner, {
+        foreignKey: "idUser",
+        as: "user",
+      });
+
       models.User.hasMany(models.Property, {
         foreignKey: "idUser",
         as: "properties",
+      });
+      models.User.hasMany(models.Reservation, {
+        foreignKey: "idUser",
+        as: "reservations",
       });
     }
   }

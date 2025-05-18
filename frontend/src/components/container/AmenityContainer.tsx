@@ -30,7 +30,7 @@ const iconMap: { [key: string]: JSX.Element } = {
 const AnmenityContainer: React.FC<IProps> = ({ amenities }) => {
   return (
     <div className="grid grid-cols-5 gap-4">
-      {amenities.map((item: Amenity, index: number) => (
+      {amenities?.map((item: Amenity, index: number) => (
         <div
           key={index}
           className="flex items-center gap-2 mt-2 text-sm font-medium"

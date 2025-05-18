@@ -187,6 +187,16 @@ const getTotalDashboard = async (req, res) => {
   }
 };
 
+const getAllPropertyByAdmin = async (req, res) => {
+  try {
+    const response = await PropertyService.getAllPropertyByAdmin();
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
 const updateStatusProperty = async (req, res) => {
   try {
     const response = await PropertyService.updateStatusProperty(
@@ -216,6 +226,7 @@ module.exports = {
   getPropertyIdByUserId,
   getAdvertisingByPropertyId,
   getTotalDashboard,
+  getAllPropertyByAdmin,
   getImageByPropertyId,
   getListPropertyByAdmin,
   updateStatusProperty,

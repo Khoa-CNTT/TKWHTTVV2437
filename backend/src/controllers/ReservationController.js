@@ -24,9 +24,11 @@ const createReservation = async (req, res) => {
 
 const listReservationApprove = async (req, res) => {
   try {
-    const { filter } = req.query;
+    const { filter, status, page } = req.query;
     const response = await ReservationService.listReservationApprove({
       filter,
+      status,
+      page,
     });
     return res.status(200).json(response);
   } catch (error) {
@@ -139,6 +141,23 @@ const updateStatusUserReservation = async (req, res) => {
     });
   }
 };
+
+const listReservationByAdmin = async (req, res) => {
+  try {
+    const { filter, idProperty, page } = req.query;
+
+    const response = await ReservationService.listReservationByAdmin({
+      filter,
+      idProperty,
+      page,
+    });
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
 module.exports = {
   lockBooking,
   createReservation,
@@ -151,4 +170,5 @@ module.exports = {
   getDataBarChart,
   updateStatusUserReservation,
   getTimeOfResLockbyId,
+  listReservationByAdmin,
 };

@@ -1,10 +1,11 @@
 const db = require("../models");
 import { v4 } from "uuid";
 import moment from "moment";
-import { Op } from "sequelize";
+import { Op, where } from "sequelize";
 import sendMail from "../utils/sendMail";
 import convertToVietnameseDate from "../utils/convertToVietNameseDate";
 import getDatesInRange from "../utils/getDatesInRange";
+import { v4 as uuidv4 } from "uuid";
 
 const lockBooking = (body) => {
   return new Promise(async (resolve, reject) => {
@@ -29,12 +30,13 @@ const lockBooking = (body) => {
 
       if (existingReservation) {
         await t.rollback();
-        resolve({
+        return resolve({
           status: "OK",
           msg: "Bạn đã giữ phòng này rồi, vui lòng thanh toán.",
           data: existingReservation,
         });
       }
+      console.log("123213 OKOK");
 
       const dates = getDatesInRange(startDay, endDay);
 
@@ -42,7 +44,7 @@ const lockBooking = (body) => {
 
       if (!room) {
         await t.rollback();
-        resolve({
+        return resolve({
           status: "OK",
           msg: "Không tìm thấy phòng",
         });
@@ -59,7 +61,7 @@ const lockBooking = (body) => {
 
         if ((availability?.blocked_quantity || 0) >= room.quantity) {
           await t.rollback();
-          resolve({
+          return resolve({
             status: "OK",
             msg: "Hết phòng",
           });
@@ -327,12 +329,12 @@ const createReservation = (body) => {
       const booking = await db.Reservation.findByPk(resId);
       const now = new Date();
       if (booking.statusLock !== "pending" || now > booking.locked_until) {
-        resolve({
+        return resolve({
           status: "ERR",
           msg: "Đã hết thời gian thanh toán phòng.",
         });
       }
-
+      console.log("123123");
       await sendMail({
         email: email,
         text: "Cảm ơn",
@@ -402,10 +404,13 @@ const createReservation = (body) => {
   });
 };
 
-const listReservationApprove = ({ filter }) => {
+const listReservationApprove = ({ filter, status, page, limit = 10 }) => {
   return new Promise(async (resolve, reject) => {
     try {
-      console.log("filter ", filter);
+      console.log(filter, status, page, limit);
+      let queries = {
+        statusLock: "confirmed",
+      };
       let order;
       switch (filter) {
         case "latest":
@@ -422,12 +427,23 @@ const listReservationApprove = ({ filter }) => {
           order = [["createdAt", "ASC"]];
           break;
       }
+      if (status === "handle") {
+        queries.status = {
+          [Op.ne]: "waiting",
+        };
+      } else {
+        queries.status = status;
+      }
 
+      let offset = !page || +page <= 1 ? 0 : +page - 1;
       const response = await db.Reservation.findAndCountAll({
-        where: {
-          status: "waiting",
-          statusLock: "confirmed",
-        },
+        // where: {
+        //   status: "waiting",
+        //   statusLock: "confirmed",
+        // },
+        where: queries,
+        offset: offset * limit,
+        limit: limit,
         include: [
           {
             model: db.Room,
@@ -440,6 +456,8 @@ const listReservationApprove = ({ filter }) => {
 
       resolve({
         status: response ? "OK" : "ERR",
+        limit: limit,
+        page: offset + 1,
         data: response,
       });
     } catch (error) {
@@ -482,6 +500,9 @@ const approveReservation = ({
   payload,
 }) => {
   return new Promise(async (resolve, reject) => {
+    console.log({ payload });
+    console.log({ status });
+
     try {
       let html;
 
@@ -1127,6 +1148,67 @@ const approveReservation = ({
         }
       );
 
+      if (status === "confirmed") {
+        const currentMonth = moment().format("MM");
+        const currentYear = moment().format("YYYY");
+        const commissionPayment = await db.CommissionPayment.findOne({
+          where: {
+            idProperty: payload?.idProperty,
+            month: Number(currentMonth),
+            year: Number(currentYear),
+          },
+        });
+
+        if (!commissionPayment) {
+          await db.CommissionPayment.create({
+            id: v4(),
+            idProperty: payload?.idProperty,
+            month: Number(currentMonth),
+            year: Number(currentYear),
+            totalRevenue: payload?.totalPrice,
+            commissionAmount: payload?.totalPrice * 0.1,
+            status: "pending",
+            orderQuantity: 1,
+            commissionRate: 10,
+          });
+        } else {
+          await db.CommissionPayment.update(
+            {
+              totalRevenue:
+                commissionPayment.totalRevenue + payload?.totalPrice,
+              totalCommission:
+                commissionPayment.totalCommission + payload?.totalPrice * 0.1,
+              orderQuantity: commissionPayment.orderQuantity + 1,
+            },
+            {
+              where: { id: commissionPayment.id },
+            }
+          );
+        }
+
+        await db.Property.update(
+          {
+            approved: db.sequelize.literal("approved + 1"),
+          },
+          {
+            where: {
+              id: payload?.idProperty, // Thay propertyId bằng ID của property cần cập nhật
+            },
+          }
+        );
+      } else if (status === "reject") {
+        await db.Property.update(
+          {
+            approved: db.sequelize.literal("reject + 1"),
+          },
+          {
+            where: {
+              id: payload?.idProperty, // Thay propertyId bằng ID của property cần cập nhật
+            },
+          }
+        );
+      }
+
       resolve({
         status: "OK",
         msg: "Approve reservation success!",
@@ -1192,6 +1274,7 @@ const listReservationOfUser = (idUser) => {
         data: response,
       });
     } catch (error) {
+      console.log({ error });
       reject("error " + error);
     }
   });
@@ -1485,6 +1568,82 @@ const getDataBarChart = async (propertyId, filter) => {
   });
 };
 
+const listReservationByAdmin = ({ filter, idProperty, page, limit = 10 }) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log(filter, idProperty, page);
+      let queries = {};
+      let order;
+      switch (filter) {
+        case "latest":
+          order = [["createdAt", "DESC"]];
+          break;
+        case "price-asc":
+          order = [["totalPrice", "ASC"]];
+          break;
+        case "price-desc":
+          order = [["totalPrice", "DESC"]];
+          break;
+
+        default:
+          order = [["createdAt", "ASC"]];
+          break;
+      }
+      if (idProperty !== "0") {
+        queries.id = idProperty;
+      }
+
+      let offset = !page || +page <= 1 ? 0 : +page - 1;
+      const response = await db.Reservation.findAndCountAll({
+        where: {
+          // status: "waiting",
+          statusLock: "confirmed",
+        },
+        attributes: {
+          exclude: ["statusLock", "locked_until"],
+        },
+        offset: offset * limit,
+        limit: limit,
+        include: [
+          {
+            model: db.Room,
+            as: "rooms",
+            attributes: ["id", "name"],
+          },
+          {
+            model: db.User,
+            as: "users",
+            attributes: ["email", "phone", "firstName", "lastName"],
+          },
+          {
+            model: db.Property,
+            as: "properties",
+            attributes: ["name", "id"],
+            where: queries,
+            include: [
+              {
+                model: db.User,
+                as: "users",
+                attributes: ["email", "phone", "firstName", "lastName"],
+              },
+            ],
+          },
+        ],
+        order,
+      });
+
+      resolve({
+        status: response ? "OK" : "ERR",
+        limit: limit,
+        page: offset + 1,
+        data: response,
+      });
+    } catch (error) {
+      reject("error " + error);
+    }
+  });
+};
+
 module.exports = {
   lockBooking,
   removeExpiredBookings,
@@ -1498,4 +1657,5 @@ module.exports = {
   getDataBarChart,
   updateStatusUserReservation,
   getTimeOfResLockbyId,
+  listReservationByAdmin,
 };

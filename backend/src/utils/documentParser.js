@@ -105,8 +105,8 @@ function parseStringDocument(text) {
     }
 
     // Handle status
-    if (line.startsWith("Trạng thái:")) {
-      result.status = line.replace("Trạng thái:", "").trim();
+    if (line.startsWith("Trạng thái Phòng:")) {
+      result.status = line.replace("Trạng thái Phòng:", "").trim();
     }
 
     // Handle rating

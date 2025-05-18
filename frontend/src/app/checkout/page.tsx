@@ -19,6 +19,7 @@ import FailedCheckout from "@/components/checkout/FailedCheckout";
 import apiPayment from "@/api/payment";
 import { IInfoPayment } from "../types/accountPayment";
 import apiReservation from "@/api/reservation";
+import Footer from "@/components/header/Footer";
 interface IDataEnter {
   resId: string;
   firstName: string;
@@ -230,66 +231,74 @@ const CheckoutContent = () => {
   };
 
   return (
-    <div className="w-[1150px] mx-auto min-h-screen pt-10">
-      {show ? (
-        <div>
-          <SuccessCheckout />
-          <FailedCheckout />
-        </div>
-      ) : (
-        <div>
-          <div className="flex items-center justify-between w-[60%] pr-6">
-            <p className="text-2xl font-semibold">Begin your booking</p>
-            <p className="text-gray-500">{`Bước ${step}/2`} </p>
+    <div>
+      <div className="w-[1150px] mx-auto min-h-screen pt-10">
+        {show ? (
+          <div>
+            <SuccessCheckout />
+            <FailedCheckout />
           </div>
-          <div className="flex w-[1150px] mx-auto  gap-8 min-h-screen">
-            {step === 1 ? (
-              <div className="w-[60%]">
-                <ContentCheckout
-                  property={property}
-                  handleStep2={handleStep2}
-                  dataEnter={dataEnter}
-                  onChangeDataEnter={setDataEnter}
-                  invalidFields={invalidFields}
-                  setInvalidFields={setInvalidFields}
-                />
-              </div>
-            ) : (
-              <div className="w-[60%]">
-                <PaymentCheckout
-                  handleStep1={handleStep1}
-                  dataEnter={dataEnter}
-                  onChangeDataEnter={setDataEnter}
-                  userId={user?.id}
-                  startDay={handleToISOString(startDate, "startDay")}
-                  endDay={handleToISOString(endDate, "endDay")}
-                  roomId={roomId}
-                  code={code}
-                  AccountPayment={infoPayment}
-                  propertyId={propertyId}
-                />
-              </div>
-            )}
+        ) : (
+          <div>
+            <div className="flex items-center justify-between w-[60%] pr-6">
+              <p className="text-2xl font-semibold">Bắt đầu đặt phòng</p>
+              <p className="text-gray-500">{`Bước ${step}/2`} </p>
+            </div>
+            <div className="flex w-[1150px] mx-auto  gap-8 min-h-screen">
+              {step === 1 ? (
+                <div className="w-[60%]">
+                  <ContentCheckout
+                    property={property}
+                    handleStep2={handleStep2}
+                    dataEnter={dataEnter}
+                    onChangeDataEnter={setDataEnter}
+                    invalidFields={invalidFields}
+                    setInvalidFields={setInvalidFields}
+                  />
+                </div>
+              ) : (
+                <div className="w-[60%]">
+                  <PaymentCheckout
+                    handleStep1={handleStep1}
+                    dataEnter={dataEnter}
+                    onChangeDataEnter={setDataEnter}
+                    userId={user?.id}
+                    startDay={handleToISOString(startDate, "startDay")}
+                    endDay={handleToISOString(endDate, "endDay")}
+                    roomId={roomId}
+                    code={code}
+                    AccountPayment={infoPayment}
+                    propertyId={propertyId}
+                  />
+                </div>
+              )}
 
-            <div className="w-[40%]">
-              <div className="mb-4 p-4 rounded-xl border border-red-600 flex justify-center  text-red-600 flex-col items-center">
-                {timeLeft !== 0 ? (
-                  <p className="text-[-18] font-semibold">
-                    Thời gian giữ phòng: {timeLeft && formatTime(timeLeft)} phút
+              <div className="w-[40%]">
+                <div className="mb-4 p-4 rounded-xl border border-red-600 flex justify-center  text-red-600 flex-col items-center">
+                  {timeLeft !== 0 ? (
+                    <p className="text-[-18] font-semibold">
+                      Thời gian giữ phòng: {timeLeft && formatTime(timeLeft)}{" "}
+                      phút
+                    </p>
+                  ) : (
+                    <p className="text-[-18] font-semibold">Hết giờ</p>
+                  )}
+
+                  <p className="text-[-14] italic">
+                    Phòng sẽ hủy sau khi hết thời gian
                   </p>
-                ) : (
-                  <p className="text-[-18] font-semibold">Hết giờ</p>
-                )}
-
-                <p className="text-[-14] italic">
-                  Phòng sẽ hủy sau khi hết thời gian
-                </p>
+                </div>
+                <InforRoomCheckout
+                  property={property}
+                  room={room}
+                  code={code}
+                />
               </div>
-              <InforRoomCheckout property={property} room={room} code={code} />
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
+      <Footer />
     </div>
   );
 };

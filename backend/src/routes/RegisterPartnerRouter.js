@@ -23,4 +23,9 @@ router.delete(
   registerParnerController.cancelRegisterPartner
 );
 
+router.get(
+  "/getAll-registerPartner",
+  registerParnerController.getAllRegisterPartner
+);
+
 module.exports = router;

@@ -12,7 +12,7 @@ const IconChat = () => {
   };
 
   return (
-    <div className="w-[60px] h-[60px] flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition duration-300 ease-in-out cursor-pointer">
+    <div className="w-[60px] h-[60px] flex items-center justify-center rounded-full bg-blue-500 text-white hover:bg-blue-600 transition duration-300 ease-in-out cursor-pointer">
       <SiChatbot onClick={handleShowBox} size={30} />
 
       {isOpen && (

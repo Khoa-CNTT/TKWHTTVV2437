@@ -236,7 +236,7 @@ const EditEmail = () => {
                   <InputForm
                     titleHeader={itemsLabelForm[step].title}
                     labelHeader={itemsLabelForm[step].label}
-                    labelBtn="Verify OTP"
+                    labelBtn="Xác nhận OTP"
                     labelInput="6-digit code"
                     typeInput="text"
                     idInput="otp"
@@ -249,11 +249,7 @@ const EditEmail = () => {
 
                   <div className="mt-5 relative">
                     <ButtonLogin
-                      text={
-                        isCounting
-                          ? `Send again OTP ${countdown}`
-                          : `Send again OTP`
-                      }
+                      text={isCounting ? `Gởi lại ${countdown}` : `Gởi lại`}
                       inForm={false}
                       disable={isCounting}
                       onClick={handdleOnSendAgainOTP}
@@ -309,7 +305,7 @@ const EditEmail = () => {
 
                     <div className="mt-5">
                       <ButtonLogin
-                        text="Countinue"
+                        text="Lưu thông tin"
                         onClick={handleSendOTPEmailNew}
                       />
                     </div>
@@ -322,7 +318,7 @@ const EditEmail = () => {
                   <InputForm
                     titleHeader={itemsLabelForm[step].title}
                     labelHeader={itemsLabelForm[step].label}
-                    labelBtn="Verify OTP"
+                    labelBtn="Xác nhận OTP"
                     labelInput="6-digit code"
                     typeInput="text"
                     idInput="otp"
@@ -336,9 +332,7 @@ const EditEmail = () => {
                   <div className="mt-5 relative">
                     <ButtonLogin
                       text={
-                        isCounting
-                          ? `Send again OTP ${countdown}`
-                          : `Send again OTP`
+                        isCounting ? `Gởi lại OTP ${countdown}` : `Gởi lại OTP`
                       }
                       inForm={false}
                       disable={isCounting}

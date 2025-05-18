@@ -10,6 +10,9 @@ import {
   showErrorAlert,
   showConfirmAlert,
 } from "@/helper/Alert";
+import { FaInfoCircle, FaTrashAlt } from "react-icons/fa";
+import { useSearchParamsWrapper } from "@/hooks/useSearchParamsWrapper";
+
 // Interface chung cho người dùng
 interface IUser {
   id: string;
@@ -211,11 +214,11 @@ const ManageUserContainer: React.FC = () => {
     };
 
     return (
-      <table className="min-w-full text-black">
-        <thead className="bg-gray-200 text-gray-500 font-bold text-sm">
+      <table className="min-w-full text-black rounded-2xl">
+        <thead className="bg-gray-200 text-[14px] text-gray-500 font-bold">
           <tr>
             <th
-              className="px-4 py-3 text-left cursor-pointer"
+              className="px-4 py-3 text-left rounded-tl-2xl cursor-pointer"
               onClick={() => handleSort("firstName")}
             >
               Họ và Tên{" "}
@@ -248,7 +251,7 @@ const ManageUserContainer: React.FC = () => {
               Vai trò{" "}
               {sortField === "role" && (sortOrder === "asc" ? "▲" : "▼")}
             </th>
-            <th className="px-4 py-3 text-left">Hành động</th>
+            <th className="px-4 py-3 text-left rounded-tr-2xl">Hành động</th>
           </tr>
         </thead>
         <tbody className="text-sm font-semibold">
@@ -264,7 +267,7 @@ const ManageUserContainer: React.FC = () => {
               <td className="px-4 py-5">
                 <span
                   className={`px-2 py-1 rounded-full ${getStatusClass(
-                    user.status
+                    user.status || "Active"
                   )}`}
                 >
                   {user.status == "active" ? "Hoạt động" : "Khóa"}
@@ -273,7 +276,11 @@ const ManageUserContainer: React.FC = () => {
               <td className="px-4 py-5">
                 <span
                   className={`px-2 py-1 rounded-full ${getRoleClass(
-                    user.role
+                    user.role === "3"
+                      ? "User"
+                      : user.role === "7"
+                        ? "Owner"
+                        : "Admin"
                   )}`}
                 >
                   {user?.role == "3"
@@ -295,20 +302,22 @@ const ManageUserContainer: React.FC = () => {
             ></i>
         )} */}
                   <i
-                    className="fa fa-eye text-gray-500 text-lg cursor-pointer hover:text-blue-700"
+                    className=" text-gray-500 text-[20px] cursor-pointer hover:text-blue-700"
                     onClick={(e) => {
                       e.stopPropagation();
                       onSelectUser(user);
                     }}
-                  ></i>
+                  >
+                    <FaInfoCircle />
+                  </i>
                   <button
-                    className="text-red-500 hover:text-red-700  text-[20px]"
+                    className="text-red-500 text-[18px] cursor-pointer hover:text-red-700"
                     onClick={(e) => {
                       e.stopPropagation();
                       onDeleteUser(user.id);
                     }}
                   >
-                    <i className="fa fa-trash text-lg cursor-pointer"></i>
+                    <FaTrashAlt />
                   </button>
                 </div>
               </td>
@@ -336,7 +345,7 @@ const ManageUserContainer: React.FC = () => {
       dateOfBirth: "",
       emergencyPhone: "",
       address: "",
-      role: "User",
+      role: "3",
       status: "Active",
     });
 
@@ -355,7 +364,17 @@ const ManageUserContainer: React.FC = () => {
         ...newUser,
         dateOfBirth: new Date(newUser.dateOfBirth), // Chuyển string -> Date
       };
-      const invalidCount = validate(newUser, setInvalidFields);
+
+      const invalidCount = validate(
+        {
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+          email: newUser.email,
+          password: newUser.password,
+          phone: newUser.phone,
+        },
+        setInvalidFields
+      );
       if (invalidCount > 0) {
         showErrorAlert("Vui lòng kiểm tra lại các trường nhập liệu.");
         return;
@@ -375,18 +394,22 @@ const ManageUserContainer: React.FC = () => {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-        <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl max-h-[80vh] overflow-y-auto">
-          <h2 className="text-lg font-bold mb-4">Thêm người dùng mới</h2>
+        <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl max-h-full h-full overflow-y-auto">
+          <h2 className="text-2xl font-bold mb-8">Thêm người dùng mới</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Existing fields */}
-            <div>
-              <label className="block font-bold">Họ:</label>
+            {/* Họ */}
+            <div className="flex flex-col gap-1">
+              <label className="font-semibold text-sm">Họ</label>
               <input
                 type="text"
                 name="lastName"
                 value={newUser.lastName}
                 onChange={handleInputChange}
-                className={`border rounded px-2 py-1 w-full ${invalidFields.some((f) => f.name === "lastName") ? "border-red-500" : ""}`}
+                className={`border w-full border-gray-300 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  invalidFields.some((f) => f.name === "lastName")
+                    ? "border-red-500"
+                    : ""
+                }`}
               />
               {invalidFields.some((f) => f.name === "lastName") && (
                 <p className="text-red-500 text-sm">
@@ -395,14 +418,19 @@ const ManageUserContainer: React.FC = () => {
               )}
             </div>
 
-            <div>
-              <label className="block font-bold">Tên:</label>
+            {/* Tên */}
+            <div className="flex flex-col gap-1">
+              <label className="font-semibold text-sm">Tên</label>
               <input
                 type="text"
                 name="firstName"
                 value={newUser.firstName}
                 onChange={handleInputChange}
-                className={`border rounded px-2 py-1 w-full ${invalidFields.some((f) => f.name === "firstName") ? "border-red-500" : ""}`}
+                className={`border w-full border-gray-300 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  invalidFields.some((f) => f.name === "firstName")
+                    ? "border-red-500"
+                    : ""
+                }`}
               />
               {invalidFields.some((f) => f.name === "firstName") && (
                 <p className="text-red-500 text-sm">
@@ -411,25 +439,89 @@ const ManageUserContainer: React.FC = () => {
               )}
             </div>
 
-            {/* New fields */}
+            {/* Email */}
+            <div className="flex flex-col gap-1">
+              <label className="font-semibold text-sm">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={newUser.email}
+                onChange={handleInputChange}
+                className={`border w-full border-gray-300 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  invalidFields.some((f) => f.name === "email")
+                    ? "border-red-500"
+                    : ""
+                }`}
+              />
+              {invalidFields.some((f) => f.name === "email") && (
+                <p className="text-red-500 text-sm">
+                  {invalidFields.find((f) => f.name === "email")?.mes}
+                </p>
+              )}
+            </div>
 
-            <div>
-              <label className="block font-bold">Giới tính:</label>
+            {/* Số điện thoại */}
+            <div className="flex flex-col gap-1">
+              <label className="font-semibold text-sm">Số điện thoại</label>
+              <input
+                type="text"
+                name="phone"
+                value={newUser.phone}
+                onChange={handleInputChange}
+                className={`border w-full border-gray-300 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  invalidFields.some((f) => f.name === "phone")
+                    ? "border-red-500"
+                    : ""
+                }`}
+              />
+              {invalidFields.some((f) => f.name === "phone") && (
+                <p className="text-red-500 text-sm">
+                  {invalidFields.find((f) => f.name === "phone")?.mes}
+                </p>
+              )}
+            </div>
+
+            {/* Mật khẩu */}
+            <div className="flex flex-col gap-1">
+              <label className="font-semibold text-sm">Mật khẩu</label>
+              <input
+                type="password"
+                name="password"
+                value={newUser.password}
+                onChange={handleInputChange}
+                className={`border w-full border-gray-300 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  invalidFields.some((f) => f.name === "password")
+                    ? "border-red-500"
+                    : ""
+                }`}
+              />
+              {invalidFields.some((f) => f.name === "password") && (
+                <p className="text-red-500 text-sm">
+                  {invalidFields.find((f) => f.name === "password")?.mes}
+                </p>
+              )}
+            </div>
+
+            {/* Giới tính */}
+            <div className="flex flex-col gap-1">
+              <label className="font-semibold text-sm">Giới tính</label>
               <select
                 name="gender"
                 value={newUser.gender}
                 onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-full"
+                className="border w-full border-gray-300 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Chọn giới tính</option>
-                <option value="Male">Nam</option>
                 <option value="Female">Nữ</option>
-                <option value="Other">Khác</option>
+                <option value="Male">Nam</option>
+                <option value="unspecified">Không xác định (X)</option>
+                <option value="undisclosed">Không tiết lộ (U)</option>
               </select>
             </div>
 
-            <div>
-              <label className="block font-bold">Ngày sinh:</label>
+            {/* Ngày sinh */}
+            <div className="flex flex-col gap-1">
+              <label className="font-semibold text-sm">Ngày sinh</label>
               <input
                 type="date"
                 name="dateOfBirth"
@@ -442,99 +534,30 @@ const ManageUserContainer: React.FC = () => {
                       : "",
                   }));
                 }}
-                className="border rounded px-2 py-1 w-full"
+                className="border w-full border-gray-300 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
-            <div>
-              <label className="block font-bold">Số điện thoại khẩn cấp:</label>
+            {/* Số điện thoại khẩn cấp */}
+            <div className="flex flex-col gap-1">
+              <label className="font-semibold text-sm">Số khẩn cấp</label>
               <input
                 type="text"
                 name="emergencyPhone"
                 value={newUser.emergencyPhone}
                 onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-full"
+                className="border w-full border-gray-300 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
-            <div className="md:col-span-2">
-              <label className="block font-bold">Địa chỉ:</label>
-              <input
-                type="text"
-                name="address"
-                value={newUser.address}
-                onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-full"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block font-bold">Giới thiệu:</label>
-              <textarea
-                name="bio"
-                value={newUser.bio}
-                onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-full"
-                rows={3}
-              />
-            </div>
-
-            {/* Existing fields */}
-            <div>
-              <label className="block font-bold">Email:</label>
-              <input
-                type="email"
-                name="email"
-                value={newUser.email}
-                onChange={handleInputChange}
-                className={`border rounded px-2 py-1 w-full ${invalidFields.some((f) => f.name === "email") ? "border-red-500" : ""}`}
-              />
-              {invalidFields.some((f) => f.name === "email") && (
-                <p className="text-red-500 text-sm">
-                  {invalidFields.find((f) => f.name === "email")?.mes}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block font-bold">Mật khẩu:</label>
-              <input
-                type="password"
-                name="password"
-                value={newUser.password}
-                onChange={handleInputChange}
-                className={`border rounded px-2 py-1 w-full ${invalidFields.some((f) => f.name === "password") ? "border-red-500" : ""}`}
-              />
-              {invalidFields.some((f) => f.name === "password") && (
-                <p className="text-red-500 text-sm">
-                  {invalidFields.find((f) => f.name === "password")?.mes}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block font-bold">Số điện thoại:</label>
-              <input
-                type="text"
-                name="phone"
-                value={newUser.phone}
-                onChange={handleInputChange}
-                className={`border rounded px-2 py-1 w-full ${invalidFields.some((f) => f.name === "phone") ? "border-red-500" : ""}`}
-              />
-              {invalidFields.some((f) => f.name === "phone") && (
-                <p className="text-red-500 text-sm">
-                  {invalidFields.find((f) => f.name === "phone")?.mes}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block font-bold">Vai trò:</label>
+            {/* Vai trò */}
+            <div className="flex flex-col gap-1">
+              <label className="font-semibold text-sm">Vai trò</label>
               <select
                 name="role"
                 value={newUser.role}
                 onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-full"
+                className="border w-full border-gray-300 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="9">Admin</option>
                 <option value="3">Khách hàng</option>
@@ -542,29 +565,54 @@ const ManageUserContainer: React.FC = () => {
               </select>
             </div>
 
-            <div>
-              <label className="block font-bold">Trạng thái:</label>
+            {/* Trạng thái */}
+            <div className="flex flex-col gap-1">
+              <label className="font-semibold text-sm">Trạng thái</label>
               <select
                 name="status"
                 value={newUser.status}
                 onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-full"
+                className="border w-full border-gray-300 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="active">Đang hoạt động</option>
                 <option value="banned">Khóa</option>
               </select>
             </div>
+
+            {/* Địa chỉ */}
+            <div className="md:col-span-2 flex flex-col gap-1">
+              <label className="font-semibold text-sm">Địa chỉ</label>
+              <input
+                type="text"
+                name="address"
+                value={newUser.address}
+                onChange={handleInputChange}
+                className="border w-full border-gray-300 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Giới thiệu */}
+            <div className="md:col-span-2 flex flex-col gap-1">
+              <label className="font-semibold text-sm">Giới thiệu</label>
+              <textarea
+                name="bio"
+                value={newUser.bio}
+                onChange={handleInputChange}
+                rows={3}
+                className="border w-full border-gray-300 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
 
           <div className="flex justify-end gap-4 mt-6">
             <button
-              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
               onClick={handleAddUser}
             >
               Thêm
             </button>
             <button
-              className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+              className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 text-sm"
               onClick={onClose}
             >
               Hủy
@@ -626,105 +674,109 @@ const ManageUserContainer: React.FC = () => {
         <div className="w-2/5 bg-white h-full p-6 shadow-lg flex flex-col justify-between transform transition-transform duration-300 translate-x-0">
           <div>
             <h2 className="text-lg font-bold mb-4">Thông tin chi tiết</h2>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-4">
               {/* Avatar */}
-              <div className="col-span-2">
-                <label className="block font-bold text-sm">Ảnh đại diện:</label>
-                {editingUser ? (
-                  <></>
-                ) : (
-                  user.avatar && (
-                    <img
-                      src={user.avatar}
-                      alt="Avatar"
-                      className="w-20 h-20 rounded-full object-cover"
-                    />
-                  )
-                )}
-              </div>
 
               {/* Basic Info */}
-              <div>
-                <label className="block font-bold text-sm">Họ:</label>
-                <input
-                  type="text"
-                  name="lastName"
-                  value={editingUser ? editingUser.lastName : user.lastName}
-                  onChange={handleEditChange}
-                  disabled={!isEditing}
-                  className="border rounded px-2 py-1 w-full text-sm"
-                />
-              </div>
-              <div>
-                <label className="block font-bold text-sm">Tên:</label>
-                <input
-                  type="text"
-                  name="firstName"
-                  value={editingUser ? editingUser.firstName : user.firstName}
-                  onChange={handleEditChange}
-                  disabled={!isEditing}
-                  className="border rounded px-2 py-1 w-full text-sm"
-                />
+              <div className="flex gap-4">
+                {/* Họ */}
+                <div className="flex flex-col gap-1 w-1/2">
+                  <p className="font-semibold text-sm">Họ</p>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={editingUser ? editingUser.lastName : user.lastName}
+                    onChange={handleEditChange}
+                    disabled={!isEditing}
+                    className="border w-full border-gray-300 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                {/* Tên */}
+                <div className="flex flex-col gap-1 w-1/2">
+                  <p className="font-semibold text-sm">Tên</p>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={editingUser ? editingUser.firstName : user.firstName}
+                    onChange={handleEditChange}
+                    disabled={!isEditing}
+                    className="border w-full border-gray-300 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
               </div>
 
               {/* Contact Info */}
-              <div>
-                <label className="block font-bold text-sm">Email:</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={editingUser ? editingUser.email : user.email}
-                  onChange={handleEditChange}
-                  disabled={!isEditing}
-                  className="border rounded px-2 py-1 w-full text-sm"
-                />
+              <div className="flex gap-4">
+                <div className="flex flex-col gap-1 w-1/2">
+                  <p className="font-semibold text-sm ">Email</p>
+                  <input
+                    type="email"
+                    name="email"
+                    value={editingUser ? editingUser.email : user.email}
+                    onChange={handleEditChange}
+                    disabled={!isEditing}
+                    className="border w-full border-gray-300 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="flex flex-col gap-1 w-1/2">
+                  <p className="font-semibold text-sm">Điện thoại di động</p>
+                  <input
+                    type="text"
+                    name="phone"
+                    value={editingUser ? editingUser.phone : user.phone}
+                    onChange={handleEditChange}
+                    disabled={!isEditing}
+                    className="border w-full border-gray-300 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block font-bold text-sm">
-                  Số điện thoại:
-                </label>
-                <input
-                  type="text"
-                  name="phone"
-                  value={editingUser ? editingUser.phone : user.phone}
-                  onChange={handleEditChange}
-                  disabled={!isEditing}
-                  className="border rounded px-2 py-1 w-full text-sm"
-                />
-              </div>
+              <div></div>
 
               {/* Additional Info */}
-              <div>
-                <label className="block font-bold text-sm">Giới tính:</label>
-                <select
-                  name="gender"
-                  value={
-                    editingUser ? editingUser.gender || "" : user.gender || ""
-                  }
-                  onChange={handleEditChange}
-                  disabled={!isEditing}
-                  className="border rounded px-2 py-1 w-full text-sm"
-                >
-                  <option value="">Chọn giới tính</option>
-                  <option value="Male">Nam</option>
-                  <option value="Female">Nữ</option>
-                  <option value="Other">Khác</option>
-                </select>
-              </div>
-              <div>
-                <label className="block font-bold text-sm">Ngày sinh:</label>
-                <input
-                  type="date"
-                  name="dateOfBirth"
-                  value={
-                    editingUser
-                      ? dayjs(user.dateOfBirth).format("YYYY-MM-DD")
-                      : ""
-                  }
-                  onChange={handleEditChange}
-                  disabled={!isEditing}
-                  className="border rounded px-2 py-1 w-full text-sm"
-                />
+
+              <div className="flex gap-4">
+                <div className="w-1/2">
+                  <label className="block font-bold text-sm mb-1">
+                    Giới tính:
+                  </label>
+                  <select
+                    name="gender"
+                    value={
+                      editingUser ? editingUser.gender || "" : user.gender || ""
+                    }
+                    onChange={handleEditChange}
+                    disabled={!isEditing}
+                    className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Chọn giới tính</option>
+                    <option value="Female">Nữ</option>
+                    <option value="Male">Nam</option>
+                    <option value="unspecified">Không xác định (X)</option>
+                    <option value="undisclosed">Không tiết lộ (U)</option>
+                  </select>
+                </div>
+                <div className="w-1/2">
+                  <label className="block font-bold text-sm mb-1">
+                    Ngày sinh:
+                  </label>
+                  <input
+                    type="date"
+                    name="dateOfBirth"
+                    value={
+                      user?.dateOfBirth
+                        ? dayjs(user.dateOfBirth, [
+                            "YYYY-MM-DD",
+                            "DD/MM/YYYY",
+                            "MM/DD/YYYY",
+                          ]).format("YYYY-MM-DD")
+                        : ""
+                    }
+                    onChange={handleEditChange}
+                    disabled={!isEditing}
+                    className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
               </div>
 
               {/* Status and Role */}
@@ -755,10 +807,13 @@ const ManageUserContainer: React.FC = () => {
                   <option value="9">Admin</option>
                 </select>
               </div>
+              <div></div>
 
               {/* Emergency Contact */}
               <div>
-                <label className="block font-bold text-sm">Số khẩn cấp:</label>
+                <label className="block font-bold text-sm mb-1">
+                  Số khẩn cấp:
+                </label>
                 <input
                   type="text"
                   name="emergencyPhone"
@@ -769,13 +824,13 @@ const ManageUserContainer: React.FC = () => {
                   }
                   onChange={handleEditChange}
                   disabled={!isEditing}
-                  className="border rounded px-2 py-1 w-full text-sm"
+                  className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               {/* Address */}
               <div className="col-span-2">
-                <label className="block font-bold text-sm">Địa chỉ:</label>
+                <label className="block font-bold text-sm mb-1">Địa chỉ:</label>
                 <input
                   type="text"
                   name="address"
@@ -784,19 +839,21 @@ const ManageUserContainer: React.FC = () => {
                   }
                   onChange={handleEditChange}
                   disabled={!isEditing}
-                  className="border rounded px-2 py-1 w-full text-sm"
+                  className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               {/* Bio */}
               <div className="col-span-2">
-                <label className="block font-bold text-sm">Giới thiệu:</label>
+                <label className="block font-bold text-sm mb-1">
+                  Giới thiệu:
+                </label>
                 <textarea
                   name="bio"
                   value={editingUser ? editingUser.bio || "" : user.bio || ""}
                   onChange={handleEditChange}
                   disabled={!isEditing}
-                  className="border rounded px-2 py-1 w-full text-sm"
+                  className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                   rows={3}
                 />
               </div>
@@ -845,9 +902,9 @@ const ManageUserContainer: React.FC = () => {
             className="border rounded p-2"
           >
             <option value="all">All Roles</option>
-            <option value="User">User</option>
-            <option value="Owner">Owner</option>
-            <option value="Admin">Admin</option>
+            <option value="3">User</option>
+            <option value="7">Owner</option>
+            <option value="9">Admin</option>
           </select>
           {/* Các controls khác */}
         </div>
@@ -860,6 +917,7 @@ const ManageUserContainer: React.FC = () => {
       </div>
 
       {/* Bảng người dùng */}
+
       <UserTable
         users={currentRows}
         onDeleteUser={handleDeleteUser}
