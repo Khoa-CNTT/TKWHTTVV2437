@@ -284,7 +284,11 @@ const Commission = () => {
                             ? "Đã thanh toán"
                             : "Đã hủy"}
                       </td>
-                      <td className="pl-4 py-5">{`${item?.user?.firstName} ${item?.user?.lastName}`}</td>
+                      <td className="pl-4 py-5">
+                        {item?.user?.firstName
+                          ? `${item?.user?.firstName} ${item?.user?.lastName}`
+                          : "Trống"}
+                      </td>
                       <td className="px-4 py-5">
                         {item?.paymentDate
                           ? moment(item?.paymentDate).format("DD/MM/YYYY")

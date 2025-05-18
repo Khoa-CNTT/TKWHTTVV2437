@@ -42,7 +42,8 @@ const InforRoomCheckout: React.FC<IProps> = ({ property, room, code }) => {
 
     fetchReview();
   }, [propertyId]);
-
+  console.log("sta", startDate);
+  console.log("end", endDate);
   return (
     <div className="w-full">
       <div>

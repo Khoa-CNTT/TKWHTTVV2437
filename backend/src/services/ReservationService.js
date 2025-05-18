@@ -1165,8 +1165,8 @@ const approveReservation = ({
             idProperty: payload?.idProperty,
             month: Number(currentMonth),
             year: Number(currentYear),
-            totalRevenue: payload?.totalPrice,
-            commissionAmount: payload?.totalPrice * 0.1,
+            totalRevenue: Number(payload?.totalPrice),
+            commissionAmount: Number(payload?.totalPrice * 0.1),
             status: "pending",
             orderQuantity: 1,
             commissionRate: 10,
@@ -1175,10 +1175,12 @@ const approveReservation = ({
           await db.CommissionPayment.update(
             {
               totalRevenue:
-                commissionPayment.totalRevenue + payload?.totalPrice,
-              totalCommission:
-                commissionPayment.totalCommission + payload?.totalPrice * 0.1,
-              orderQuantity: commissionPayment.orderQuantity + 1,
+                Number(commissionPayment.totalRevenue) +
+                Number(payload?.totalPrice),
+              commissionAmount:
+                Number(commissionPayment.commissionAmount) +
+                Number(payload?.totalPrice * 0.1),
+              orderQuantity: Number(commissionPayment.orderQuantity) + 1,
             },
             {
               where: { id: commissionPayment.id },
@@ -1199,7 +1201,7 @@ const approveReservation = ({
       } else if (status === "reject") {
         await db.Property.update(
           {
-            approved: db.sequelize.literal("reject + 1"),
+            reject: db.sequelize.literal("reject + 1"),
           },
           {
             where: {
