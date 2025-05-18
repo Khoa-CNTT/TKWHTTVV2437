@@ -57,8 +57,8 @@ const ChooseDateContainer = () => {
       return;
     }
 
-    setStartDate(selectedDateRange[0] || null);
-    setEndDate(selectedDateRange[1] || null);
+    setStartDate(selectedDateRange[0]?.startOf("day") || null);
+    setEndDate(selectedDateRange[1]?.startOf("day") || null);
     setShowDateRange(false); // Ẩn lịch sau khi chọn
   };
 
