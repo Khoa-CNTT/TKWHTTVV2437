@@ -62,12 +62,48 @@ const chartData = {
   ],
 };
 
+const chartDataCommission = {
+  labels: [
+    "06/2024",
+    "07/2024",
+    "08/2024",
+    "09/2024",
+    "10/2024",
+    "11/2024",
+    "12/2024",
+    "01/2025",
+    "02/2025",
+    "03/2025",
+    "04/2025",
+    "05/2025",
+  ],
+  datasets: [
+    {
+      label: "Biểu đồ tiền hoa hồng",
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      backgroundColor: "rgba(255, 99, 132, 0.6)", // Màu đỏ với 60% opacity
+      borderColor: "rgba(255, 99, 132, 1)",
+      borderWidth: 2,
+    },
+  ],
+};
+
 // Tùy chọn biểu đồ
 const chartOptions = {
   plugins: {
     title: {
       display: true,
-      text: "Báo cáo doanh thu",
+      text: "Biểu đồ doanh thu",
+    },
+  },
+};
+
+// Tùy chọn biểu đồ
+const chartOptions2 = {
+  plugins: {
+    title: {
+      display: true,
+      text: "Biểu đồ tiền hoa hồng",
     },
   },
 };
@@ -79,8 +115,11 @@ const DashboardOwner = () => {
   const searchParams = useSearchParams(); // Lấy query từ URL
   const router = useRouter();
   const [type, setType] = useState<string>("month");
+  const [typeCommission, setTypeCommission] = useState<string>("month");
 
   const [barChart, setBarChart] = useState<IBarChar>(chartData);
+  const [barChartCommission, setBarChartCommission] =
+    useState<IBarChar>(chartDataCommission);
 
   useEffect(() => {
     const fetchPropertyId = async (id: string) => {
@@ -116,11 +155,11 @@ const DashboardOwner = () => {
         labels: response.data.labels,
         datasets: [
           {
-            label: "Doanh thu",
+            label: "Biểu đồ doanh thu",
             data: response.data.data,
             backgroundColor: "rgba(54, 162, 235, 0.6)", // Blue with 60% opacity
             borderColor: "rgba(54, 162, 235, 1)",
-            borderWidth: 1,
+            borderWidth: 2,
           },
         ],
       });
@@ -128,6 +167,33 @@ const DashboardOwner = () => {
 
     fetDataBarChart();
   }, [propertyId, type]);
+
+  useEffect(() => {
+    const fetDataBarChart = async () => {
+      const response = await apisReservation.getDataBarChart(propertyId, {
+        type: typeCommission,
+      });
+
+      console.log({
+        response: response?.data?.data?.map((item: any) => item * 0.1),
+      });
+
+      setBarChartCommission({
+        labels: response.data.labels,
+        datasets: [
+          {
+            label: "Tiền hoa hồng",
+            data: response.data.data.map((item: any) => item * 0.1),
+            backgroundColor: "rgba(255, 99, 132, 0.6)", // Màu đỏ với 60% opacity
+            borderColor: "rgba(255, 99, 132, 1)",
+            borderWidth: 2,
+          },
+        ],
+      });
+    };
+
+    fetDataBarChart();
+  }, [propertyId, typeCommission]);
 
   return (
     <div className="w-full">
@@ -188,45 +254,94 @@ const DashboardOwner = () => {
               </div>
             </div>
 
-            <div className="mt-8 w-full">
-              <div className="flex justify-end">
-                <ul className="flex items-center gap-4 font-semibold">
-                  <li
-                    className={clsx(
-                      "cursor-pointer",
-                      type === "month" ? "text-blue-600" : "text-gray-500"
-                    )}
-                    onClick={() => setType("month")}
-                  >
-                    Tháng
-                  </li>
-                  <li
-                    className={clsx(
-                      "cursor-pointer",
-                      type === "quarter" ? "text-blue-600" : "text-gray-500"
-                    )}
-                    onClick={() => setType("quarter")}
-                  >
-                    Quý
-                  </li>
-                  <li
-                    className={clsx(
-                      "cursor-pointer",
-                      type === "year" ? "text-blue-600" : "text-gray-500"
-                    )}
-                    onClick={() => setType("year")}
-                  >
-                    Năm
-                  </li>
-                </ul>
+            <div className="flex gap-4 items-center">
+              <div className="mt-8 w-full">
+                <div className="flex justify-end">
+                  <ul className="flex items-center gap-4 font-semibold">
+                    <li
+                      className={clsx(
+                        "cursor-pointer",
+                        type === "month" ? "text-blue-600" : "text-gray-500"
+                      )}
+                      onClick={() => setType("month")}
+                    >
+                      Tháng
+                    </li>
+                    <li
+                      className={clsx(
+                        "cursor-pointer",
+                        type === "quarter" ? "text-blue-600" : "text-gray-500"
+                      )}
+                      onClick={() => setType("quarter")}
+                    >
+                      Quý
+                    </li>
+                    <li
+                      className={clsx(
+                        "cursor-pointer",
+                        type === "year" ? "text-blue-600" : "text-gray-500"
+                      )}
+                      onClick={() => setType("year")}
+                    >
+                      Năm
+                    </li>
+                  </ul>
+                </div>
+                <BarChartContainer data={barChart} options={chartOptions} />
               </div>
-              <BarChartContainer data={barChart} options={chartOptions} />
+              <div className="mt-8 w-full">
+                <div className="flex justify-end">
+                  <ul className="flex items-center gap-4 font-semibold">
+                    <li
+                      className={clsx(
+                        "cursor-pointer",
+                        typeCommission === "month"
+                          ? "text-blue-600"
+                          : "text-gray-500"
+                      )}
+                      onClick={() => setTypeCommission("month")}
+                    >
+                      Tháng
+                    </li>
+                    <li
+                      className={clsx(
+                        "cursor-pointer",
+                        typeCommission === "quarter"
+                          ? "text-blue-600"
+                          : "text-gray-500"
+                      )}
+                      onClick={() => setTypeCommission("quarter")}
+                    >
+                      Quý
+                    </li>
+                    <li
+                      className={clsx(
+                        "cursor-pointer",
+                        typeCommission === "year"
+                          ? "text-blue-600"
+                          : "text-gray-500"
+                      )}
+                      onClick={() => setTypeCommission("year")}
+                    >
+                      Năm
+                    </li>
+                  </ul>
+                </div>
+                <BarChartContainer
+                  data={barChartCommission}
+                  options={chartOptions2}
+                />
+              </div>
             </div>
 
             <div className="mt-8">
               <TopRoomContainer propertyId={propertyId} />
             </div>
           </div>
+        </div>
+
+        <div className="mt-8">
+          <TopRoomContainer propertyId={propertyId} />
         </div>
       </div>
     </div>

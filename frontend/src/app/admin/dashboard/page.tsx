@@ -10,6 +10,8 @@ import LineChartContainer from "@/components/container/LineChartContainer";
 import apisUser from "@/apis/user";
 import apisAdOrder from "@/apis/adOrder";
 import apisCommissionPayment from "@/apis/commissionPayment";
+import TopPropertyContainerAdmin from "@/components/container/TopPropertyContainerAdmin";
+import TopCommissionContainerAdmin from "@/components/container/TopCommissionContainerAdmin";
 
 interface IChar {
   labels: string[];
@@ -219,7 +221,7 @@ const DashboardPage = () => {
             </div>
           </div>
 
-          <div className="mt-8 w-[80%]">
+          <div className="mt-8 mx-auto w-[80%]">
             <div className="flex justify-end">
               <ul className="flex items-center gap-4 font-semibold">
                 <li
@@ -333,6 +335,14 @@ const DashboardPage = () => {
               </div>
               <BarChartContainer data={barChartAd} options={chartOptionsAd} />
             </div>
+          </div>
+
+          <div className="mt-8">
+            <TopPropertyContainerAdmin />
+          </div>
+
+          <div className="mt-8">
+            <TopCommissionContainerAdmin />
           </div>
         </div>
       </div>

@@ -37,14 +37,14 @@ const ContainerRecomendCity: React.FC<IProps> = ({ properties }) => {
           <SwiperSlide key={index}>
             <InforRomItem
               key={index}
-              image={item.images[0].image}
-              title={item.name}
-              price={item.price}
+              image={item?.images[0]?.image}
+              title={item?.name}
+              price={item?.price}
               city={item?.propertyAddress?.city}
-              quantityReview={item.reviewCount}
-              rating={item.averageRating || 0}
-              slug={item.slug}
-              advertising={Number(item.advertising) || 0}
+              quantityReview={item?.reviewCount}
+              rating={item?.averageRating || 0}
+              slug={item?.slug}
+              advertising={Number(item?.advertising) || 0}
             />
           </SwiperSlide>
         ))}

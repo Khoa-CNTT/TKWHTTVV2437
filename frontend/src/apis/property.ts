@@ -26,6 +26,18 @@ const apisProperty = {
     }
   },
 
+  getListTop10CommissionByAdmin: async () => {
+    const response = await fetch(
+      `${process.env.URL_SERVER_API}/property/list-top-10-commission-by-admin`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
+
+    return response.json();
+  },
+
   getListPropertyByAdmin: async (query: Record<string, string | number>) => {
     // Tạo query string từ object query
     const queryString = new URLSearchParams(

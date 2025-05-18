@@ -5,6 +5,7 @@ import { Op, where } from "sequelize";
 import sendMail from "../utils/sendMail";
 import convertToVietnameseDate from "../utils/convertToVietNameseDate";
 import getDatesInRange from "../utils/getDatesInRange";
+import { v4 as uuidv4 } from "uuid";
 
 const lockBooking = (body) => {
   return new Promise(async (resolve, reject) => {
@@ -499,6 +500,9 @@ const approveReservation = ({
   payload,
 }) => {
   return new Promise(async (resolve, reject) => {
+    console.log({ payload });
+    console.log({ status });
+
     try {
       let html;
 
@@ -1144,6 +1148,69 @@ const approveReservation = ({
         }
       );
 
+      if (status === "confirmed") {
+        const currentMonth = moment().format("MM");
+        const currentYear = moment().format("YYYY");
+        const commissionPayment = await db.CommissionPayment.findOne({
+          where: {
+            idProperty: payload?.idProperty,
+            month: Number(currentMonth),
+            year: Number(currentYear),
+          },
+        });
+
+        if (!commissionPayment) {
+          await db.CommissionPayment.create({
+            id: v4(),
+            idProperty: payload?.idProperty,
+            month: Number(currentMonth),
+            year: Number(currentYear),
+            totalRevenue: Number(payload?.totalPrice),
+            commissionAmount: Number(payload?.totalPrice * 0.1),
+            status: "pending",
+            orderQuantity: 1,
+            commissionRate: 10,
+          });
+        } else {
+          await db.CommissionPayment.update(
+            {
+              totalRevenue:
+                Number(commissionPayment.totalRevenue) +
+                Number(payload?.totalPrice),
+              commissionAmount:
+                Number(commissionPayment.commissionAmount) +
+                Number(payload?.totalPrice * 0.1),
+              orderQuantity: Number(commissionPayment.orderQuantity) + 1,
+            },
+            {
+              where: { id: commissionPayment.id },
+            }
+          );
+        }
+
+        await db.Property.update(
+          {
+            approved: db.sequelize.literal("approved + 1"),
+          },
+          {
+            where: {
+              id: payload?.idProperty, // Thay propertyId bằng ID của property cần cập nhật
+            },
+          }
+        );
+      } else if (status === "reject") {
+        await db.Property.update(
+          {
+            reject: db.sequelize.literal("reject + 1"),
+          },
+          {
+            where: {
+              id: payload?.idProperty, // Thay propertyId bằng ID của property cần cập nhật
+            },
+          }
+        );
+      }
+
       resolve({
         status: "OK",
         msg: "Approve reservation success!",
@@ -1209,6 +1276,7 @@ const listReservationOfUser = (idUser) => {
         data: response,
       });
     } catch (error) {
+      console.log({ error });
       reject("error " + error);
     }
   });

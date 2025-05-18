@@ -44,7 +44,7 @@ const MoreImageModal: React.FC<IProps> = ({ propertyId, onShowModal }) => {
             <div key={index}>
               <img
                 className="rounded-sm w-full h-[230px] object-cover"
-                src={image.image}
+                src={image?.image}
                 alt={image.id}
               />
             </div>

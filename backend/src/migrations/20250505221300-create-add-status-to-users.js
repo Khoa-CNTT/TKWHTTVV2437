@@ -5,6 +5,7 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.addColumn("Users", "status", {
       type: Sequelize.STRING,
+      defaultValue: "active", // active, banned
     });
   },
 

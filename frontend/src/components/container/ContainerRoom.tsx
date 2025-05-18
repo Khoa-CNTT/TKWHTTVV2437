@@ -40,16 +40,16 @@ const ContainerRoom: React.FC<IProps> = ({ properties }) => {
           {properties?.map((item: IProperty, index: number) => (
             <SwiperSlide key={index}>
               <InforRomItem
-                image={item.images[0]?.image}
+                image={item?.images[0]?.image}
                 key={index}
-                title={item.name}
-                price={item.price}
+                title={item?.name}
+                price={item?.price}
                 city={item?.propertyAddress?.city}
-                quantityReview={item.reviewCount}
-                rating={item.averageRating || 0}
-                slug={item.slug}
+                quantityReview={item?.reviewCount}
+                rating={item?.averageRating || 0}
+                slug={item?.slug}
                 advertising={
-                  moment(item.expiredAd) > moment()
+                  moment(item?.expiredAd) > moment()
                     ? Number(item?.advertising)
                     : 0
                 }
