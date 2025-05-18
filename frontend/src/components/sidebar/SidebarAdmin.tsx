@@ -79,7 +79,7 @@ const SidebarAdmin = () => {
   ];
 
   return (
-    <div className="py-4 px-2 bg-gray-100 min-h-screen shadow-md">
+    <div className="py-4 px-2 bg-gray-100 min-h-screen">
       <div className="flex justify-center font-semibold text-xl mb-6">
         Trang quản lý Admin
       </div>

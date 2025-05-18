@@ -45,7 +45,7 @@ const Container: React.FC<IProps> = ({ cities }) => {
               >
                 <img
                   className="min-h-[170px] object-fit rounded-lg"
-                  src={item.image}
+                  src={item?.image}
                   alt=""
                 />
                 <p className="text-lg font-semibold absolute bottom-0 left-[10px] text-white">

@@ -61,6 +61,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "idUser",
         as: "users",
       });
+
+      Property.hasMany(models.CommissionPayment, {
+        foreignKey: "idProperty",
+        as: "commissionPayments",
+      });
     }
   }
   Property.init(

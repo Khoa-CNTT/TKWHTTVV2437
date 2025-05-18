@@ -122,7 +122,7 @@ const Commission = () => {
         <div className="p-2">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold">
-              Danh sách đã mua gói quảng cáo
+              Danh sách thanh toán hoa hồng
             </h1>
           </div>
 

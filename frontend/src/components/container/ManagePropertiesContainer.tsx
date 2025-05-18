@@ -105,16 +105,16 @@ const ManagePropertiesContainer: React.FC = () => {
           const minPrice = Math.min(...prices);
           const maxPrice = Math.max(...prices);
           return {
-            id: property.id,
-            name: property.name,
-            city: property.address?.city || "Không xác định",
-            description: property.description || "Không có mô tả",
-            type: property.category?.name || "Không xác định",
-            status: property.status,
-            image: property.image,
-            amenities: property.amenities,
-            createdAt: property.createdAt,
-            updatedAt: property.updatedAt,
+            id: property?.id,
+            name: property?.name,
+            city: property?.address?.city || "Không xác định",
+            description: property?.description || "Không có mô tả",
+            type: property?.category?.name || "Không xác định",
+            status: property?.status,
+            image: property?.image,
+            amenities: property?.amenities,
+            createdAt: property?.createdAt,
+            updatedAt: property?.updatedAt,
             priceRange:
               prices.length > 0
                 ? `${minPrice?.toLocaleString()} ~ ${maxPrice?.toLocaleString()}`
@@ -247,17 +247,17 @@ const ManagePropertiesContainer: React.FC = () => {
             <tbody className="text-sm font-semibold">
               {currentRows.map((property) => (
                 <tr
-                  key={property.id}
+                  key={property?.id}
                   className="border-b border-gray-200 hover:bg-gray-100"
                 >
-                  <td className="px-4 py-5">{property.name}</td>
-                  <td className="px-4 py-5">{property.address?.city}</td>
-                  <td className="px-4 py-5">{property.description}</td>
-                  <td className="px-4 py-5">{property.category?.name}</td>
-                  <td className="px-4 py-5">{property.status}</td>
-                  <td className="px-4 py-5">{property.priceRange}</td>
+                  <td className="px-4 py-5">{property?.name}</td>
+                  <td className="px-4 py-5">{property?.address?.city}</td>
+                  <td className="px-4 py-5">{property?.description}</td>
+                  <td className="px-4 py-5">{property?.category?.name}</td>
+                  <td className="px-4 py-5">{property?.status}</td>
+                  <td className="px-4 py-5">{property?.priceRange}</td>
                   <td className="px-4 py-5">
-                    {dayjs(property.createdAt).format("DD/MM/YYYY")}
+                    {dayjs(property?.createdAt).format("DD/MM/YYYY")}
                   </td>
                   <td className="px-4 py-5 ">
                     <div className="flex items-center gap-3">
@@ -265,13 +265,13 @@ const ManagePropertiesContainer: React.FC = () => {
                         className="fa fa-eye text-grey-500 text-lg cursor-pointer hover:text-blue-700"
                         onClick={() =>
                           router.push(
-                            `/admin/Properties/Room?propertyId=${property.id}`
+                            `/admin/Properties/Room?propertyId=${property?.id}`
                           )
                         }
                       ></i>
                       <button
                         className="flex items-center px-3 py-1 text-sm text-red-700 hover:bg-gray-100 rounded"
-                        onClick={() => handleDelete(property.id)}
+                        onClick={() => handleDelete(property?.id)}
                       >
                         <i className="fa fa-trash text-red-500 text-lg cursor-pointer hover:text-red-700"></i>
                       </button>

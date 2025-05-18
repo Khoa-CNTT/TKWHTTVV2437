@@ -171,7 +171,7 @@ const ListRoomContainer: React.FC<IProps> = ({ propertyId }) => {
               <img
                 alt="anh"
                 className="rounded-md w-full h-[140px] object-cover"
-                src={item.images[0]?.image}
+                src={item?.images[0]?.image}
               ></img>
 
               <div>
@@ -188,13 +188,13 @@ const ListRoomContainer: React.FC<IProps> = ({ propertyId }) => {
               <div className="flex">
                 <div className="w-[70%]">
                   <p className="font-semibold">Tóm tắt</p>
-                  {item.summaries.map((summary: ISummary) => (
+                  {item?.summaries?.map((summary: ISummary) => (
                     <p
-                      key={summary.id}
+                      key={summary?.id}
                       className="flex items-center gap-2 mt-2"
                     >
-                      {iconSumary[summary.icon]}
-                      <span className="text-sm">{summary.name}</span>
+                      {iconSumary[summary?.icon]}
+                      <span className="text-sm">{summary?.name}</span>
                     </p>
                   ))}
                 </div>

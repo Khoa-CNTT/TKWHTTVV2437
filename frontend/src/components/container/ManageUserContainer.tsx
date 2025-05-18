@@ -188,11 +188,11 @@ const ManageUserContainer: React.FC = () => {
   }) => {
     const getRoleClass = (role: string) => {
       switch (role) {
-        case "User":
+        case "3":
           return "bg-green-500 text-white";
-        case "Owner":
+        case "7":
           return "bg-yellow-500 text-white";
-        case "Admin":
+        case "9":
           return "bg-red-500 text-white";
         default:
           return "bg-gray-500 text-white";
@@ -201,12 +201,10 @@ const ManageUserContainer: React.FC = () => {
 
     const getStatusClass = (status: string) => {
       switch (status) {
-        case "Active":
+        case "active":
           return "bg-blue-100 text-blue-700";
-        case "Locked":
+        case "banned":
           return "bg-orange-100 text-orange-700";
-        case "Pending":
-          return "bg-red-100 text-red-700";
         default:
           return "bg-gray-100 text-gray-700";
       }
@@ -269,7 +267,7 @@ const ManageUserContainer: React.FC = () => {
                     user.status
                   )}`}
                 >
-                  {user.status}
+                  {user.status == "active" ? "Hoạt động" : "Khóa"}
                 </span>
               </td>
               <td className="px-4 py-5">
@@ -278,11 +276,15 @@ const ManageUserContainer: React.FC = () => {
                     user.role
                   )}`}
                 >
-                  {user.role}
+                  {user?.role == "3"
+                    ? "Khách hàng"
+                    : user?.role == "7"
+                      ? "Chủ sở hữu"
+                      : "Admin"}
                 </span>
               </td>
               <td className="px-4 py-5">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 text-[20px]">
                   {/* {user.status === "Pending" && (
             <i
                 className="fa fa-check-circle text-green-500 text-lg cursor-pointer hover:text-green-700"
@@ -300,7 +302,7 @@ const ManageUserContainer: React.FC = () => {
                     }}
                   ></i>
                   <button
-                    className="text-red-500 hover:text-red-700"
+                    className="text-red-500 hover:text-red-700  text-[20px]"
                     onClick={(e) => {
                       e.stopPropagation();
                       onDeleteUser(user.id);
@@ -534,9 +536,9 @@ const ManageUserContainer: React.FC = () => {
                 onChange={handleInputChange}
                 className="border rounded px-2 py-1 w-full"
               >
-                <option value="Admin">Admin</option>
-                <option value="User">User</option>
-                <option value="Owner">Owner</option>
+                <option value="9">Admin</option>
+                <option value="3">Khách hàng</option>
+                <option value="7">Chủ sở hữu</option>
               </select>
             </div>
 
@@ -548,9 +550,8 @@ const ManageUserContainer: React.FC = () => {
                 onChange={handleInputChange}
                 className="border rounded px-2 py-1 w-full"
               >
-                <option value="Active">Active</option>
-                <option value="Locked">Locked</option>
-                <option value="Pending">Pending</option>
+                <option value="active">Đang hoạt động</option>
+                <option value="banned">Khóa</option>
               </select>
             </div>
           </div>
@@ -736,9 +737,8 @@ const ManageUserContainer: React.FC = () => {
                   disabled={!isEditing}
                   className="border rounded px-2 py-1 w-full text-sm"
                 >
-                  <option value="Active">Active</option>
-                  <option value="Locked">Locked</option>
-                  <option value="Pending">Pending</option>
+                  <option value="active">Đang hoạt động</option>
+                  <option value="banned">Khóa</option>
                 </select>
               </div>
               <div>
@@ -750,9 +750,9 @@ const ManageUserContainer: React.FC = () => {
                   disabled={!isEditing}
                   className="border rounded px-2 py-1 w-full text-sm"
                 >
-                  <option value="User">User</option>
-                  <option value="Owner">Owner</option>
-                  <option value="Admin">Admin</option>
+                  <option value="3">Khách hàng</option>
+                  <option value="7">Chủ sở hữu</option>
+                  <option value="9">Admin</option>
                 </select>
               </div>
 

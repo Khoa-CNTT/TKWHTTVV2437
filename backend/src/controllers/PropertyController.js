@@ -11,6 +11,17 @@ const listTop10HomestayRating = async (req, res) => {
   }
 };
 
+const listTop10CommissionByAdmin = async (req, res) => {
+  try {
+    const response = await PropertyService.getListTop10CommissionByAdmin();
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      msg: "Error in controller : " + error,
+    });
+  }
+};
+
 const getPropertyIdByUserId = async (req, res) => {
   try {
     const response = await PropertyService.getPropertyIdByUserId(req.params.id);
@@ -208,4 +219,5 @@ module.exports = {
   getImageByPropertyId,
   getListPropertyByAdmin,
   updateStatusProperty,
+  listTop10CommissionByAdmin,
 };
