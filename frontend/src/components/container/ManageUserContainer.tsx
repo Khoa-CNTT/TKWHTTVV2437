@@ -267,7 +267,7 @@ const ManageUserContainer: React.FC = () => {
               <td className="px-4 py-5">
                 <span
                   className={`px-2 py-1 rounded-full ${getStatusClass(
-                    user.status || "Active"
+                    user.status || "active"
                   )}`}
                 >
                   {user.status == "active" ? "Hoạt động" : "Khóa"}
@@ -276,11 +276,7 @@ const ManageUserContainer: React.FC = () => {
               <td className="px-4 py-5">
                 <span
                   className={`px-2 py-1 rounded-full ${getRoleClass(
-                    user.role === "3"
-                      ? "User"
-                      : user.role === "7"
-                        ? "Owner"
-                        : "Admin"
+                    user.role
                   )}`}
                 >
                   {user?.role == "3"
