@@ -576,8 +576,14 @@ const InformationRoom: React.FC<IProps> = ({ id }) => {
 
       <div className="flex justify-end mt-8">
         <button
-          onClick={handleSubmit}
-          disabled={id ? !hasChanges() && !isFormValid() : !isFormValid()} // Vô hiệu hóa nút nếu form không hợp lệ
+          onClick={() => {
+            if (hasChanges() && isFormValid()) {
+              handleSubmit();
+            } else {
+              return;
+            }
+          }}
+          disabled={!hasChanges() && !isFormValid()} // Vô hiệu hóa nút nếu form không hợp lệ
           className={`flex items-center gap-2 py-3 px-8 text-white rounded-md font-semibold transition-300 ${
             id
               ? hasChanges() && isFormValid()

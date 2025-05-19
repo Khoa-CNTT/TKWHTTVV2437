@@ -4,6 +4,7 @@ import { IImage } from "@/app/types/property";
 import apisProperty from "@/apis/property";
 import { useState, useEffect } from "react";
 import { IoMdClose } from "react-icons/io";
+import clsx from "clsx";
 
 interface IProps {
   propertyId: string;
@@ -29,7 +30,12 @@ const MoreImageModal: React.FC<IProps> = ({ propertyId, onShowModal }) => {
       onClick={(e) => e.stopPropagation()}
       className="fixed w-creeen h-screen z-10 inset-0 flex items-center justify-center bg-overblack"
     >
-      <div className="bg-white w-[900px] rounded-md shadow-lg pl-6 py-6 flex flex-col">
+      <div
+        className={clsx(
+          "bg-white w-[900px] rounded-md shadow-lg py-6 flex flex-col",
+          images.length >= 6 ? "px-6" : "pl-6"
+        )}
+      >
         <div className="flex items-center gap-4">
           <IoMdClose
             onClick={() => onShowModal(false)}
