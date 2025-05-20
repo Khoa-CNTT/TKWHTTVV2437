@@ -18,7 +18,7 @@ const config: Config = {
       },
       backgroundColor: {
         primary: "#1668e3",
-        overblack: "rgba(0, 0, 0, 0.1)",
+        overblack: "rgba(0, 0, 0, 0.3)",
       },
       colors: {
         background: "var(--background)",

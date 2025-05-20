@@ -180,10 +180,13 @@ const getListProperty = (filter, limit = 12) => {
       // Điều kiện lọc theo city trong bảng Address
       const addressConditions = {};
       if (city) {
-        addressConditions["slug"] = slugify(city, {
-          lower: true, // chuyển thành chữ thường
-          strict: true, // bỏ các ký tự đặc biệt
-        }); // So sánh với cột city trong bảng Address
+        // addressConditions["city"] = slugify(city, {
+        //   lower: true, // chuyển thành chữ thường
+        //   strict: true, // bỏ các ký tự đặc biệt
+        // }); // So sánh với cột city trong bảng Address
+        addressConditions["city"] = {
+          [Op.like]: `%${city}%`,
+        };
       }
 
       if (category) {

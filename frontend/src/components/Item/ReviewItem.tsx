@@ -14,7 +14,7 @@ interface IProps {
 
 const ReviewItem: React.FC<IProps> = ({ user, rating, text, createdAt }) => {
   return (
-    <div className="border-b border-gray-300 pb-3 mt-3">
+    <div className="border-b mr-5 border-gray-300 pb-3 mt-3">
       <h4 className="text-lg font-semibold">{`${rating}/5 ${ratingText(rating)}`}</h4>
       <p className="font-semibold">{`${user?.firstName} ${user?.lastName}`}</p>
       <p className="text-sm">{moment(createdAt).format("HH:mm DD/MM/YYYY")}</p>

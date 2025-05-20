@@ -32,8 +32,8 @@ const MoreImageModal: React.FC<IProps> = ({ propertyId, onShowModal }) => {
     >
       <div
         className={clsx(
-          "bg-white w-[900px] rounded-md shadow-lg py-6 flex flex-col",
-          images.length >= 6 ? "px-6" : "pl-6"
+          "bg-white w-[1200px] rounded-md shadow-lg py-6 flex flex-col",
+          images.length >= 6 ? "pl-6" : "px-6"
         )}
       >
         <div className="flex items-center gap-4">
@@ -45,7 +45,7 @@ const MoreImageModal: React.FC<IProps> = ({ propertyId, onShowModal }) => {
           <p className="font-semibold text-lg">Tất cả các ảnh</p>
         </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-2 overflow-y-auto max-h-[70vh] pb-[20px]">
+        <div className="mt-4 grid grid-cols-3 gap-2 overflow-y-auto max-h-[80vh] pb-[20px]">
           {images.map((image, index) => (
             <div key={index}>
               <img
