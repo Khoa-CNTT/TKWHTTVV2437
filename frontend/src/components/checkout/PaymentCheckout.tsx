@@ -263,7 +263,7 @@ const PaymentCheckout = ({
           {dataEnter.imageBanking && (
             <div className="relative w-fit">
               <img
-                src={dataEnter.imageBanking}
+                src={dataEnter?.imageBanking}
                 alt="Xem trước"
                 className="w-[200px] object-cover rounded-lg border shadow"
               />

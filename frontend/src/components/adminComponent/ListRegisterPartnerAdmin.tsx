@@ -11,6 +11,7 @@ import ReactPaginate from "react-paginate";
 import { GrFormNext, GrFormPrevious } from "react-icons/gr";
 import Swal from "sweetalert2";
 import LoadingItem from "../loading/LoadingItem";
+import { Suspense } from "react";
 
 interface IDataRegisterPartner {
   id: string;
@@ -40,7 +41,7 @@ interface IDataRegisterPartner {
   };
 }
 
-const ListRegisterPartnerAdmin = () => {
+const ListRegisterPartnerAdminContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isOpenApprove, setIsOpenAppove] = useState(false);
@@ -116,7 +117,6 @@ const ListRegisterPartnerAdmin = () => {
     } else {
       params.set(key, value);
     }
-
     if (key === "status") {
       params.set("page", "1");
       setPage(1); // Đồng bộ state luôn
@@ -387,4 +387,10 @@ const ListRegisterPartnerAdmin = () => {
   );
 };
 
-export default ListRegisterPartnerAdmin;
+export default function ListRegisterPartnerAdmin() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ListRegisterPartnerAdminContent />
+    </Suspense>
+  );
+}

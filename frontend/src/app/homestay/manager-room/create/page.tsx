@@ -177,22 +177,22 @@ const InformationRoom: React.FC<IProps> = ({ id }) => {
         setData(roomData);
         setInitialData(roomData);
 
-        const amenities = response.data.amenities.map(
-          (item: { id: string }) => item.id
+        const amenities = response?.data?.amenities?.map(
+          (item: { id: string }) => item?.id
         );
         setSelectedAmenities(amenities);
         setInitialAmenities(amenities);
 
-        const summaries = response.data.summaries.map(
-          (item: { id: string }) => item.id
+        const summaries = response?.data?.summaries?.map(
+          (item: { id: string }) => item?.id
         );
         setSelectedSummaries(summaries);
         setInitialSummaries(summaries);
 
-        const images = response.data.images.map(
+        const images = response?.data?.images?.map(
           (item: { id: string; image: string }) => ({
-            id: item.id,
-            image: item.image,
+            id: item?.id,
+            image: item?.image,
           })
         );
         setSelectedImage(images);
@@ -352,7 +352,7 @@ const InformationRoom: React.FC<IProps> = ({ id }) => {
             <img
               alt="image"
               className="h-[160px] w-full rounded-md object-cover"
-              src={item.image}
+              src={item?.image}
             ></img>
 
             {showTrash === item.id && (
@@ -460,9 +460,9 @@ const InformationRoom: React.FC<IProps> = ({ id }) => {
                 },
               }}
             >
-              {listStatus.map((item: { key: string; value: string }) => (
-                <MenuItem key={item.key} value={item.key}>
-                  {item.value}
+              {listStatus?.map((item: { key: string; value: string }) => (
+                <MenuItem key={item?.key} value={item?.key}>
+                  {item?.value}
                 </MenuItem>
               ))}
             </Select>

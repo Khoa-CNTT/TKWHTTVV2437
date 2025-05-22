@@ -11,6 +11,8 @@ import {
   showConfirmAlert,
 } from "@/helper/Alert";
 import { FaInfoCircle, FaTrashAlt } from "react-icons/fa";
+import { useSearchParamsWrapper } from "@/hooks/useSearchParamsWrapper";
+
 // Interface chung cho người dùng
 interface IUser {
   id: string;
@@ -189,11 +191,11 @@ const ManageUserContainer: React.FC = () => {
   }) => {
     const getRoleClass = (role: string) => {
       switch (role) {
-        case "User":
+        case "3":
           return "bg-green-500 text-white";
-        case "Owner":
+        case "7":
           return "bg-yellow-500 text-white";
-        case "Admin":
+        case "9":
           return "bg-red-500 text-white";
         default:
           return "bg-gray-500 text-white";
@@ -202,12 +204,10 @@ const ManageUserContainer: React.FC = () => {
 
     const getStatusClass = (status: string) => {
       switch (status) {
-        case "Active":
+        case "active":
           return "bg-blue-100 text-blue-700";
-        case "Locked":
+        case "banned":
           return "bg-orange-100 text-orange-700";
-        case "Pending":
-          return "bg-red-100 text-red-700";
         default:
           return "bg-gray-100 text-gray-700";
       }
@@ -267,31 +267,27 @@ const ManageUserContainer: React.FC = () => {
               <td className="px-4 py-5">
                 <span
                   className={`px-2 py-1 rounded-full ${getStatusClass(
-                    user.status || "Active"
+                    user.status || "active"
                   )}`}
                 >
-                  {user.status || "Active"}
+                  {user.status == "active" ? "Hoạt động" : "Khóa"}
                 </span>
               </td>
               <td className="px-4 py-5">
                 <span
                   className={`px-2 py-1 rounded-full ${getRoleClass(
-                    user.role === "3"
-                      ? "User"
-                      : user.role === "7"
-                        ? "Owner"
-                        : "Admin"
+                    user.role
                   )}`}
                 >
-                  {user.role === "3"
-                    ? "User"
-                    : user.role === "7"
-                      ? "Owner"
+                  {user?.role == "3"
+                    ? "Khách hàng"
+                    : user?.role == "7"
+                      ? "Chủ sở hữu"
                       : "Admin"}
                 </span>
               </td>
               <td className="px-4 py-5">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 text-[20px]">
                   {/* {user.status === "Pending" && (
             <i
                 className="fa fa-check-circle text-green-500 text-lg cursor-pointer hover:text-green-700"
@@ -559,9 +555,9 @@ const ManageUserContainer: React.FC = () => {
                 onChange={handleInputChange}
                 className="border w-full border-gray-300 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="3">User</option>
-                <option value="7">Owner</option>
                 <option value="9">Admin</option>
+                <option value="3">Khách hàng</option>
+                <option value="7">Chủ sở hữu</option>
               </select>
             </div>
 
@@ -574,9 +570,8 @@ const ManageUserContainer: React.FC = () => {
                 onChange={handleInputChange}
                 className="border w-full border-gray-300 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="Active">Active</option>
-                <option value="Locked">Locked</option>
-                <option value="Pending">Pending</option>
+                <option value="active">Đang hoạt động</option>
+                <option value="banned">Khóa</option>
               </select>
             </div>
 
@@ -781,39 +776,32 @@ const ManageUserContainer: React.FC = () => {
               </div>
 
               {/* Status and Role */}
-              <div className="flex gap-4">
-                <div className="w-1/2">
-                  <label className="block font-bold text-sm mb-1">
-                    Trạng thái:
-                  </label>
-                  <select
-                    name="status"
-                    value={editingUser ? editingUser.status : user.status}
-                    onChange={handleEditChange}
-                    disabled={!isEditing}
-                    className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="Active">Active</option>
-                    <option value="Locked">Locked</option>
-                    <option value="Pending">Pending</option>
-                  </select>
-                </div>
-                <div className="w-1/2">
-                  <label className="block font-bold text-sm mb-1">
-                    Vai trò:
-                  </label>
-                  <select
-                    name="role"
-                    value={editingUser ? editingUser.role : user.role}
-                    onChange={handleEditChange}
-                    disabled={!isEditing}
-                    className="border rounded px-4 py-2  w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="3">User</option>
-                    <option value="7">Owner</option>
-                    <option value="9">Admin</option>
-                  </select>
-                </div>
+              <div>
+                <label className="block font-bold text-sm">Trạng thái:</label>
+                <select
+                  name="status"
+                  value={editingUser ? editingUser.status : user.status}
+                  onChange={handleEditChange}
+                  disabled={!isEditing}
+                  className="border rounded px-2 py-1 w-full text-sm"
+                >
+                  <option value="active">Đang hoạt động</option>
+                  <option value="banned">Khóa</option>
+                </select>
+              </div>
+              <div>
+                <label className="block font-bold text-sm">Vai trò:</label>
+                <select
+                  name="role"
+                  value={editingUser ? editingUser.role : user.role}
+                  onChange={handleEditChange}
+                  disabled={!isEditing}
+                  className="border rounded px-2 py-1 w-full text-sm"
+                >
+                  <option value="3">Khách hàng</option>
+                  <option value="7">Chủ sở hữu</option>
+                  <option value="9">Admin</option>
+                </select>
               </div>
               <div></div>
 

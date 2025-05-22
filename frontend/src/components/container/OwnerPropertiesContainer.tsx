@@ -92,28 +92,28 @@ const OwnerPropertiesContainer: React.FC = () => {
           .map((property) => {
             const roomPrices = property.rooms?.map((r) => r.price ?? 0) || [];
             return {
-              id: property.id,
-              name: property.name,
-              description: property.description,
-              status: property.status,
-              image: property.image,
-              createdAt: property.createdAt,
-              updatedAt: property.updatedAt,
-              city: property.address?.city || "Không xác định",
-              type: property.category?.name || "Không có loại",
+              id: property?.id,
+              name: property?.name,
+              description: property?.description,
+              status: property?.status,
+              image: property?.image,
+              createdAt: property?.createdAt,
+              updatedAt: property?.updatedAt,
+              city: property?.address?.city || "Không xác định",
+              type: property?.category?.name || "Không có loại",
               amenities: [], // Có thể xử lý nếu cần
-              rooms: (property.rooms || []).map((room) => ({
-                id: room.id,
-                name: room.name || "Chưa đặt tên",
-                price: room.price || 0,
-                maxPerson: room.maxPerson || 0,
-                status: room.status || "Unknown",
+              rooms: (property?.rooms || []).map((room) => ({
+                id: room?.id,
+                name: room?.name || "Chưa đặt tên",
+                price: room?.price || 0,
+                maxPerson: room?.maxPerson || 0,
+                status: room?.status || "Unknown",
                 images: room.images?.map((img) => img.image) || [],
                 amenities:
                   room.amenities?.map((am) => ({ name: am.name })) || [],
-                description: room.description || "Không có mô tả",
-                createdAt: room.createdAt,
-                updatedAt: room.updatedAt,
+                description: room?.description || "Không có mô tả",
+                createdAt: room?.createdAt,
+                updatedAt: room?.updatedAt,
               })),
               priceRange:
                 roomPrices.length > 0
@@ -180,18 +180,18 @@ const OwnerPropertiesContainer: React.FC = () => {
         </thead>
         <tbody className="text-sm font-semibold">
           {propPaginated.map((property) => (
-            <React.Fragment key={property.id}>
+            <React.Fragment key={property?.id}>
               <tr
                 className="border-b border-gray-200 hover:bg-gray-100 cursor-pointer"
-                onClick={() => toggleExpand(property.id)}
+                onClick={() => toggleExpand(property?.id)}
               >
-                <td className="px-4 py-5">{property.name}</td>
-                <td className="px-4 py-5">{property.city}</td>
-                <td className="px-4 py-5">{property.type}</td>
+                <td className="px-4 py-5">{property?.name}</td>
+                <td className="px-4 py-5">{property?.city}</td>
+                <td className="px-4 py-5">{property?.type}</td>
                 <td className="px-4 py-5">
                   <span
                     className={`px-2 py-1 rounded-full ${
-                      property.status === "Active"
+                      property?.status === "Active"
                         ? "bg-green-100 text-green-700"
                         : "bg-red-100 text-red-700"
                     }`}
@@ -199,21 +199,21 @@ const OwnerPropertiesContainer: React.FC = () => {
                     {property.status}
                   </span>
                 </td>
-                <td className="px-4 py-5">{property.priceRange}</td>
+                <td className="px-4 py-5">{property?.priceRange}</td>
                 <td className="px-4 py-5">
                   <button
                     className="text-blue-500 hover:text-blue-700"
                     onClick={(e) => {
                       e.stopPropagation();
-                      toggleExpand(property.id);
+                      toggleExpand(property?.id);
                     }}
                   >
-                    {expandedPropertyId === property.id ? "▼" : "▶"}
+                    {expandedPropertyId === property?.id ? "▼" : "▶"}
                   </button>
                 </td>
               </tr>
 
-              {expandedPropertyId === property.id && (
+              {expandedPropertyId === property?.id && (
                 <tr className="bg-gray-50">
                   <td colSpan={6} className="px-4 py-5">
                     <div className="ml-8">
@@ -230,29 +230,29 @@ const OwnerPropertiesContainer: React.FC = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {property.rooms.map((room) => (
+                          {property?.rooms?.map((room) => (
                             <tr
-                              key={`${room.id}`} // Sử dụng kết hợp property.id và index
+                              key={`${room?.id}`} // Sử dụng kết hợp property.id và index
                               className="border-b border-gray-200 hover:bg-gray-100"
                             >
                               <td className="px-4 py-4">
-                                {room.name || "Chưa đặt tên"}
+                                {room?.name || "Chưa đặt tên"}
                               </td>
                               <td className="px-4 py-4">
-                                {room.price?.toLocaleString() || 0} VND
+                                {room?.price?.toLocaleString() || 0} VND
                               </td>
                               <td className="px-4 py-4">
-                                {room.maxPerson || 0}
+                                {room?.maxPerson || 0}
                               </td>
                               <td className="px-4 py-4">
                                 <span
                                   className={`px-2 py-1 rounded-full ${
-                                    room.status === "Active"
+                                    room?.status === "Active"
                                       ? "bg-green-100 text-green-700"
                                       : "bg-red-100 text-red-700"
                                   }`}
                                 >
-                                  {room.status || "Unknown"}
+                                  {room?.status || "Unknown"}
                                 </span>
                               </td>
                             </tr>

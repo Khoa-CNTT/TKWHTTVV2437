@@ -15,6 +15,11 @@ router.get(
   "/image-by-property-id/:id",
   propertyController.getImageByPropertyId
 );
+
+router.get(
+  "/list-top-10-commission-by-admin",
+  propertyController.listTop10CommissionByAdmin
+);
 router.get("/admin/list-property", propertyController.getListPropertyByAdmin);
 router.get("/total-dashboard/:id", propertyController.getTotalDashboard);
 router.get("/advertising/:id", propertyController.getAdvertisingByPropertyId);

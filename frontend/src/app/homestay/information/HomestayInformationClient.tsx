@@ -113,12 +113,12 @@ const HomestayInformationClient = () => {
     const fetchPropertyId = async (id: string) => {
       const response = await apisProperty.getPropertyIdByUserId(id);
 
-      if (response.data) {
-        setPropertyId(response.data.id);
+      if (response?.data) {
+        setPropertyId(response?.data?.id);
       }
     };
     if (user?.id) {
-      fetchPropertyId(user.id);
+      fetchPropertyId(user?.id);
     }
   }, [user?.id, check]);
 
@@ -127,7 +127,7 @@ const HomestayInformationClient = () => {
       const response = await apisAmenity.getAllList();
 
       if (response?.data) {
-        setAmenities(response.data);
+        setAmenities(response?.data);
       }
     };
 
@@ -135,14 +135,14 @@ const HomestayInformationClient = () => {
       const response = await apisHighlight.getListAll();
 
       if (response?.data) {
-        setHighLights(response.data);
+        setHighLights(response?.data);
       }
     };
 
     const fetchDataCategories = async () => {
       const response = await apisCategory.getAllList();
       if (response?.data) {
-        setCategories(response.data);
+        setCategories(response?.data);
       }
     };
 
@@ -166,9 +166,9 @@ const HomestayInformationClient = () => {
       const response = await apisAddress.getListProvince();
       if (response?.data) {
         setCities(
-          response.data.data.map((item: { name: string; code: string }) => ({
-            name: item.name,
-            code: item.code,
+          response?.data?.data?.map((item: { name: string; code: string }) => ({
+            name: item?.name,
+            code: item?.code,
           }))
         );
       }
@@ -200,20 +200,20 @@ const HomestayInformationClient = () => {
         setData(propertyData);
         setInitialData(propertyData);
 
-        const amenities = response.data.amenities.map(
+        const amenities = response?.data?.amenities?.map(
           (item: IAmenity) => item.id
         );
         setSelectedAmenities(amenities);
         setInitialAmenities(amenities);
 
-        const highlights = response.data.highlights.map(
+        const highlights = response?.data?.highlights?.map(
           (item: IHightlight) => item.id
         );
         setSelectedHighLight(highlights);
         setInitialHighLight(highlights);
 
-        const images = response.data.images.map((item: IImage) => ({
-          image: item.image,
+        const images = response?.data?.images?.map((item: IImage) => ({
+          image: item?.image,
           id: item.id,
         }));
         setSelectedImage(images);
@@ -239,15 +239,15 @@ const HomestayInformationClient = () => {
 
   // get province code when select city
   useEffect(() => {
-    const selectedCity = cities.find((city) => city.name === data.city);
-    if (selectedCity && data.city !== "0") {
-      setProvinceCode(selectedCity.code); // Lưu `code` vào state
+    const selectedCity = cities?.find((city) => city?.name === data?.city);
+    if (selectedCity && data?.city !== "0") {
+      setProvinceCode(selectedCity?.code); // Lưu `code` vào state
     }
 
-    if (data.city === "0") {
+    if (data?.city === "0") {
       setDistricts([]);
     }
-  }, [data.city, cities]);
+  }, [data?.city, cities]);
 
   useEffect(() => {
     const fetchDistricts = async () => {
@@ -255,8 +255,8 @@ const HomestayInformationClient = () => {
       if (response?.data) {
         setDistricts(
           response?.data?.data?.map((item: { name: string; code: string }) => ({
-            name: item.name,
-            code: item.code,
+            name: item?.name,
+            code: item?.code,
           }))
         );
       }
@@ -270,7 +270,7 @@ const HomestayInformationClient = () => {
     setSelectedHighLight((prev) => {
       if (prev.includes(id)) {
         // Nếu đã chọn, loại bỏ khỏi danh sách
-        return prev.filter((highlightId) => highlightId !== id);
+        return prev?.filter((highlightId) => highlightId !== id);
       } else {
         // Nếu chưa chọn, thêm vào danh sách
         return [...prev, id];
@@ -279,19 +279,18 @@ const HomestayInformationClient = () => {
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
+    if (e?.target?.files) {
       const formData = new FormData();
-      Array.from(e.target.files).forEach((file) => {
+      Array.from(e?.target?.files).forEach((file) => {
         formData.append("images", file);
       });
 
       const uploadImage = async () => {
         const response = await apisImage.uploadImageMutiple(formData);
-
-        if (response.files) {
-          const newImages = response.files.map((item: { url: string }) => ({
+        if (response?.files) {
+          const newImages = response?.files?.map((item: { url: string }) => ({
             id: uuidv4(),
-            image: item.url,
+            image: item?.url,
           }));
           setSelectedImage((prev) => [...prev, ...newImages]);
         }
@@ -303,15 +302,15 @@ const HomestayInformationClient = () => {
 
   const isFormValid = () => {
     return (
-      data.name.trim() !== "" &&
-      data.categoryId.trim() !== "" &&
-      data.country.trim() !== "" &&
-      data.city.trim() !== "" &&
-      data.district.trim() !== "" &&
-      data.street.trim() !== "" &&
-      selectedAmenities.length > 0 &&
-      selectedHighLight.length > 0 &&
-      selectedImage.length >= 5
+      data?.name?.trim() !== "" &&
+      data?.categoryId?.trim() !== "" &&
+      data?.country?.trim() !== "" &&
+      data?.city?.trim() !== "" &&
+      data?.district?.trim() !== "" &&
+      data?.street?.trim() !== "" &&
+      selectedAmenities?.length > 0 &&
+      selectedHighLight?.length > 0 &&
+      selectedImage?.length >= 5
     );
   };
 
@@ -400,16 +399,16 @@ const HomestayInformationClient = () => {
       <div className="grid grid-cols-6 gap-2 mt-2">
         {selectedImage?.map((item: { image: string; id: string }) => (
           <div
-            key={item.id}
+            key={item?.id}
             className="relative"
-            onMouseEnter={() => setShowTrash(item.id)}
+            onMouseEnter={() => setShowTrash(item?.id)}
             onMouseLeave={() => setShowTrash("")}
           >
             <img
-              key={item.id}
+              key={item?.id}
               alt="image"
               className="h-[160px] w-full rounded-md object-cover"
-              src={item.image}
+              src={item?.image}
             ></img>
 
             {showTrash === item.id && (
@@ -481,9 +480,9 @@ const HomestayInformationClient = () => {
               }}
             >
               <MenuItem value={"0"}>Chọn danh mục</MenuItem>
-              {categories.map((item: { id: string; name: string }) => (
-                <MenuItem key={item.id} value={item.id}>
-                  {item.name}
+              {categories?.map((item: { id: string; name: string }) => (
+                <MenuItem key={item?.id} value={item?.id}>
+                  {item?.name}
                 </MenuItem>
               ))}
             </Select>

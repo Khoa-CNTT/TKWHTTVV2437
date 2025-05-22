@@ -122,7 +122,7 @@ const Commission = () => {
         <div className="p-2">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold">
-              Danh sách đã mua gói quảng cáo
+              Danh sách thanh toán hoa hồng
             </h1>
           </div>
 
@@ -284,7 +284,11 @@ const Commission = () => {
                             ? "Đã thanh toán"
                             : "Đã hủy"}
                       </td>
-                      <td className="pl-4 py-5">{`${item?.user?.firstName} ${item?.user?.lastName}`}</td>
+                      <td className="pl-4 py-5">
+                        {item?.user?.firstName
+                          ? `${item?.user?.firstName} ${item?.user?.lastName}`
+                          : "Trống"}
+                      </td>
                       <td className="px-4 py-5">
                         {item?.paymentDate
                           ? moment(item?.paymentDate).format("DD/MM/YYYY")

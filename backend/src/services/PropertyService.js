@@ -77,6 +77,75 @@ const listTop10HomestayRating = () => {
   });
 };
 
+const getListTop10CommissionByAdmin = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const properties = await db.Property.findAll({
+        attributes: {
+          include: [
+            // Tính trung bình điểm rating và làm tròn đến 1 chữ số thập phân
+            [
+              fn(
+                "COALESCE",
+                fn(
+                  "ROUND",
+                  fn("SUM", col("commissionPayments.commissionAmount")),
+                  1
+                ),
+                0
+              ),
+              "totalCommission",
+            ],
+            [
+              fn(
+                "COALESCE",
+                fn(
+                  "ROUND",
+                  fn("SUM", col("commissionPayments.orderQuantity")),
+                  1
+                ),
+                0
+              ),
+              "totalOrder",
+            ],
+          ],
+        },
+        include: [
+          {
+            model: db.CommissionPayment,
+            as: "commissionPayments",
+            attributes: ["id", "commissionAmount", "orderQuantity"],
+          },
+          {
+            model: db.ImageProperty,
+            as: "images",
+            attributes: ["id", "image"],
+            limit: 1,
+            order: [["createdAt", "ASC"]],
+          },
+          {
+            model: db.Address,
+            as: "propertyAddress",
+            attributes: ["id", "city"],
+          },
+        ],
+        subQuery: false,
+        order: [
+          [fn("SUM", col("commissionPayments.commissionAmount")), "DESC"],
+        ],
+        limit: 10,
+      });
+
+      resolve({
+        status: properties.length > 0 ? "OK" : "ERR",
+        data: properties || [],
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 const getListProperty = (filter, limit = 12) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -1051,4 +1120,5 @@ module.exports = {
   getImageByPropertyId,
   getListPropertyByAdmin,
   updateStatusProperty,
+  getListTop10CommissionByAdmin,
 };

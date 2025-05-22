@@ -30,6 +30,17 @@ export interface IProperty {
   expiredAd: string;
   idUser: string;
   user: IUser;
+  status: string;
+}
+
+export interface IPropertyTop10Commission {
+  name: string;
+  propertyAddress: IAddress;
+  id: string;
+  totalCommission: number;
+  totalOrder: number;
+  images: { id: string; image: string }[];
+  status: string;
 }
 
 export interface IPropertyCreate {

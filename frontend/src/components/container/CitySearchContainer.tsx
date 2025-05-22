@@ -46,9 +46,9 @@ const CitySearchContainer: React.FC<IProps> = ({
           >
             <img
               className="rounded-md h-[96px] object-cover"
-              src={item.image}
+              src={item?.image}
             ></img>
-            <p className="text-sm font-semibold mt-1">{item.name}</p>
+            <p className="text-sm font-semibold mt-1">{item?.name}</p>
           </div>
         ))}
       </div>
