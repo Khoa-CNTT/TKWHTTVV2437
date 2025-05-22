@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import EditInfoPayment from "@/components/paymenInfo/EditInfoPayment";
 import LoadingItem from "@/components/loading/LoadingItem";
+import { Suspense } from "react";
 
 interface IInfoPayment {
   numberAccount: string;
@@ -178,4 +179,13 @@ const PaymentInfo = () => {
   );
 };
 
-export default PaymentInfo;
+// Component chính
+const PaymentInforPage = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PaymentInfo />
+    </Suspense>
+  );
+};
+
+export default PaymentInforPage;

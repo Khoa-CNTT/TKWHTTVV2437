@@ -38,20 +38,20 @@ const PayingCommissionModal: React.FC<IProps> = ({
       });
 
       if (response.success) {
-        console.log("response", response);
         // Chuyển hướng người dùng đến URL thanh toán
         window.location.href = response.data.vnpUrl;
       } else {
         toast.error("Thanh toán thất bại");
-        console.error("Thanh toán thất bại");
       }
     } catch (error) {
       toast.error("Đã có lỗi trong quá trình thanh toán");
-      console.error("Đã có lỗi trong quá trình thanh toán:", error);
     }
   };
   return (
-    <div className="fixed w-creeen h-screen z-10 inset-0 flex items-center justify-center bg-overblack ">
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="fixed w-creeen h-screen z-10 inset-0 flex items-center justify-center bg-overblack "
+    >
       <div className="bg-white w-[500px] rounded-md shadow-lg p-4 flex flex-col text-black">
         <div className="flex items-center gap-4">
           <IoMdClose
