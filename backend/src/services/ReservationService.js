@@ -403,13 +403,33 @@ const createReservation = (body) => {
   });
 };
 
-const listReservationApprove = ({ filter, status, page, limit = 10 }) => {
+const listReservationApprove = ({
+  filter,
+  status,
+  page,
+  limit = 10,
+  idUser,
+}) => {
   return new Promise(async (resolve, reject) => {
     try {
       console.log(filter, status, page, limit);
       let queries = {
         statusLock: "confirmed",
       };
+
+      const properties = await db.Property.findAll({
+        where: { idUser: idUser },
+        attributes: ["id"],
+        raw: true,
+      });
+
+      const propertyIds = properties?.map((p) => p.id);
+
+      if (propertyIds) {
+        queries.idProperty = { [Op.in]: propertyIds };
+        console.log("3", queries);
+      }
+
       let order;
       switch (filter) {
         case "latest":

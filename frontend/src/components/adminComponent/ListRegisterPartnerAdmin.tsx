@@ -10,6 +10,7 @@ import ItemRegisterPartnerAdminPage from "./ItemRegisterPartnerAdmin";
 import ReactPaginate from "react-paginate";
 import { GrFormNext, GrFormPrevious } from "react-icons/gr";
 import Swal from "sweetalert2";
+import LoadingItem from "../loading/LoadingItem";
 
 interface IDataRegisterPartner {
   id: string;
@@ -57,6 +58,7 @@ const ListRegisterPartnerAdmin = () => {
   const [total, setTotal] = useState<number | null>(null);
   const [limit, setLimit] = useState<number>(10);
   const [action, setAction] = useState<boolean>(true);
+  const [isLoadingItem, setIsLoadingItem] = useState<boolean>(false);
   useEffect(() => {
     const currentFilter = searchParams.get("filter") || "oldest";
     setFilter(currentFilter);
@@ -80,6 +82,7 @@ const ListRegisterPartnerAdmin = () => {
     filter: string,
     page: number
   ) => {
+    setIsLoadingItem(true);
     const res = await apiRegisterPartner.getAllRegisterPartner(
       status,
       filter,
@@ -92,6 +95,7 @@ const ListRegisterPartnerAdmin = () => {
       setTotal(res?.data?.count);
       setLimit(res.limit);
     }
+    setIsLoadingItem(false);
   };
 
   useEffect(() => {
@@ -145,6 +149,7 @@ const ListRegisterPartnerAdmin = () => {
       cancelButtonText: "Hủy",
     });
     if (result.isConfirmed) {
+      setIsLoadingItem(true);
       const res = await apiRegisterPartner.cancel(id);
       if (res?.status === "OK") {
         Swal.fire({
@@ -158,6 +163,7 @@ const ListRegisterPartnerAdmin = () => {
       } else {
         Swal.fire("Lỗi!", "Xóa không thành công.", "error");
       }
+      setIsLoadingItem(false);
     }
   };
 
@@ -272,73 +278,86 @@ const ListRegisterPartnerAdmin = () => {
                 <th className="px-4 py-3 text-left w-[80px]">...</th>
               </tr>
             </thead>
-            <tbody className=" text-[-14] font-semibold ">
-              {listRegPartner !== null &&
-                listRegPartner?.map((item, index: number) => {
-                  return (
-                    <tr key={index} className="border-b border-gray-200">
-                      {/* <td className="px-4 py-5">
+            {isLoadingItem === false && (
+              <tbody className=" text-[-14] font-semibold ">
+                {listRegPartner !== null &&
+                  listRegPartner?.map((item, index: number) => {
+                    return (
+                      <tr key={index} className="border-b border-gray-200">
+                        {/* <td className="px-4 py-5">
                         <input type="checkbox" />
                       </td> */}
-                      <td className="px-4 py-5">
-                        <div className="w-fit flex items-center gap-2 border border-b-[3px] border-gray-400 rounded-3xl py-1 px-3">
-                          <img
-                            src="https://a0.anyrgb.com/pngimg/1236/14/no-facial-features-no-avatar-no-eyes-expressionless-avatar-icon-delayering-avatar-user-avatar-men-head-portrait-thumbnail.png"
-                            alt=""
-                            className="w-6 h-6 rounded-full"
-                          />
-                          <p>{`${item?.name}`}</p>
-                        </div>
-                      </td>
-                      <td className="px-4 py-5 w-1/5">{item?.user?.email}</td>
-                      <td className="px-4 py-5">{item?.user?.phone}</td>
+                        <td className="px-4 py-5">
+                          <div className="w-fit flex items-center gap-2 border border-b-[3px] border-gray-400 rounded-3xl py-1 px-3">
+                            <img
+                              src="https://a0.anyrgb.com/pngimg/1236/14/no-facial-features-no-avatar-no-eyes-expressionless-avatar-icon-delayering-avatar-user-avatar-men-head-portrait-thumbnail.png"
+                              alt=""
+                              className="w-6 h-6 rounded-full"
+                            />
+                            <p>{`${item?.name}`}</p>
+                          </div>
+                        </td>
+                        <td className="px-4 py-5 w-1/5">{item?.user?.email}</td>
+                        <td className="px-4 py-5">{item?.user?.phone}</td>
 
-                      <td className="px-4 py-5 ">{item?.numberCCCD}</td>
+                        <td className="px-4 py-5 ">{item?.numberCCCD}</td>
 
-                      <td className={`px-4 py-5  text-green-500}`}>
-                        Trở thành partner
-                      </td>
-                      <td
-                        className={`px-4 py-5  ${item?.status === "request" ? "text-green-500" : item?.status === "rejected" ? "text-red-600" : "text-primary"}`}
-                      >
-                        {item?.status === "request"
-                          ? "Đang chờ phê duyệt"
-                          : item?.status === "rejected"
-                            ? "Đã từ chối"
-                            : "Đã phê duyệt"}
-                      </td>
-                      <td className="px-4 py-5">
-                        {dayjs(item?.createdAt)?.format("DD/MM/YYYY HH:mm")}
-                      </td>
-                      <td className="px-4 py-5 flex items-center gap-4">
-                        <button
-                          className={`w-fit py-2 px-2 rounded-3xl text-white font-semibold cursor-pointer min-w-32 bg-green-700`}
-                          onClick={() => {
-                            setItemRegPartner({
-                              ...item,
-                            });
-                            handleOpenAppove();
-                          }}
+                        <td className={`px-4 py-5  text-green-500}`}>
+                          Trở thành partner
+                        </td>
+                        <td
+                          className={`px-4 py-5  ${item?.status === "request" ? "text-green-500" : item?.status === "rejected" ? "text-red-600" : "text-primary"}`}
                         >
-                          Chi tiết
-                        </button>
-                        <div
-                          className="px-2 py-2 bg-red-600 text-white rounded-3xl cursor-pointer hover:opacity-70"
-                          onClick={() => {
-                            handleDelete(item?.idUser);
-                          }}
-                        >
-                          {" "}
-                          <FaTrashAlt />
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-            </tbody>
+                          {item?.status === "request"
+                            ? "Đang chờ phê duyệt"
+                            : item?.status === "rejected"
+                              ? "Đã từ chối"
+                              : "Đã phê duyệt"}
+                        </td>
+                        <td className="px-4 py-5">
+                          {dayjs(item?.createdAt)?.format("DD/MM/YYYY HH:mm")}
+                        </td>
+                        <td className="px-4 py-5 flex items-center gap-4">
+                          <button
+                            className={`w-fit py-2 px-2 rounded-3xl text-white font-semibold cursor-pointer min-w-32 bg-green-700`}
+                            onClick={() => {
+                              setItemRegPartner({
+                                ...item,
+                              });
+                              handleOpenAppove();
+                            }}
+                          >
+                            Chi tiết
+                          </button>
+                          <div
+                            className="px-2 py-2 bg-red-600 text-white rounded-3xl cursor-pointer hover:opacity-70"
+                            onClick={() => {
+                              handleDelete(item?.idUser);
+                            }}
+                          >
+                            {" "}
+                            <FaTrashAlt />
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            )}
           </table>
         </div>
-        {total && (
+
+        {listRegPartner?.length === 0 && (
+          <div className="mt-3 flex justify-center text-xl">
+            Chưa có người dùng nào đăng ký...
+          </div>
+        )}
+        {isLoadingItem && (
+          <div className="w-full flex justify-center">
+            <LoadingItem />
+          </div>
+        )}
+        {total !== null && total !== 0 && (
           <div className="mt-8 flex justify-center">
             <ReactPaginate
               pageCount={Math.ceil(total / limit)}
@@ -350,9 +369,9 @@ const ListRegisterPartnerAdmin = () => {
               containerClassName="flex items-center space-x-2 "
               pageClassName="px-3 py-1 border border-gray-300 rounded-xl hover:bg-gray-100 cursor-pointer active:scale-95 transition-transform"
               activeClassName="bg-blue-500 text-white  hover:bg-blue-500 hover:text-black"
-              previousClassName="px-5 py-1 border border-gray-300 rounded-xl hover:bg-gray-100 cursor-pointer active:scale-95 transition-transform"
-              nextClassName="px-5 py-1 border border-gray-300 rounded-xl hover:bg-gray-100 cursor-pointer active:scale-95 transition-transform"
-              breakClassName="px-5 py-1 border border-gray-300 rounded-xl bg-gray-100 cursor-default active:scale-95 transition-transform"
+              previousClassName="px-1 py-1 border border-gray-300 rounded-xl hover:bg-gray-100 cursor-pointer active:scale-95 transition-transform"
+              nextClassName="px-1 py-1 border border-gray-300 rounded-xl hover:bg-gray-100 cursor-pointer active:scale-95 transition-transform"
+              breakClassName="px-2 py-1 border border-gray-300 rounded-xl bg-gray-100 cursor-default active:scale-95 transition-transform"
             />
           </div>
         )}

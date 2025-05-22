@@ -10,6 +10,7 @@ import * as React from "react";
 
 import apiUser from "@/api/user";
 import Swal from "sweetalert2";
+import LoadingEdit from "../loading/LoadingEdit";
 
 const EditAddressInfo = () => {
   const searchParams = useSearchParams();
@@ -19,7 +20,7 @@ const EditAddressInfo = () => {
   const [show, setShow] = useState(false);
   const { user, setUser } = useAuth();
   const [editUser, setEditUser] = useState<IUser | null>();
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   useEffect(() => {
     setShow(isOpen);
   }, [isOpen]);
@@ -34,6 +35,7 @@ const EditAddressInfo = () => {
   };
 
   const handleEditInfo = async () => {
+    setIsLoading(true);
     const token = localStorage.getItem("access_token");
 
     if (editUser?.id && token) {
@@ -43,20 +45,20 @@ const EditAddressInfo = () => {
         address: editUser?.address,
       });
       if (res?.status === "OK" && res?.msg === "Update") {
-        // Swal.fire<any>({
-        //   title: "Update thành công!",
-        //   icon: "success",
-        //   draggable: true,
-        // });
+        Swal.fire("Cập nhật!", "Cập nhật thông tin thành công", "success");
         setUser({ ...editUser });
         closeModal();
+      } else {
+        Swal.fire("Cập nhật!", "Cập nhật thông tin không thành công", "error");
       }
     }
+    setIsLoading(false);
   };
   if (!show) return null;
 
   return (
     <div>
+      {isLoading && <LoadingEdit />}
       <div className="fixed top-0 left-0 bottom-0 right-0 bg-white">
         <div className="p-5">
           <div

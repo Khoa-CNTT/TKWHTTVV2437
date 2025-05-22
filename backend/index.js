@@ -11,7 +11,7 @@ const ReservationService = require("./src/services/ReservationService");
 const app = express();
 app.use(
   cors({
-    origin: "*",
+    origin: "http://localhost:3000",
     methods: ["POST", "PUT", "GET", "DELETE"],
     credentials: true,
   })

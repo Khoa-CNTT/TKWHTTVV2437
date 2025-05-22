@@ -5,9 +5,14 @@ const apiReservation = {
   createReservation: (data: object) =>
     http.post(`reservation/createReservation`, data),
 
-  listReservationApprove: (filter: string, status: string, page: number) =>
+  listReservationApprove: (
+    filter: string,
+    status: string,
+    page: number,
+    idUser: string
+  ) =>
     http.get(
-      `reservation/listReservationApprove?filter=${filter}&status=${status}&page=${page}`
+      `reservation/listReservationApprove?filter=${filter}&status=${status}&page=${page}&idUser=${idUser}`
     ),
 
   detailReservationApprove: (reid: string) =>

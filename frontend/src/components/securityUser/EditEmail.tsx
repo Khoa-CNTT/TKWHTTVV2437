@@ -12,6 +12,7 @@ import validate from "@/utils/validateInput";
 import { useAuth } from "@/app/contexts/AuthContext";
 import apiUser from "@/api/user";
 import Swal from "sweetalert2";
+import LoadingEdit from "../loading/LoadingEdit";
 
 interface IEditEmail {
   email: string;
@@ -39,6 +40,7 @@ const EditEmail = () => {
 
   const [countdown, setCountdown] = useState(0);
   const [isCounting, setIsCounting] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   useEffect(() => {
     setIsCounting(true);
     setCountdown(30);
@@ -83,6 +85,7 @@ const EditEmail = () => {
   ];
 
   const handleVerifyOtp = async () => {
+    setIsLoading(true);
     const invalids = validate({ otp: otp }, setInvalidFields);
     if (invalids === 0) {
       try {
@@ -98,7 +101,7 @@ const EditEmail = () => {
           ) {
             setStep(1);
           } else {
-            console.log("OTP sai"); // OTP sai
+            Swal.fire("OTP", "OTP sai hoặc hết hạn!", "error");
           }
         }
       } catch (error) {
@@ -106,20 +109,24 @@ const EditEmail = () => {
         console.log(2); // Lỗi khi gọi API
       }
     }
+    setIsLoading(false);
   };
 
   const handdleOnSendAgainOTP = async () => {
+    setIsLoading(true);
     if (user?.email) {
       const respone = await apiUser.sendOtpToEmail({
-        email: dataEditEmail?.email,
+        email: user?.email,
       });
     }
 
     setIsCounting(true);
+    setIsLoading(false);
     setCountdown(30);
   };
 
   const handdleOnSendAgainOTPNew = async () => {
+    setIsLoading(true);
     if (dataEditEmail?.email) {
       const respone = await apiUser.sendOtpToEmail({
         email: dataEditEmail?.email,
@@ -129,9 +136,11 @@ const EditEmail = () => {
 
     setIsCounting(true);
     setCountdown(30);
+    setIsLoading(false);
   };
 
   const handleSendOTPEmailNew = async () => {
+    setIsLoading(true);
     const invalids = validate({ ...dataEditEmail }, setInvalidFields);
     if (invalids === 0) {
       try {
@@ -150,9 +159,11 @@ const EditEmail = () => {
         console.log("Lỗi khi gọi API send OTP"); // Lỗi khi gọi API
       }
     }
+    setIsLoading(false);
   };
 
   const handleVerifyOtpNew = async () => {
+    setIsLoading(true);
     const invalids = validate({ otp: otpNew }, setInvalidFields);
     if (invalids === 0) {
       try {
@@ -176,29 +187,21 @@ const EditEmail = () => {
                 setUser((prev) =>
                   prev ? { ...prev, email: dataEditEmail?.email } : null
                 );
-                Swal.fire({
-                  title: "Thay đổi email thành công!",
-                  icon: "success",
-                  allowOutsideClick: true,
-                  allowEscapeKey: true,
-                  allowEnterKey: true,
-                  showConfirmButton: true,
-                  confirmButtonText: "OK",
-                  confirmButtonColor: "#3085d6",
-                });
+                Swal.fire("Cập nhật", "Cập nhật email thành công", "success");
 
                 closeModal();
               }
             } else {
-              console.log("OTP sai"); // OTP sai
+              Swal.fire("Cập nhật", "Cập nhật email không thành công", "error");
             }
           }
         }
       } catch (error) {
         console.error("Failed to verify OTP:", error);
-        console.log(2); // Lỗi khi gọi API
+        Swal.fire("OTP", "OTP sai hoặc hết hạn!", "error");
       }
     }
+    setIsLoading(false);
   };
 
   const handleOnChangeDataRegister = (key: keyof IEditEmail, value: string) => {
@@ -209,6 +212,7 @@ const EditEmail = () => {
   };
   return (
     <div>
+      {isLoading && <LoadingEdit />}
       <div className="fixed top-0 left-0 bottom-0 right-0 bg-black bg-opacity-30 flex justify-center items-center py-48">
         <div className="w-2/5 bg-white  rounded-2xl p-4">
           <div className="">
@@ -237,7 +241,7 @@ const EditEmail = () => {
                     titleHeader={itemsLabelForm[step].title}
                     labelHeader={itemsLabelForm[step].label}
                     labelBtn="Xác nhận OTP"
-                    labelInput="6-digit code"
+                    labelInput="6 chữ số"
                     typeInput="text"
                     idInput="otp"
                     value={otp}

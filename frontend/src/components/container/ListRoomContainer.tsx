@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { startTransition, useEffect, useState } from "react";
 import { IoFastFood } from "react-icons/io5";
 import { IoPersonSharp } from "react-icons/io5";
 import { IoBed } from "react-icons/io5";
@@ -26,6 +26,7 @@ import apiReservation from "@/api/reservation";
 import moment from "moment";
 import Swal from "sweetalert2";
 import { useAuth } from "@/app/contexts/AuthContext";
+import Loading from "../loading/loading";
 
 interface IProps {
   propertyId: string;
@@ -60,7 +61,7 @@ const ListRoomContainer: React.FC<IProps> = ({ propertyId }) => {
   const [listRoomAvailability, setListRoomAvailability] = useState<
     { id: string; status: boolean }[]
   >([]);
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   useEffect(() => {
     const fetchListRoom = async () => {
       const response = await apisRoom.searchListRoomForBooking(propertyId);
@@ -103,6 +104,7 @@ const ListRoomContainer: React.FC<IProps> = ({ propertyId }) => {
   };
 
   const handleCheckOut = async (id: string) => {
+    setIsLoading(true);
     console.log("propertyId", propertyId);
     setRoomId(id); // Gọi hàm setRoomId với giá trị "roomId"
     setPropertyId(propertyId); // Gọi hàm setRoomId với giá trị "roomId"
@@ -130,6 +132,7 @@ const ListRoomContainer: React.FC<IProps> = ({ propertyId }) => {
       ) {
         setCodeId(code);
         setReservationId(booking.data.id);
+
         router.push("/checkout");
       } else {
         Swal.fire({
@@ -146,6 +149,7 @@ const ListRoomContainer: React.FC<IProps> = ({ propertyId }) => {
 
     // setReservationId("1");
     // router.push("/checkout");
+    setIsLoading(false);
   };
 
   // Delete localStorage when component unmounts
@@ -160,6 +164,7 @@ const ListRoomContainer: React.FC<IProps> = ({ propertyId }) => {
 
   return (
     <div>
+      {isLoading && <Loading />}
       {rooms.map((item: IRoom) => (
         <div
           key={item.id}

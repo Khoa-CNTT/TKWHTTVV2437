@@ -11,6 +11,8 @@ import validate from "@/utils/validateInput";
 import { useAuth } from "@/app/contexts/AuthContext";
 import apiUser from "@/api/user";
 import Swal from "sweetalert2";
+import LoadingItem from "../loading/LoadingItem";
+import LoadingEdit from "../loading/LoadingEdit";
 
 interface IEditPassword {
   password: string;
@@ -37,6 +39,7 @@ const EditPassword = () => {
 
   const [countdown, setCountdown] = useState(0);
   const [isCounting, setIsCounting] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   useEffect(() => {
     setIsCounting(true);
     setCountdown(30);
@@ -76,6 +79,7 @@ const EditPassword = () => {
   ];
 
   const handleVerifyOtp = async () => {
+    setIsLoading(true);
     const invalids = validate({ otp: otp }, setInvalidFields);
     if (invalids === 0) {
       try {
@@ -91,7 +95,7 @@ const EditPassword = () => {
           ) {
             setStep(1);
           } else {
-            console.log("OTP sai"); // OTP sai
+            Swal.fire("OTP", "OTP sai hoặc hết hạn!", "error"); // OTP sai
           }
         }
       } catch (error) {
@@ -99,18 +103,22 @@ const EditPassword = () => {
         console.log(2); // Lỗi khi gọi API
       }
     }
+    setIsLoading(false);
   };
 
   const handdleOnSendAgainOTP = async () => {
+    setIsLoading(true);
     if (user) {
       const respone = await apiUser.sendOtpToEmail({ email: user?.email });
     }
 
     setIsCounting(true);
+    setIsLoading(false);
     setCountdown(30);
   };
 
   const handleSubmitEdit = async () => {
+    setIsLoading(true);
     const invalids = validate({ ...dataEditPass }, setInvalidFields);
     if (invalids === 0) {
       const token = localStorage.getItem("access_token");
@@ -120,21 +128,15 @@ const EditPassword = () => {
           password: dataEditPass?.password,
         });
         if (res?.status === "OK" && res?.msg === "Update") {
-          Swal.fire({
-            title: "Thay đổi mật khẩu thành công!",
-            icon: "success",
-            allowOutsideClick: true,
-            allowEscapeKey: true,
-            allowEnterKey: true,
-            showConfirmButton: true,
-            confirmButtonText: "OK",
-            confirmButtonColor: "#3085d6",
-          });
+          Swal.fire("Mật khẩu", "Thay đổi mật khẩu thành công", "success");
 
           closeModal();
+        } else {
+          Swal.fire("Mật khẩu", "Thay đổi mật khẩu không thành công", "error");
         }
       }
     }
+    setIsLoading(false);
   };
 
   const handleOnChangeDataRegister = (
@@ -148,6 +150,7 @@ const EditPassword = () => {
   };
   return (
     <div>
+      {isLoading && <LoadingEdit />}
       <div className="fixed top-0 left-0 bottom-0 right-0 bg-white">
         <div className="p-5">
           <div
@@ -164,8 +167,8 @@ const EditPassword = () => {
                 <InputForm
                   titleHeader={itemsLabelForm[step].title}
                   labelHeader={itemsLabelForm[step].label}
-                  labelBtn="Verify OTP"
-                  labelInput="6-digit code"
+                  labelBtn="Xác nhận OTP"
+                  labelInput="6 chữ số"
                   typeInput="text"
                   idInput="otp"
                   value={otp}
@@ -177,11 +180,7 @@ const EditPassword = () => {
 
                 <div className="mt-5 relative">
                   <ButtonLogin
-                    text={
-                      isCounting
-                        ? `Send again OTP ${countdown}`
-                        : `Send again OTP`
-                    }
+                    text={isCounting ? `Gởi lại ${countdown}` : `Gởi lại`}
                     inForm={false}
                     disable={isCounting}
                     onClick={handdleOnSendAgainOTP}

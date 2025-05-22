@@ -10,6 +10,7 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import EditInfoPayment from "@/components/paymenInfo/EditInfoPayment";
+import LoadingItem from "@/components/loading/LoadingItem";
 
 interface IInfoPayment {
   numberAccount: string;
@@ -23,6 +24,7 @@ const PaymentInfo = () => {
   const searchParams = useSearchParams();
   const isOpen = searchParams.get("action") === "add-info-payment";
   const isOpenEdit = searchParams.get("action") === "edit-info-payment";
+  const [isLoadingItem, setIsLoadingItem] = useState<boolean>(false);
   const handleAddInfoPayment = (value: string) => {
     router.push(`?action=${value}`);
   };
@@ -31,6 +33,7 @@ const PaymentInfo = () => {
   const [deleted, setDeleted] = useState(false);
   const handleGetInfoAccountPayment = async () => {
     if (user) {
+      setIsLoadingItem(true);
       const res = await apiPayment.infoAccountPayment(user?.id);
       if (res?.status === "OK")
         setInfoPayment({
@@ -40,6 +43,7 @@ const PaymentInfo = () => {
           qrCode: res?.data?.qrCode,
           id: res?.data?.id,
         });
+      setIsLoadingItem(false);
     }
   };
 
@@ -48,12 +52,14 @@ const PaymentInfo = () => {
   }, [isOpen, user, deleted, isOpenEdit]);
 
   const handleDeleteAccountPayment = async () => {
+    setIsLoadingItem(true);
     const token = localStorage.getItem("access_token");
     if (token && infoPayment?.id) {
       const res = await apiPayment.deleteAccountPayment(infoPayment?.id, token);
       setInfoPayment(null);
       setDeleted(!deleted);
     }
+    setIsLoadingItem(false);
   };
 
   const handleDelete = async () => {
@@ -88,6 +94,7 @@ const PaymentInfo = () => {
             Lưu ý: Thông tin tài khoản thụ hưởng của bạn phải trùng với thông
             tin trong hợp đồng, nếu không mọi trách nhiệm rủi ro sẽ là của bạn.
           </p>
+          {isLoadingItem && <LoadingItem />}
           {infoPayment ? (
             <div>
               <div className="flex justify-between items-center">

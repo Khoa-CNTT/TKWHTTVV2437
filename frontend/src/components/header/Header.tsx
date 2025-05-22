@@ -13,6 +13,7 @@ import {
 } from "react-icons/ci";
 import { GiAirplaneDeparture } from "react-icons/gi";
 import Link from "next/link";
+import apiUser from "@/api/user";
 const Header = () => {
   const router = useRouter();
   const { user } = useAuth();
@@ -53,10 +54,10 @@ const Header = () => {
     setIsLoginModalOpen(false);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setIsLoginModalOpen(false);
     localStorage.removeItem("access_token");
-
+    const res = await apiUser.logOut();
     window.location.href = "/";
   };
 
@@ -71,6 +72,10 @@ const Header = () => {
   };
   const handleBecomePartner = () => {
     router.push("/become-partner");
+    setIsLoginModalOpen(false);
+  };
+  const handleReservationMyTrip = () => {
+    router.push("/");
     setIsLoginModalOpen(false);
   };
   const menu = [
@@ -92,15 +97,16 @@ const Header = () => {
     {
       title: "Đặt chuyến đi",
       icon: <CiRollingSuitcase />,
+      handle: handleReservationMyTrip,
     },
-    {
-      title: "Đánh giá",
-      icon: <CiPen />,
-    },
-    {
-      title: "Đã lưu",
-      icon: <CiHeart />,
-    },
+    // {
+    //   title: "Đánh giá",
+    //   icon: <CiPen />,
+    // },
+    // {
+    //   title: "Đã lưu",
+    //   icon: <CiHeart />,
+    // },
     {
       title: "Đăng xuất",
       icon: <CiLogout />,
@@ -190,12 +196,6 @@ const Header = () => {
                     onClick={handleNavigateLogin} // Đóng modal khi click vào nút
                   >
                     Đăng nhập or Đăng ký
-                  </button>
-                  <button
-                    className="bg-primary text-white px-4 py-2 rounded-3xl hover:bg-blue-600 w-full hover:opacity-80 mt-4 text-[-14] font-bold"
-                    onClick={handleNavigateLogin} // Đóng modal khi click vào nút
-                  >
-                    Đăng nhập cho chủ sở hữu
                   </button>
                 </div>
               </div>
