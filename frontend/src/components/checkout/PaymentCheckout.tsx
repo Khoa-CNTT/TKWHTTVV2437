@@ -4,11 +4,13 @@ import { IInfoPayment } from "@/app/types/accountPayment";
 import validate from "@/utils/validateInput";
 import { useRouter } from "next/navigation";
 import PreviousMap_ from "postcss/lib/previous-map";
-import { useState } from "react";
+import { startTransition, useRef, useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { TiArrowBack } from "react-icons/ti";
 import Swal from "sweetalert2";
+import LoadingItem from "../loading/LoadingItem";
+import Loading from "../loading/loading";
 interface IDataEnter {
   resId: string;
   firstName: string;
@@ -63,10 +65,13 @@ const PaymentCheckout = ({
     code,
     propertyId,
   });
-
+  const [isOpenImage, setIsOpenImage] = useState(false);
   const [invalidFields, setInvalidFields] = useState<IInvalidField[]>([]);
-
+  const imgRef = useRef<HTMLInputElement>(null);
+  const [isLoadingImg, setIsLoadingImg] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsLoadingImg(true);
     const file = e.target.files?.[0];
     if (file) {
       const formData = new FormData();
@@ -82,6 +87,7 @@ const PaymentCheckout = ({
         imageBanking: res?.data?.secure_url,
       }));
     }
+    setIsLoadingImg(false);
   };
 
   const handleFileRemove = () => {
@@ -93,9 +99,13 @@ const PaymentCheckout = ({
       ...prev,
       imageBanking: "",
     }));
+    if (imgRef?.current) {
+      imgRef.current.value = "";
+    }
   };
 
   const handleCreateResservaiton = async (data: object) => {
+    setIsLoading(true);
     const valid = validate(
       {
         imageBanking: dataEnter?.imageBanking || "",
@@ -121,10 +131,12 @@ const PaymentCheckout = ({
         }
       }
     }
+    setIsLoading(false);
   };
 
   return (
     <div>
+      {isLoading && <Loading />}
       <div className="border-[1px] border-gray-300 rounded-lg p-8 mt-4">
         <h3 className="font-semibold text-lg mb-8">
           Thanh toán cho kỳ nghĩ dưỡng của bạn
@@ -150,7 +162,7 @@ const PaymentCheckout = ({
                 <p>
                   Đơn vị thụ hưởng:{" "}
                   <span className="font-semibold">
-                    {AccountPayment?.nameAccount}
+                    {AccountPayment?.nameAccount || "Trần Văn Thịnh"}
                   </span>
                 </p>
               </div>
@@ -161,7 +173,7 @@ const PaymentCheckout = ({
                 <p>
                   Số tài khoản:{" "}
                   <span className="font-semibold">
-                    {AccountPayment?.numberAccount}
+                    {AccountPayment?.numberAccount || "19036854190011"}
                   </span>
                 </p>
               </div>
@@ -172,7 +184,7 @@ const PaymentCheckout = ({
                 <p>
                   Tại:{" "}
                   <span className="font-semibold">
-                    {AccountPayment?.nameBank}
+                    {AccountPayment?.nameBank || "Techcombank (TCB)"}
                   </span>
                 </p>
               </div>
@@ -198,10 +210,18 @@ const PaymentCheckout = ({
                 </div>
               </div>
 
-              <div className="flex flex-col items-center justify-center ">
+              <div
+                className="flex flex-col items-center justify-center cursor-pointer "
+                onClick={() => {
+                  setIsOpenImage(true);
+                }}
+              >
                 <img
-                  src={AccountPayment?.qrCode || ""}
-                  className="w-40 h-40 object-contain"
+                  src={
+                    AccountPayment?.qrCode ||
+                    "https://res.cloudinary.com/dzcgxdbbw/image/upload/v1747859051/phongtro123/ncm4jc0uqq4id9ysw50s.jpg"
+                  }
+                  className="w-56 h-56 object-contain"
                   alt=""
                 />
                 <p className="mt-1 font-semibold">Mã QR tài khoản: </p>
@@ -226,6 +246,7 @@ const PaymentCheckout = ({
           )}
 
           <input
+            ref={imgRef}
             id="file-upload"
             type="file"
             accept="image/*"
@@ -234,7 +255,12 @@ const PaymentCheckout = ({
               handleFileChange(e);
             }}
           />
-          {dataEnter?.imageBanking && (
+          {isLoadingImg && (
+            <div className="flex items-center justify-center w-[200px] h-[300px]">
+              <LoadingItem />
+            </div>
+          )}
+          {dataEnter.imageBanking && (
             <div className="relative w-fit">
               <img
                 src={dataEnter?.imageBanking}
@@ -254,7 +280,10 @@ const PaymentCheckout = ({
 
       <div>
         <p className="mt-6 text-sm text-gray-600">
-          Nhấn vào nút trở lại để thay đổi thông tin
+          Nhấn vào nút trở lại để thay đổi thông tin và khi bạn hoàn tất là bạn
+          đã đồng ý với{" "}
+          <span className="text-blue-700"> Điều khoản và Hợp đồng</span> của
+          chúng tôi.
         </p>
         <div className="flex items-center justify-between">
           <button
@@ -276,6 +305,28 @@ const PaymentCheckout = ({
           </button>
         </div>
       </div>
+      {isOpenImage && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 "
+          onClick={() => setIsOpenImage(false)}
+        >
+          <button
+            className="absolute top-4 right-4 text-white text-4xl"
+            onClick={() => setIsOpenImage(false)}
+          >
+            &times;
+          </button>
+          <img
+            src={
+              AccountPayment?.qrCode ||
+              "https://res.cloudinary.com/dzcgxdbbw/image/upload/v1747859051/phongtro123/ncm4jc0uqq4id9ysw50s.jpg"
+            }
+            alt="Ảnh lớn"
+            className="object-contain rounded-xl shadow-lg"
+            onClick={(e) => e.stopPropagation()} // để click vào ảnh không bị đóng modal
+          />
+        </div>
+      )}
     </div>
   );
 };

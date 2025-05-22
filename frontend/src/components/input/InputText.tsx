@@ -64,17 +64,18 @@ const InputText = (props: IInputText) => {
       >
         {label}
       </label>
-      {(id === "password" || id === "confirmPassword") &&
-        value !== "" &&
-        (lock ? (
-          <span className="absolute right-5 top-4" onClick={handleLock}>
-            <FaEyeSlash />
-          </span>
-        ) : (
-          <span className="absolute right-5 top-4" onClick={handleLock}>
-            <IoEyeSharp />
-          </span>
-        ))}
+      {(id === "password" || id === "confirmPassword") && value !== "" && (
+        <span
+          className="absolute right-4 top-4 z-10 bg-white cursor-pointer w-6 h-6 flex items-center justify-center"
+          onClick={handleLock}
+        >
+          {lock ? (
+            <FaEyeSlash key="eye-slash" />
+          ) : (
+            <IoEyeSharp key="eye-sharp" />
+          )}
+        </span>
+      )}
 
       {/* <IoEyeSharp /> */}
       {invalidFields?.some((el) => el.name === id) && (

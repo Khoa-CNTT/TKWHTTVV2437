@@ -1,6 +1,6 @@
 "use client";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { IoMdClose } from "react-icons/io";
 import InputText from "../input/InputText";
 import ButtonLogin from "../button/ButtonLogin";
@@ -14,6 +14,8 @@ import Swal from "sweetalert2";
 import { TextField } from "@mui/material";
 import apiPayment from "@/api/payment";
 import validate from "@/utils/validateInput";
+import LoadingEdit from "../loading/LoadingEdit";
+import LoadingItem from "../loading/LoadingItem";
 
 interface IInfoPayment {
   numberAccount: string;
@@ -45,9 +47,12 @@ const EditInfoPayment = ({ data }: IEditData) => {
     qrCode: "",
     id: "",
   });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingImg, setIsLoadingImg] = useState<boolean>(false);
+  const imgRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     setDataPayment({
-      numberAccount: data?.nameAccount || "",
+      numberAccount: data?.numberAccount || "",
       nameAccount: data?.nameAccount || "",
       nameBank: data?.nameBank || "",
       qrCode: data?.qrCode || "",
@@ -61,7 +66,7 @@ const EditInfoPayment = ({ data }: IEditData) => {
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    // setIsLoading(true);
+    setIsLoadingImg(true);
     const file = e.target.files?.[0];
     if (file) {
       const formData = new FormData();
@@ -75,15 +80,17 @@ const EditInfoPayment = ({ data }: IEditData) => {
           qrCode: res?.data?.secure_url,
         }));
       }
-
-      // setIsLoading(false);
     }
+    setIsLoadingImg(false);
   };
   const handleFileRemove = () => {
     setDataPayment((prev) => ({
       ...prev,
       qrCode: "",
     }));
+    if (imgRef?.current) {
+      imgRef.current.value = "";
+    }
   };
 
   const handleSubmit = async () => {
@@ -98,6 +105,7 @@ const EditInfoPayment = ({ data }: IEditData) => {
     );
 
     if (valid === 0) {
+      setIsLoading(true);
       const token = localStorage.getItem("access_token");
       if (token && dataPayment?.id) {
         const res = await apiPayment.updateAccountPayment(
@@ -123,8 +131,15 @@ const EditInfoPayment = ({ data }: IEditData) => {
           });
 
           closeModal();
+        } else {
+          Swal.fire(
+            "Thất bại",
+            "Cật nhật thông tin không thành công!",
+            "error"
+          );
         }
       }
+      setIsLoading(false);
     }
   };
 
@@ -134,6 +149,7 @@ const EditInfoPayment = ({ data }: IEditData) => {
 
   return (
     <div>
+      {isLoading && <LoadingEdit />}
       <div className="fixed top-0 left-0 bottom-0 right-0 bg-white">
         <div className="p-5">
           <div
@@ -250,6 +266,7 @@ const EditInfoPayment = ({ data }: IEditData) => {
               </label>
 
               <input
+                ref={imgRef}
                 id="file-upload"
                 type="file"
                 accept="image/png, image/jpeg, image/jpg, image/gif, image/webp"
@@ -259,6 +276,12 @@ const EditInfoPayment = ({ data }: IEditData) => {
                 }}
                 onFocus={handleFocus}
               />
+
+              {isLoadingImg && (
+                <div className="flex items-center justify-center w-[200px] h-[200px]">
+                  <LoadingItem />
+                </div>
+              )}
               {dataPayment?.qrCode && (
                 <div>
                   <div className="relative w-fit">

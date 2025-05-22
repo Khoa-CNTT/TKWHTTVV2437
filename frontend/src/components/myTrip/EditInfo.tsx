@@ -1,6 +1,6 @@
 "use client";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { IoMdArrowRoundBack, IoMdClose } from "react-icons/io";
 import InputText from "../input/InputText";
 import ButtonLogin from "../button/ButtonLogin";
@@ -14,6 +14,7 @@ import { FaRegTrashCan } from "react-icons/fa6";
 import apiPayment from "@/api/payment";
 import validate from "@/utils/validateInput";
 import apiReservation from "@/api/reservation";
+import LoadingItem from "../loading/LoadingItem";
 
 interface IInfo {
   id: string;
@@ -45,6 +46,9 @@ const EditInfo = ({ data }: IProps) => {
   const { user, setUser } = useAuth();
   const [editUser, setEditUser] = useState<IInfo | null>(null);
   const [invalidFields, setInvalidFields] = useState<IInvalidField[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingImg, setIsLoadingImg] = useState<boolean>(false);
+  const imgRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     setShow(isOpen);
     if (isOpen) {
@@ -87,6 +91,7 @@ const EditInfo = ({ data }: IProps) => {
         });
 
         if (result.isConfirmed) {
+          setIsLoading(true);
           const res = await apiReservation.updateInfoReservation({
             ...editUser,
           });
@@ -100,6 +105,7 @@ const EditInfo = ({ data }: IProps) => {
             router.push(pathname); // Quay về trang trước (server component)
             router.refresh(); // Refresh lại dữ liệu mới
           }
+          setIsLoading(false);
         }
       }
     }
@@ -107,6 +113,7 @@ const EditInfo = ({ data }: IProps) => {
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     // setIsLoading(true);
+    setIsLoadingImg(true);
     const file = e.target.files?.[0];
     if (file) {
       const formData = new FormData();
@@ -122,6 +129,7 @@ const EditInfo = ({ data }: IProps) => {
 
       // setIsLoading(false);
     }
+    setIsLoadingImg(false);
   };
   const handleFileRemove = () => {
     setEditUser((prev) => (prev ? { ...prev, imageBanking: "" } : null));
@@ -298,6 +306,11 @@ const EditInfo = ({ data }: IProps) => {
                   }}
                   // onFocus={handleFocus}
                 />
+                {isLoadingImg && (
+                  <div className="flex items-center justify-center w-[200px] h-[200px]">
+                    <LoadingItem />
+                  </div>
+                )}
                 {editUser?.imageBanking && (
                   <div>
                     <div className="relative w-fit">

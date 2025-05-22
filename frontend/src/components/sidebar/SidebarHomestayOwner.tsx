@@ -11,6 +11,7 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { FaRegCalendarCheck } from "react-icons/fa";
 import { MdOutlineAdsClick } from "react-icons/md";
 import { LuLayoutDashboard } from "react-icons/lu";
+import { CiCreditCard2 } from "react-icons/ci";
 
 const links = [
   {
@@ -27,6 +28,11 @@ const links = [
     href: "/homestay/status-room",
     label: "Theo dõi phòng",
     icon: <FaRegCalendarCheck size={25} />,
+  },
+  {
+    href: "/homestay/payment-info",
+    label: "Thông tin tài khoản ngân hàng",
+    icon: <CiCreditCard2 size={25} />,
   },
   {
     href: "/homestay/list-reservation-approve",

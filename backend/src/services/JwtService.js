@@ -8,7 +8,7 @@ const generalAccessToken = async (payload) => {
       ...payload,
     },
     process.env.ACCESS_TOKEN,
-    { expiresIn: "24h" }
+    { expiresIn: "365d" }
   );
 
   return access_token;

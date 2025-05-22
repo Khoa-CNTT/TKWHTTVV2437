@@ -5,6 +5,7 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import EditPassword from "@/components/securityUser/EditPassword";
 import SecurityUser from "@/components/securityUser/SecurityUser";
 import EditEmail from "@/components/securityUser/EditEmail";
+import LoadingEdit from "@/components/loading/LoadingEdit";
 
 const SecurityContent = () => {
   const searchParams = useSearchParams();
@@ -13,6 +14,7 @@ const SecurityContent = () => {
   return (
     <div className="w-full">
       <SecurityUser />
+
       {isEditPassword && <EditPassword />}
       {isEditEmail && <EditEmail />}
       {/* <EditBasicInfo />

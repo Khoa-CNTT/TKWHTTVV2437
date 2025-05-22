@@ -17,7 +17,7 @@ const registerUser = (newUser) => {
     const { phone, password, email, firstName, lastName } = newUser;
     try {
       const response = await db.User.findOrCreate({
-        where: { [Op.or]: [{ phone }, { email }] },
+        where: { [Op.or]: [{ email }] },
         defaults: {
           email,
           phone,
@@ -28,8 +28,9 @@ const registerUser = (newUser) => {
           id: v4(),
         },
       });
-
+      console.log("123");
       if (response[1]) {
+        console.log("124");
         const checkUser = await db.User.findOne({
           where: { email },
           raw: true,
@@ -43,16 +44,16 @@ const registerUser = (newUser) => {
           role: checkUser.role,
         });
 
-        resolve({
+        return resolve({
           status: "OK",
           msg: "Register is success",
           access_token,
           refresh_token,
         });
       }
-
+      console.log("125");
       resolve({
-        status: response[1] ? "OK" : "ERR",
+        status: response[1] ? "OK" : "ERR1",
         msg: response[1] ? "Register is success" : "Phone is exist",
       });
     } catch (error) {
@@ -162,7 +163,7 @@ const sendMailOTP = (email, status) => {
         delete otpStore[email];
       }
 
-      const expires = Date.now() + 5 * 60 * 1000;
+      const expires = Date.now() + 15 * 60 * 1000;
       otpStore[email] = { OTP, expires };
       console.log("oooopp");
       console.log(otpStore);
