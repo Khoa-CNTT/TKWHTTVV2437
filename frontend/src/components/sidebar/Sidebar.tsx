@@ -5,6 +5,7 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { FaQuestionCircle } from "react-icons/fa";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/app/contexts/AuthContext";
+import apiUser from "@/api/user";
 
 const Sidebar = () => {
   const { user } = useAuth();
@@ -26,8 +27,9 @@ const Sidebar = () => {
     },
   ];
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     localStorage.removeItem("access_token");
+    const res = await apiUser.logOut();
     window.location.href = "/";
   };
 

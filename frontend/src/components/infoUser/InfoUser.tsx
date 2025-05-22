@@ -5,6 +5,9 @@ import InfoField from "./InfoField";
 import { useRouter } from "next/navigation";
 import { IUser } from "@/app/types/user";
 import dayjs, { Dayjs } from "dayjs";
+
+import Loading from "../loading/loading";
+import LoadingItem from "../loading/LoadingItem";
 interface IInfoUser {
   fullName?: string | null;
   dateOfBirth?: Dayjs | null;
@@ -51,76 +54,82 @@ const InfoUser = () => {
   };
   return (
     <div className="w-full">
-      <div className="flex flex-col gap-10 w-full">
-        <div className="">
-          <h1 className="text-[text] text-[28px] font-semibold">{`${user?.firstName} ${user?.lastName}`}</h1>
-        </div>
+      {user ? (
+        <div className="flex flex-col gap-10 w-full">
+          <div className="">
+            <h1 className="text-[text] text-[28px] font-semibold">{`${user?.firstName} ${user?.lastName}`}</h1>
+          </div>
 
-        <div className="w-full">
           <div className="w-full">
-            <div className="flex justify-between w-full">
-              <h1 className="text-[text] text-[24px] font-semibold">
-                Thông tin cơ bản
-              </h1>
-              <div
-                className="text-primary font-semibold text-[14] py-2 px-2  rounded-2xl hover:bg-blue-100 cursor-pointer"
-                onClick={() => handleEditInfo("basic-info")}
-              >
-                Chỉnh sửa
+            <div className="w-full">
+              <div className="flex justify-between w-full">
+                <h1 className="text-[text] text-[24px] font-semibold">
+                  Thông tin cơ bản
+                </h1>
+                <div
+                  className="text-primary font-semibold text-[14] py-2 px-2  rounded-2xl hover:bg-blue-100 cursor-pointer"
+                  onClick={() => handleEditInfo("basic-info")}
+                >
+                  Chỉnh sửa
+                </div>
               </div>
+              <p className="text-[-14] text-[text]">
+                Hảy đảm bảo thông tin này trùng khớp với thông tin của bạn như
+                hộ chiếu hoặc giấy phép lái xe
+              </p>
             </div>
-            <p className="text-[-14] text-[text]">
-              Hảy đảm bảo thông tin này trùng khớp với thông tin của bạn như hộ
-              chiếu hoặc giấy phép lái xe
-            </p>
+
+            <div className="flex flex-wrap ">
+              <InfoField title="Họ tên" label={userInfo?.fullName || ""} />
+              <InfoField title="Tiểu sử" label={userInfo?.bio || ""} />
+              <InfoField
+                title="Ngày sinh"
+                label={
+                  dayjs(userInfo?.dateOfBirth).isValid()
+                    ? String(dayjs(userInfo?.dateOfBirth).format("DD/MM/YYYY"))
+                    : ""
+                }
+              />
+              <InfoField title="Giới tính" label={userInfo?.gender || ""} />
+            </div>
           </div>
 
-          <div className="flex flex-wrap ">
-            <InfoField title="Họ tên" label={userInfo?.fullName || ""} />
-            <InfoField title="Tiểu sử" label={userInfo?.bio || ""} />
-            <InfoField
-              title="Ngày sinh"
-              label={
-                String(dayjs(userInfo?.dateOfBirth).format("DD/MM/YYYY")) || ""
-              }
-            />
-            <InfoField title="Giới tính" label={userInfo?.gender || ""} />
-          </div>
-        </div>
-
-        <div className="w-full">
           <div className="w-full">
-            <div className="flex justify-between w-full">
-              <h1 className="text-[text] text-[24px] font-semibold">
-                Thông tin liên lạc
-              </h1>
-              <div
-                className="text-primary font-semibold text-[14] py-2 px-2  rounded-2xl hover:bg-blue-100 cursor-pointer"
-                onClick={() => handleEditInfo("address-info")}
-              >
-                Chỉnh sửa
+            <div className="w-full">
+              <div className="flex justify-between w-full">
+                <h1 className="text-[text] text-[24px] font-semibold">
+                  Thông tin liên lạc
+                </h1>
+                <div
+                  className="text-primary font-semibold text-[14] py-2 px-2  rounded-2xl hover:bg-blue-100 cursor-pointer"
+                  onClick={() => handleEditInfo("address-info")}
+                >
+                  Chỉnh sửa
+                </div>
               </div>
+              <p className="text-[-14] text-[text]">
+                Nhận thông báo về hoạt động tài khoản và cập nhật chuyến đi bằng
+                cách chia sẻ thông tin này
+              </p>
             </div>
-            <p className="text-[-14] text-[text]">
-              Nhận thông báo về hoạt động tài khoản và cập nhật chuyến đi bằng
-              cách chia sẻ thông tin này
-            </p>
-          </div>
 
-          <div className="flex flex-wrap ">
-            <InfoField
-              title="Số điện thoại di động"
-              label={userInfo?.phone || ""}
-            />
-            <InfoField title="Email" label={userInfo?.email || ""} />
-            <InfoField
-              title="Liên lạc khẩn cấp"
-              label={userInfo?.emergencyPhone || ""}
-            />
-            <InfoField title="Địa chỉ" label={userInfo?.address || ""} />
+            <div className="flex flex-wrap ">
+              <InfoField
+                title="Số điện thoại di động"
+                label={userInfo?.phone || ""}
+              />
+              <InfoField title="Email" label={userInfo?.email || ""} />
+              <InfoField
+                title="Liên lạc khẩn cấp"
+                label={userInfo?.emergencyPhone || ""}
+              />
+              <InfoField title="Địa chỉ" label={userInfo?.address || ""} />
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <LoadingItem />
+      )}
     </div>
   );
 };

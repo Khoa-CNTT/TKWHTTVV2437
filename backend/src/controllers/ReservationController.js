@@ -24,11 +24,12 @@ const createReservation = async (req, res) => {
 
 const listReservationApprove = async (req, res) => {
   try {
-    const { filter, status, page } = req.query;
+    const { filter, status, page, idUser } = req.query;
     const response = await ReservationService.listReservationApprove({
       filter,
       status,
       page,
+      idUser,
     });
     return res.status(200).json(response);
   } catch (error) {

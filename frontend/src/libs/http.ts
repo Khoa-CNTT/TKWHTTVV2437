@@ -62,6 +62,7 @@ const request = async <Response>(
       body,
       method,
       cache: "no-cache",
+      credentials: "include",
     });
     const payload = await response.json();
     return payload;

@@ -14,7 +14,13 @@ const registerUser = async (req, res) => {
     const response = await UserService.registerUser(req.body);
     const { refresh_token = null, ...newRespone } = response;
     console.log("123 ", refresh_token);
-    if (refresh_token !== null) {
+
+    if (refresh_token !== null && newRespone?.access_token !== null) {
+      res.cookie("access_token", newRespone.access_token, {
+        httpOnly: true,
+        secure: false,
+        samesite: "strict",
+      });
       res.cookie("refresh_token", refresh_token, {
         httpOnly: true,
         secure: false,
@@ -42,6 +48,11 @@ const signInUser = async (req, res) => {
     const response = await UserService.signInUser(req.body);
 
     const { refresh_token, ...newRespone } = response;
+    res.cookie("access_token", newRespone.access_token, {
+      httpOnly: true,
+      secure: false,
+      samesite: "strict",
+    });
     res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
       secure: false,
@@ -58,6 +69,7 @@ const signInUser = async (req, res) => {
 const logOutUser = async (req, res) => {
   try {
     res.clearCookie("refresh_token");
+    res.clearCookie("access_token");
     return res.status(200).json({
       status: "OK",
       msg: "Log-out successfully",
@@ -195,6 +207,11 @@ const verifyOTPLogin = async (req, res) => {
 
     const respon = await UserService.verifyOTPLogin(email, OTP);
     const { refresh_token, ...newRespone } = respon;
+    res.cookie("access_token", newRespone.access_token, {
+      httpOnly: true,
+      secure: false,
+      samesite: "strict",
+    });
     res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
       secure: false,

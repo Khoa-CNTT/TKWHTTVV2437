@@ -32,6 +32,8 @@ const apiUser = {
     phone: string;
   }) => http.post(`user/sign-up`, data),
 
+  logOut: () => http.get(`user/log-out`),
+
   refreshToken: () =>
     http.get("user/refresh-token", {
       credentials: "include",

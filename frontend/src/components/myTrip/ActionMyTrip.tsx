@@ -1,10 +1,13 @@
 "use client";
 import apiReservation from "@/api/reservation";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { FaUserEdit } from "react-icons/fa";
 import { IoMdCloseCircle } from "react-icons/io";
 import { RiDeviceRecoverFill } from "react-icons/ri";
 import Swal from "sweetalert2";
+import LoadingEdit from "../loading/LoadingEdit";
+import Loading from "../loading/loading";
 
 interface IProps {
   id: string;
@@ -24,7 +27,7 @@ const ActionMyTrip = ({
   idRoom,
 }: IProps) => {
   const router = useRouter();
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const handleCancel = async () => {
     const result = await Swal.fire({
       title: `Bạn có chắc muốn ${statusUser === "created" ? "hủy" : "khôi phục"} phòng này chứ?`,
@@ -38,6 +41,7 @@ const ActionMyTrip = ({
     });
 
     if (result.isConfirmed) {
+      setIsLoading(true);
       if (statusUser === "created") {
         const res = await apiReservation.updateStatusUserReservation({
           startDay: startDay,
@@ -73,6 +77,7 @@ const ActionMyTrip = ({
           router.refresh(); // Refresh lại dữ liệu mới
         }
       }
+      setIsLoading(false);
     }
   };
 
@@ -81,6 +86,7 @@ const ActionMyTrip = ({
   };
   return (
     <div>
+      {isLoading && <Loading />}
       <div className="border rounded-lg shadow p-6 flex flex-col gap-4">
         <p className="font-semibold">Tất cả các thông tin có đúng không?</p>
         <div

@@ -15,6 +15,7 @@ import ReactPaginate from "react-paginate";
 import { GrFormNext, GrFormPrevious } from "react-icons/gr";
 import ItemReservationAdmin from "./ItemReservationAdmin";
 import apiProperty from "@/api/property";
+import LoadingItem from "../loading/LoadingItem";
 
 interface IBooking {
   id: string;
@@ -81,6 +82,7 @@ const ListReservationApprovePage = () => {
     []
   );
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
+  const [isLoadingItem, setIsLoadingItem] = useState<boolean>(false);
   useEffect(() => {
     const currentFilter = searchParams.get("filter") || "oldest";
     setFilter(currentFilter);
@@ -123,6 +125,7 @@ const ListReservationApprovePage = () => {
     filter: string,
     page: number
   ) => {
+    setIsLoadingItem(true);
     const res = await apiReservation.getAllReservationByAdmin(
       idProperty,
       filter,
@@ -132,13 +135,16 @@ const ListReservationApprovePage = () => {
       setDataBooking(res?.data?.rows);
       setTotal(res?.data?.count);
     }
+    setIsLoadingItem(false);
   };
 
   const getAllPropertyByAdmin = async () => {
+    setIsLoadingItem(true);
     const res = await apiProperty.getAllPropertyByAdmin();
     if (res?.status === "OK") {
       setProperties(res?.data);
     }
+    setIsLoadingItem(false);
   };
   useEffect(() => {
     getAllPropertyByAdmin();
@@ -280,59 +286,71 @@ const ListReservationApprovePage = () => {
                 <th className="px-4 py-3 text-left w-[80px]">...</th>
               </tr>
             </thead>
-            <tbody className=" text-[-14] font-semibold ">
-              {dataBooking !== null &&
-                dataBooking?.map((item, index: number) => {
-                  return (
-                    <tr key={index} className="border-b border-gray-200">
-                      {/* <td className="px-4 py-5">
+            {isLoadingItem === false && (
+              <tbody className=" text-[-14] font-semibold ">
+                {dataBooking !== null &&
+                  dataBooking?.map((item, index: number) => {
+                    return (
+                      <tr key={index} className="border-b border-gray-200">
+                        {/* <td className="px-4 py-5">
                         <input type="checkbox" />
                       </td> */}
-                      <td className="px-4 py-5">{item?.code}</td>
-                      <td className="px-4 py-5 ">{item?.properties?.name}</td>
-                      <td className="px-4 py-5">
-                        <div className="w-fit flex items-center gap-2 border border-b-[3px] border-gray-400 rounded-3xl py-1 px-3">
-                          <p>{`${item?.users?.email}`}</p>
-                        </div>
-                      </td>
+                        <td className="px-4 py-5">{item?.code}</td>
+                        <td className="px-4 py-5 ">{item?.properties?.name}</td>
+                        <td className="px-4 py-5">
+                          <div className="w-fit flex items-center gap-2 border border-b-[3px] border-gray-400 rounded-3xl py-1 px-3">
+                            <p>{`${item?.users?.email}`}</p>
+                          </div>
+                        </td>
 
-                      <td className="px-4 py-5">
-                        {dayjs(item?.checkIndate)?.format("DD/MM/YYYY HH:mm")}
-                      </td>
+                        <td className="px-4 py-5">
+                          {dayjs(item?.checkIndate)?.format("DD/MM/YYYY HH:mm")}
+                        </td>
 
-                      <td className="px-4 py-5 ">
-                        {item?.totalPrice?.toLocaleString("it-IT", {
-                          style: "currency",
-                          currency: "VND",
-                        })}
-                      </td>
+                        <td className="px-4 py-5 ">
+                          {item?.totalPrice?.toLocaleString("it-IT", {
+                            style: "currency",
+                            currency: "VND",
+                          })}
+                        </td>
 
-                      <td
-                        className={`px-4 py-5  ${item?.statusUser === "created" ? "text-green-500" : "text-red-600"}`}
-                      >
-                        {item?.statusUser === "created" ? "Đặt" : "Hủy"}
-                      </td>
-                      <td className="px-4 py-5">
-                        {dayjs(item?.createdAt)?.format("DD/MM/YYYY HH:mm")}
-                      </td>
-                      <td className="px-4 py-5 ">
-                        <button
-                          className={`w-fit py-2 px-4 rounded-3xl text-white font-semibold cursor-pointer min-w-32 bg-green-700`}
-                          onClick={() => {
-                            setItemBooking({ ...item });
-                            handleOpenAppove();
-                          }}
+                        <td
+                          className={`px-4 py-5  ${item?.statusUser === "created" ? "text-green-500" : "text-red-600"}`}
                         >
-                          Chi tiết
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-            </tbody>
+                          {item?.statusUser === "created" ? "Đặt" : "Hủy"}
+                        </td>
+                        <td className="px-4 py-5">
+                          {dayjs(item?.createdAt)?.format("DD/MM/YYYY HH:mm")}
+                        </td>
+                        <td className="px-4 py-5 ">
+                          <button
+                            className={`w-fit py-2 px-4 rounded-3xl text-white font-semibold cursor-pointer min-w-32 bg-green-700`}
+                            onClick={() => {
+                              setItemBooking({ ...item });
+                              handleOpenAppove();
+                            }}
+                          >
+                            Chi tiết
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            )}
           </table>
         </div>
-        {total && (
+        {dataBooking?.length === 0 && (
+          <div className="mt-3 flex justify-center text-xl">
+            Chưa có đơn đặt nào...
+          </div>
+        )}
+        {isLoadingItem && (
+          <div className="w-full flex justify-center">
+            <LoadingItem />
+          </div>
+        )}
+        {total !== null && total !== 0 && (
           <div className="mt-8 flex justify-center">
             <ReactPaginate
               pageCount={Math.ceil(total / limit)}
@@ -344,9 +362,9 @@ const ListReservationApprovePage = () => {
               containerClassName="flex items-center space-x-2 "
               pageClassName="px-3 py-1 border border-gray-300 rounded-xl hover:bg-gray-100 cursor-pointer active:scale-95 transition-transform"
               activeClassName="bg-blue-500 text-white  hover:bg-blue-500 hover:text-black"
-              previousClassName="px-5 py-1 border border-gray-300 rounded-xl hover:bg-gray-100 cursor-pointer active:scale-95 transition-transform"
-              nextClassName="px-5 py-1 border border-gray-300 rounded-xl hover:bg-gray-100 cursor-pointer active:scale-95 transition-transform"
-              breakClassName="px-5 py-1 border border-gray-300 rounded-xl bg-gray-100 cursor-default active:scale-95 transition-transform"
+              previousClassName="px-1 py-1 border border-gray-300 rounded-xl hover:bg-gray-100 cursor-pointer active:scale-95 transition-transform"
+              nextClassName="px-1 py-1 border border-gray-300 rounded-xl hover:bg-gray-100 cursor-pointer active:scale-95 transition-transform"
+              breakClassName="px-2 py-1 border border-gray-300 rounded-xl bg-gray-100 cursor-default active:scale-95 transition-transform"
             />
           </div>
         )}
