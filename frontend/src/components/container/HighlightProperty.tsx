@@ -5,6 +5,8 @@ import { FaParking, FaBusAlt } from "react-icons/fa";
 import { IoIosHeartEmpty } from "react-icons/io";
 import { SlPicture } from "react-icons/sl";
 import { IHightlight } from "@/app/types/highlight";
+import { FaKitchenSet } from "react-icons/fa6";
+import { IoFastFoodOutline } from "react-icons/io5";
 
 interface IProps {
   highlights: IHightlight[];
@@ -16,10 +18,11 @@ const iconMapHighlight: { [key: string]: JSX.Element } = {
   IoIosHeartEmpty: <IoIosHeartEmpty size={30} />,
   SlPicture: <SlPicture size={30} />,
   FaBusAlt: <FaBusAlt size={30} />,
+  FaKitchenSet: <FaKitchenSet size={30} />,
+  IoFastFoodOutline: <IoFastFoodOutline size={30} />,
 };
 
 const HighlightProperty: React.FC<IProps> = ({ highlights }) => {
-  console.log({ highlights });
   return (
     <div className="border-[1px] border-gray-300 rounded-xl p-5 shadow-sm">
       <h3 className="text-lg font-semibold">Các điểm nổi bật tại chỗ nghỉ</h3>

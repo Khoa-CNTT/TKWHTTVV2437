@@ -6,6 +6,9 @@ import { FaUmbrellaBeach } from "react-icons/fa";
 import { MdRestaurant } from "react-icons/md";
 import { TbBus } from "react-icons/tb";
 import { MdFamilyRestroom } from "react-icons/md";
+import { MdTableBar } from "react-icons/md";
+import { FaSpa } from "react-icons/fa";
+import { GiMagicBroom } from "react-icons/gi";
 
 interface Amenity {
   icon: string; // Tên icon (key trong `iconMap`)
@@ -25,6 +28,9 @@ const iconMap: { [key: string]: JSX.Element } = {
   MdRestaurant: <MdRestaurant />,
   TbBus: <TbBus />,
   MdFamilyRestroom: <MdFamilyRestroom />,
+  MdTableBar: <MdTableBar />,
+  FaSpa: <FaSpa />,
+  GiMagicBroom: <GiMagicBroom />,
 };
 
 const AnmenityContainer: React.FC<IProps> = ({ amenities }) => {

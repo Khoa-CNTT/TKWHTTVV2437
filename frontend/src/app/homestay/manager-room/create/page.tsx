@@ -45,6 +45,9 @@ import apisRoom from "@/apis/room";
 import { toast } from "react-toastify";
 import { useAuth } from "@/app/contexts/AuthContext";
 import apisProperty from "@/apis/property";
+import { MdTableBar } from "react-icons/md";
+import { FaSpa } from "react-icons/fa";
+import { GiMagicBroom } from "react-icons/gi";
 
 // set icon map
 const iconMap: { [key: string]: JSX.Element } = {
@@ -56,6 +59,9 @@ const iconMap: { [key: string]: JSX.Element } = {
   MdRestaurant: <MdRestaurant />,
   TbBus: <TbBus />,
   MdFamilyRestroom: <MdFamilyRestroom />,
+  MdTableBar: <MdTableBar />,
+  FaSpa: <FaSpa />,
+  GiMagicBroom: <GiMagicBroom />,
 };
 
 // set icon sumary
