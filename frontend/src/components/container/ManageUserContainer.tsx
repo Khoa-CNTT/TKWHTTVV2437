@@ -897,10 +897,10 @@ const ManageUserContainer: React.FC = () => {
             onChange={(e) => setFilterRole(e.target.value)}
             className="border rounded p-2"
           >
-            <option value="all">All Roles</option>
-            <option value="3">User</option>
-            <option value="7">Owner</option>
-            <option value="9">Admin</option>
+            <option value="all">Tất cả</option>
+            <option value="3">Khách hàng</option>
+            <option value="7">Chủ sở hữu</option>
+            {/* <option value="9">Admin</option> */}
           </select>
           {/* Các controls khác */}
         </div>

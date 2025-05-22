@@ -22,12 +22,12 @@ const SidebarAdmin = () => {
 
   const menuItems = [
     {
-      title: "Dashboard",
+      title: "Thống kê",
       icon: <FaTachometerAlt />,
       path: "/admin/dashboard",
     },
     {
-      title: "Accounts",
+      title: "Tài khoản",
       icon: <FaUsers />,
       path: "/admin/Account",
     },

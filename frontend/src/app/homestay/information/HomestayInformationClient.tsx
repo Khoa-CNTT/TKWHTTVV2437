@@ -32,6 +32,9 @@ import apisProperty from "@/apis/property";
 import apisHighlight from "@/apis/highlight";
 import { IHightlight } from "@/app/types/highlight";
 import { MdDeleteForever } from "react-icons/md";
+import { MdTableBar } from "react-icons/md";
+import { FaSpa } from "react-icons/fa";
+import { GiMagicBroom } from "react-icons/gi";
 
 // import icon highlight
 import { IoIosHeartEmpty } from "react-icons/io";
@@ -42,6 +45,8 @@ import apisCategory from "@/apis/category";
 import apisAddress from "@/apis/address";
 import apisImage from "@/apis/image";
 import { useAuth } from "@/app/contexts/AuthContext";
+import { FaKitchenSet } from "react-icons/fa6";
+import { IoFastFoodOutline } from "react-icons/io5";
 
 // set icon map
 const iconMap: { [key: string]: JSX.Element } = {
@@ -53,6 +58,9 @@ const iconMap: { [key: string]: JSX.Element } = {
   MdRestaurant: <MdRestaurant />,
   TbBus: <TbBus />,
   MdFamilyRestroom: <MdFamilyRestroom />,
+  MdTableBar: <MdTableBar />,
+  FaSpa: <FaSpa />,
+  GiMagicBroom: <GiMagicBroom />,
 };
 
 // set icon map highlight
@@ -61,6 +69,8 @@ const iconMapHighlight: { [key: string]: JSX.Element } = {
   IoIosHeartEmpty: <IoIosHeartEmpty size={30} />,
   SlPicture: <SlPicture size={30} />,
   FaBusAlt: <FaBusAlt size={30} />,
+  FaKitchenSet: <FaKitchenSet size={30} />,
+  IoFastFoodOutline: <IoFastFoodOutline size={30} />,
 };
 
 // interface data

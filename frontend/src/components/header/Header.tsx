@@ -120,7 +120,7 @@ const Header = () => {
       <div className="w-[1260px] mx-auto flex justify-between items-center">
         <Link
           href={"/"}
-          className="font-bold text-[22px] text-blue-800 flex gap-2"
+          className="font-bold text-[22px] text-blue-800 flex gap-2 outline-none"
         >
           <Image src={main_logo} alt="logo" width={45} height={45} />
           <h2 className="text-2xl font-bold text-blue-800 mt-2">LoveTrip</h2>

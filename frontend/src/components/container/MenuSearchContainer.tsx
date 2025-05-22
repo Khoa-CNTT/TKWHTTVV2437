@@ -14,6 +14,8 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import { FaHotel } from "react-icons/fa";
+import { SiHomeassistantcommunitystore } from "react-icons/si";
+
 import slugify from "slugify";
 
 import Box from "@mui/material/Box";
@@ -44,9 +46,15 @@ const menuCategory = [
   },
   {
     id: 4,
-    icon: <FaHotel size={37} />,
+    icon: <FaHotel size={36} />,
     title: "Khách sạn",
     categoryId: 3,
+  },
+  {
+    id: 5,
+    icon: <SiHomeassistantcommunitystore size={37} />,
+    title: "Village",
+    categoryId: 4,
   },
 ];
 

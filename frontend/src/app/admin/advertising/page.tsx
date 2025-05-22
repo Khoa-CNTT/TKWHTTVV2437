@@ -13,6 +13,7 @@ import Select from "@mui/material/Select";
 import { useDebounce } from "use-debounce";
 import MessageNotFound from "@/components/Item/MessageNotFound";
 import moment from "moment";
+import clsx from "clsx";
 
 interface IPagination {
   totalItems: number;
@@ -207,7 +208,18 @@ const Advertising = () => {
                     <td className="px-4 py-5 flex items-center gap-2">
                       {item?.methodPay?.toLocaleUpperCase()}
                     </td>
-                    <td className="px-4 py-5">
+                    <td
+                      className={clsx(
+                        "px-4 py-5",
+                        item?.status === "pending"
+                          ? "bg-yellow-600"
+                          : item?.status === "done"
+                            ? "text-green-600"
+                            : item?.status === "failed"
+                              ? "text-red-600"
+                              : "text-gray-600"
+                      )}
+                    >
                       {item?.status === "pending"
                         ? "Chưa thanh toán"
                         : item?.status === "done"

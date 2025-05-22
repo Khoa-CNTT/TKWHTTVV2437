@@ -45,6 +45,9 @@ import apisRoom from "@/apis/room";
 import { toast } from "react-toastify";
 import { useAuth } from "@/app/contexts/AuthContext";
 import apisProperty from "@/apis/property";
+import { MdTableBar } from "react-icons/md";
+import { FaSpa } from "react-icons/fa";
+import { GiMagicBroom } from "react-icons/gi";
 
 // set icon map
 const iconMap: { [key: string]: JSX.Element } = {
@@ -56,6 +59,9 @@ const iconMap: { [key: string]: JSX.Element } = {
   MdRestaurant: <MdRestaurant />,
   TbBus: <TbBus />,
   MdFamilyRestroom: <MdFamilyRestroom />,
+  MdTableBar: <MdTableBar />,
+  FaSpa: <FaSpa />,
+  GiMagicBroom: <GiMagicBroom />,
 };
 
 // set icon sumary
@@ -576,8 +582,14 @@ const InformationRoom: React.FC<IProps> = ({ id }) => {
 
       <div className="flex justify-end mt-8">
         <button
-          onClick={handleSubmit}
-          disabled={id ? !hasChanges() && !isFormValid() : !isFormValid()} // Vô hiệu hóa nút nếu form không hợp lệ
+          onClick={() => {
+            if (hasChanges() && isFormValid()) {
+              handleSubmit();
+            } else {
+              return;
+            }
+          }}
+          disabled={!hasChanges() && !isFormValid()} // Vô hiệu hóa nút nếu form không hợp lệ
           className={`flex items-center gap-2 py-3 px-8 text-white rounded-md font-semibold transition-300 ${
             id
               ? hasChanges() && isFormValid()
