@@ -98,18 +98,13 @@ class QueryController {
         queryResult,
         previousQuery
       );
-      const cleanResponseText = responseText
-        .replace(/<[^>]*>/g, "") // Xóa các HTML tags
-        .replace(/\n\s*\n/g, "\n") // Xóa các dòng trống thừa
-        .replace(/\s+/g, " ") // Xóa khoảng trắng thừa
-        .trim();
 
       // Tạo prompt với tất cả intents
       let prompt = `Bạn là một trợ lý du lịch thân thiện của webite LoveTrip. Dựa trên câu hỏi hiện tại: "${text}", và thông tin từ cơ sở dữ liệu (lọc theo các loại: ${intents.join(
         ", "
       )}):\n\n`;
 
-      prompt += cleanResponseText + "\n\n";
+      prompt += responseText + "\n\n";
 
       if (previousQuery) {
         console.log("Previous query:", previousQuery);
@@ -121,16 +116,16 @@ class QueryController {
       console.log("Clean Prompt:", prompt);
 
       const [groqResult, deepSeekResult] = await Promise.all([
-        callDeepSeekWithTimeout(prompt, previousQuery, 3000).catch((err) => ({
-          response: null,
-          source: "deepseek",
-          error: err.message,
-        })),
-        // callGroqWithTimeout(prompt, 3000).catch((err) => ({
+        // callDeepSeekWithTimeout(prompt, previousQuery, 3000).catch((err) => ({
         //   response: null,
-        //   source: "groq",
+        //   source: "deepseek",
         //   error: err.message,
         // })),
+        callGroqWithTimeout(prompt, 3000).catch((err) => ({
+          response: null,
+          source: "groq",
+          error: err.message,
+        })),
       ]);
 
       const aiResponse = selectBestResponse(groqResult, deepSeekResult, text);
@@ -141,7 +136,6 @@ class QueryController {
       context.history.push({
         query: text,
         response: aiResponse,
-        matchedItems: matchedItems.slice(0, 5),
         intents,
       });
       if (context.history.length > 5) {
@@ -164,11 +158,11 @@ class QueryController {
 
       try {
         const [groqResult, deepSeekResult] = await Promise.all([
-          callGroqWithTimeout(fallbackPrompt, 3000).catch((err) => ({
-            response: null,
-            source: "groq",
-            error: err.message,
-          })),
+          // callGroqWithTimeout(fallbackPrompt, 3000).catch((err) => ({
+          //   response: null,
+          //   source: "groq",
+          //   error: err.message,
+          // })),
           callDeepSeekWithTimeout(fallbackPrompt, 3000).catch((err) => ({
             response: null,
             source: "deepseek",
