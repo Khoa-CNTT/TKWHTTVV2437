@@ -4,26 +4,29 @@ const { getCollectionCache, setCollectionCache } = require("./cacheService");
 // Configure ChromaDB client with better settings
 const client = new ChromaClient({
   path: "http://localhost:8000",
-  timeout: 30000, // 30 seconds timeout
+  timeout: 30000, // Increased to 30 seconds
 });
 
 async function getOrCreateCollection(name) {
   let collection = getCollectionCache();
-  if (collection) return collection;
 
   try {
+    // First try to get existing collection
     collection = await client.getCollection({
       name,
       metadata: {
         "hnsw:space": "cosine",
-        "hnsw:construction_ef": 100, // Increase from default
-        "hnsw:search_ef": 100, // Increase from default
-        "hnsw:M": 64, // Increase from default
+        "hnsw:construction_ef": 100,
+        "hnsw:search_ef": 100,
+        "hnsw:M": 32,
       },
     });
+    console.log(`Successfully retrieved collection: ${name}`);
     setCollectionCache(collection);
     return collection;
   } catch (error) {
+    console.log(`Collection ${name} not found, attempting to create...`);
+
     if (
       error.message &&
       (error.message.includes("not found") ||
@@ -39,18 +42,20 @@ async function getOrCreateCollection(name) {
             "hnsw:M": 64,
           },
         });
+        console.log(`Successfully created collection: ${name}`);
         setCollectionCache(collection);
         return collection;
       } catch (createError) {
+        console.error("Error creating collection:", createError);
         if (
           createError.message &&
           createError.message.includes("already exists")
         ) {
+          console.log("Collection already exists, retrieving...");
           collection = await client.getCollection({ name });
           setCollectionCache(collection);
           return collection;
         }
-        console.error("Error creating collection:", createError);
         throw createError;
       }
     }

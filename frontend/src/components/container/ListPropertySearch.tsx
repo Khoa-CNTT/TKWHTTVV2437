@@ -10,6 +10,7 @@ import SearchNotResult from "../Item/SearchNotResult";
 import Pagination from "@mui/material/Pagination";
 import { useRouter } from "next/navigation";
 import Stack from "@mui/material/Stack";
+import LoadingItem from "../loading/LoadingItem";
 
 interface IPagination {
   totalItems: number;
@@ -33,15 +34,18 @@ const ListPropertySearch = () => {
     pageSize: 10,
   });
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [loading, setLoading] = useState<boolean>(false);
 
   // Gọi API với queryObject
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       const response = await apisProperty.getListProperty(queryObject);
       if (response?.data) {
         setProperty(response?.data);
         setPagination(response?.pagination);
       }
+      setLoading(false);
     };
 
     fetchData();
@@ -49,7 +53,12 @@ const ListPropertySearch = () => {
 
   return (
     <div>
-      {property.length === 0 ? (
+      {loading && (
+        <div className="flex items-center justify-center mt-4">
+          <LoadingItem />
+        </div>
+      )}
+      {property.length === 0 && !loading ? (
         <SearchNotResult />
       ) : (
         <div>

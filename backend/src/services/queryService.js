@@ -261,10 +261,10 @@ async function queryDatabase(text, limit, intents) {
     const embeddingVector = await getEmbeddingWithFallback(text);
 
     // Cache key for this query to avoid unnecessary repeat embedding calls
-    const cacheKey = `query_${text}_${limit}_${intents.join("_")}`;
-    if (queryResultCache.has(cacheKey)) {
-      return queryResultCache.get(cacheKey);
-    }
+    // const cacheKey = `query_${text}_${limit}_${intents.join("_")}`;
+    // if (queryResultCache.has(cacheKey)) {
+    //   return queryResultCache.get(cacheKey);
+    // }
 
     const collection = await getOrCreateCollection("unified_data_embeddings");
 
@@ -290,6 +290,11 @@ async function queryDatabase(text, limit, intents) {
       nResults: parseInt(limit) + 15, // Lấy thêm để lọc
       include: ["metadatas", "documents", "distances"],
       where: whereClause,
+      // Thêm các tham số HNSW để khắc phục lỗi
+      hnswConfig: {
+        ef: 100, // Tăng exploration factor
+        M: 32, // Tăng số lượng kết nối tối đa
+      },
     });
 
     const matchedItems =
@@ -304,13 +309,9 @@ async function queryDatabase(text, limit, intents) {
           }))
         : [];
 
-    // Cache the results
-    queryResultCache.set(cacheKey, matchedItems);
     return matchedItems;
   } catch (error) {
     console.error("Error querying database:", error);
-
-    // Return empty results instead of throwing
     return [];
   }
 }

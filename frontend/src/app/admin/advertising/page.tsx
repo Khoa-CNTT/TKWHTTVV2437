@@ -212,7 +212,7 @@ const Advertising = () => {
                       className={clsx(
                         "px-4 py-5",
                         item?.status === "pending"
-                          ? "bg-yellow-600"
+                          ? "text-yellow-600"
                           : item?.status === "done"
                             ? "text-green-600"
                             : item?.status === "failed"

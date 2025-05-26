@@ -14,7 +14,7 @@ const SearchPage = async () => {
 
   return (
     <div>
-      <div className="pt-4 w-[1260px] mx-auto">
+      <div className="pt-4 w-[1260px] mx-auto min-h-[800px]">
         <MenuSearchContainer
           provinces={province.data.data.map(
             (item: { name: string; code: string }) => ({

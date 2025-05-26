@@ -51,15 +51,15 @@ async function callGroqWithTimeout(prompt, timeoutMs = 3000) {
 async function callDeepSeekWithTimeout(
   prompt,
   previousQuery,
-  timeoutMs = 3000
+  timeoutMs = 5000
 ) {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  // const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    if (aiResponseCache.has(prompt)) {
-      return { response: aiResponseCache.get(prompt), source: "cache" };
-    }
+    // if (aiResponseCache.has(prompt)) {
+    //   return { response: aiResponseCache.get(prompt), source: "cache" };
+    // }
 
     // Tạo prompt với ngữ cảnh từ câu hỏi trước
     let fullPrompt = prompt;
@@ -86,14 +86,14 @@ async function callDeepSeekWithTimeout(
             },
             { role: "user", content: prompt },
           ],
-          max_tokens: 150,
+          max_tokens: 256,
           temperature: 0.7,
         }),
         signal: controller.signal,
       }
     );
 
-    clearTimeout(timeoutId);
+    // clearTimeout(timeoutId);
     const data = await deepSeekResponse.json();
     const response =
       data?.choices?.[0]?.message?.content ||

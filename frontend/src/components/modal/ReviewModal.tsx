@@ -13,6 +13,7 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import apisReview from "@/apis/review";
 import { IReview } from "@/app/types/review";
+import LoadingItem from "../loading/LoadingItem";
 
 const dataSort = [
   {
@@ -76,6 +77,7 @@ const ReviewModal: React.FC<IProps> = ({
   const [totalItem, setTotalItem] = useState<number>(0);
   const [sort, setSort] = useState<SortKey>("highest");
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,6 +86,7 @@ const ReviewModal: React.FC<IProps> = ({
           page: page, // Trang hiện tại
           ...sortMapping[sort],
         };
+        setLoading(true);
         const response = await apisReview.getListReviewByPropertyId(
           propertyId,
           query
@@ -100,8 +103,10 @@ const ReviewModal: React.FC<IProps> = ({
             return [...prev, ...response.data];
           });
         }
+        setLoading(false);
       } catch (error) {
         console.log(error);
+        setLoading(false);
       }
     };
     fetchData();
@@ -126,7 +131,6 @@ const ReviewModal: React.FC<IProps> = ({
 
           <p className="font-semibold">Đánh giá của khách hàng</p>
         </div>
-
         <div className="mt-6">
           <p className="text-xl font-semibold text-green-800">{`${avgRating}/5 ${ratingText(5)}`}</p>
 
@@ -135,7 +139,6 @@ const ReviewModal: React.FC<IProps> = ({
             <PiWarningCircleLight className="text-gray-700" size={18} />
           </div>
         </div>
-
         <div className="mt-6">
           <FormControl sx={{ width: 250 }}>
             <InputLabel id="demo-multiple-name-label">Sắp xếp theo</InputLabel>
@@ -159,6 +162,12 @@ const ReviewModal: React.FC<IProps> = ({
           </FormControl>
         </div>
 
+        {loading && reviews.length == 0 && (
+          <div className="flex justify-center w-full">
+            <LoadingItem />
+          </div>
+        )}
+
         <div className="mt-6 overflow-y-auto flex-1 overflow-hidden">
           {reviews.map((item) => (
             <ReviewItem
@@ -176,7 +185,7 @@ const ReviewModal: React.FC<IProps> = ({
                 onClick={() => setPage((prev) => prev + 1)}
                 className="border-[1px] border-gray-400 rounded-3xl py-2 px-5 text-blue-600 font-semibold hover:bg-blue-200 cursor-pointer"
               >
-                See more reviews
+                Xem thêm
               </button>
             </div>
           )}

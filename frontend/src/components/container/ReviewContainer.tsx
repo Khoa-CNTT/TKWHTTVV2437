@@ -58,7 +58,7 @@ const ReviewContainer: React.FC<IProps> = ({
           onClick={() => setShowModalReview(true)}
           className="border-[1px] border-gray-400 rounded-3xl py-2 px-5 text-blue-600 font-semibold hover:bg-blue-200"
         >
-          See more reviews
+          Xem thêm
         </button>
       </div>
 

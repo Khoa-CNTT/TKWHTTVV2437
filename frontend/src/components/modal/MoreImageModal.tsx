@@ -5,6 +5,7 @@ import apisProperty from "@/apis/property";
 import { useState, useEffect } from "react";
 import { IoMdClose } from "react-icons/io";
 import clsx from "clsx";
+import LoadingItem from "../loading/LoadingItem";
 
 interface IProps {
   propertyId: string;
@@ -13,14 +14,17 @@ interface IProps {
 
 const MoreImageModal: React.FC<IProps> = ({ propertyId, onShowModal }) => {
   const [images, setImages] = useState<IImage[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchDataImage = async () => {
+      setLoading(true);
       const response = await apisProperty.getImageByPropertyId(propertyId);
 
       if (response?.status === "OK") {
         setImages(response?.data?.images);
       }
+      setLoading(false);
     };
     fetchDataImage();
   }, [propertyId]);
@@ -44,6 +48,12 @@ const MoreImageModal: React.FC<IProps> = ({ propertyId, onShowModal }) => {
           />
           <p className="font-semibold text-lg">Tất cả các ảnh</p>
         </div>
+
+        {loading && (
+          <div className="w-full flex justify-center">
+            <LoadingItem />
+          </div>
+        )}
 
         <div className="mt-4 grid grid-cols-3 gap-2 overflow-y-auto max-h-[80vh] pb-[20px]">
           {images.map((image, index) => (

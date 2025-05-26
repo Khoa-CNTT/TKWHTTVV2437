@@ -129,6 +129,7 @@ const getListTop10CommissionByAdmin = () => {
             attributes: ["id", "city"],
           },
         ],
+        group: ["Property.id"],
         subQuery: false,
         order: [
           [fn("SUM", col("commissionPayments.commissionAmount")), "DESC"],
