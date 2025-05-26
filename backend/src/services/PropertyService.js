@@ -7,6 +7,7 @@ const { saveEmbedding } = require("./queryService");
 const { sequelize } = require("../models");
 const moment = require("moment");
 const { deleteCollection } = require("./collectionService");
+const reviewService = require("./reviewService");
 
 const listTop10HomestayRating = () => {
   return new Promise(async (resolve, reject) => {
