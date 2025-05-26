@@ -5,6 +5,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { FaCheck } from "react-icons/fa6";
 import { useCheckoutContext } from "@/app/contexts/CheckoutContext";
+import { ratingText } from "@/helper/ratingText";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -79,7 +80,8 @@ const InforRoomCheckout: React.FC<IProps> = ({ property, room, code }) => {
         <p className="mt-2">{property?.propertyAddress?.city}</p>
         <p className="mt-3">
           <span className="font-semibold">
-            {review?.averageRating || 0}/10 Exceptional
+            {review?.averageRating || 0}/5{" "}
+            <span>{ratingText(Number(review?.averageRating))}</span>
           </span>
           <span className="text-gray-500">
             {" "}

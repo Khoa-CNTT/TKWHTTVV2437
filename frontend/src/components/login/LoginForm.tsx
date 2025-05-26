@@ -156,7 +156,7 @@ const LoginForm = () => {
     if (dataUser?.data.role === "9") {
       router.push("/admin/dashboard"); // Điều hướng đến trang admin
     } else if (dataUser?.data.role === "7") {
-      router.push("/homestay/dashboard");
+      router.push("/homestay/information");
     } else {
       router.push("/"); // Điều hướng đến trang user
     }
